@@ -10,21 +10,9 @@ import UIKit
 import UniformTypeIdentifiers
 
 // Message model to store history
-struct Message: Identifiable {
-  let id = UUID()
-  let text: String
-  let timestamp: Date
-  let gifData: GifData?
-
-  struct GifData {
-    let url: URL
-    let frameCount: Int
-    let aspectRatio: Double
-  }
-}
 
 struct ContentView: View {
-  @StateObject private var ascii = Ascii(targetWidth: 130)
+  @StateObject private var ascii = Ascii(targetWidth: 150)
   @State private var showingFilePicker = false
   @State private var selectedGIFURL: URL?
   @State private var lastFrame: Int?
@@ -36,36 +24,33 @@ struct ContentView: View {
     GeometryReader { geometry in
       VStack(spacing: 0) {
         // Message history feed
-        ScrollView {
-          LazyVStack(alignment: .leading, spacing: 16) {
-            ForEach(messageHistory) { message in
-              MessageView(
-                message: message,
-                fontSize: calculateFontSize(for: geometry.size)
-              )
+        ScrollViewReader { proxy in
+          ScrollView {
+            LazyVStack(alignment: .leading, spacing: 16) {
+              ForEach(messageHistory) { message in
+                MessageView(
+                  message: message,
+                  fontSize: calculateFontSize(for: geometry.size)
+                )
+                .id(message.id)
+              }
             }
           }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-        ButtonGroup(
-          ascii: ascii,
-          onGifLoad: { gifData in
-            currentGifData = gifData
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+          .onChange(of: messageHistory.count) { _ in
+            if let last = messageHistory.last {
+              withAnimation(.interpolatingSpring) {
+                proxy.scrollTo(last.id, anchor: .bottom)
+              }
+            }
           }
-        )
-        .padding()
-
-        VStack {
-          Text("width: \(ascii.targetWidth)")
-            .font(.caption)
         }
 
         InputField(
           textContent: $userInput,
           onSubmit: { submitMessage() }
         )
-        .padding(.horizontal)
+        .padding()
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -76,9 +61,28 @@ struct ContentView: View {
     @ObserveInjection var forceRedraw
   #endif
 
+  private func loadBundledGIF(path: String) {
+    guard let gifURL = Bundle.main.url(forResource: path, withExtension: "gif") else {
+      return
+    }
+
+    ascii.loadGIF(from: gifURL)
+    ascii.startConversion()
+
+    // Create gif data for history
+    let gifData = Message.GifData(
+      url: gifURL,
+      frameCount: 0,
+      aspectRatio: ascii.aspectRatio
+    )
+    self.currentGifData = gifData
+  }
+
   private func submitMessage() {
     let trimmedInput = userInput.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !trimmedInput.isEmpty || currentGifData != nil else { return }
+    
+    self.loadBundledGIF(path: "veo2_wizard")
 
     let message = Message(
       text: trimmedInput,
@@ -105,43 +109,6 @@ struct ContentView: View {
 }
 
 // Individual message view with its own ASCII renderer for GIFs
-struct MessageView: View {
-  let message: Message
-  let fontSize: CGFloat
-  @StateObject private var messageAscii = Ascii(targetWidth: 130)
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      if !message.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-        Text(message.text)
-          .font(.caption)
-          .foregroundColor(.green)
-          .frame(maxWidth: .infinity, alignment: .leading)
-      }
-
-      if let gifData = message.gifData {
-        Text(messageAscii.currentFrame)
-          .font(.system(size: fontSize, design: .monospaced))
-          .lineLimit(nil)
-          .foregroundColor(.green)
-          .aspectRatio(gifData.aspectRatio, contentMode: .fit)
-          .frame(maxWidth: .infinity)
-          .onAppear {
-            messageAscii.loadGIF(from: gifData.url)
-            messageAscii.startConversion()
-          }
-          .onDisappear {
-            messageAscii.stopConversion()
-          }
-      }
-      Text(DateFormatter.messageTime.string(from: message.timestamp))
-        .font(.caption2)
-        .foregroundColor(.gray)
-        .frame(maxWidth: .infinity, alignment: .trailing)
-    }
-    .padding(.horizontal)
-  }
-}
 
 struct InputField: View {
   @Binding var textContent: String
@@ -182,56 +149,56 @@ struct InputField: View {
   }
 }
 
-private struct ButtonGroup: View {
-  let ascii: Ascii
-  let onGifLoad: (Message.GifData) -> Void
+// private struct ButtonGroup: View {
+//   let ascii: Ascii
+//   let onGifLoad: (Message.GifData) -> Void
 
-  var body: some View {
-    VStack {
-      HStack {
-        Button("Stop") {
-          ascii.stopConversion()
-        }
-        .buttonStyle(.bordered)
+//   var body: some View {
+//     VStack {
+//       HStack {
+//         Button("Stop") {
+//           ascii.stopConversion()
+//         }
+//         .buttonStyle(.bordered)
 
-        Button("Wizard") {
-          ascii.stopConversion()
+//         Button("Wizard") {
+//           ascii.stopConversion()
 
-          loadBundledGIF(path: "veo2_wizard")
-        }
-        .buttonStyle(.bordered)
+//           loadBundledGIF(path: "veo2_wizard")
+//         }
+//         .buttonStyle(.bordered)
 
-        Button("Demo GIF") {
-          ascii.stopConversion()
-          loadBundledGIF(path: "demo")
-        }
-        .buttonStyle(.borderedProminent)
-      }
-    }
-    .enableInjection()
-  }
+//         Button("Demo GIF") {
+//           ascii.stopConversion()
+//           loadBundledGIF(path: "demo")
+//         }
+//         .buttonStyle(.borderedProminent)
+//       }
+//     }
+//     .enableInjection()
+//   }
 
-  #if DEBUG
-    @ObserveInjection var forceRedraw
-  #endif
+//   #if DEBUG
+//     @ObserveInjection var forceRedraw
+//   #endif
 
-  // Function to load the bundled GIF
-  private func loadBundledGIF(path: String, frame: Int? = nil) {
-    guard let gifURL = Bundle.main.url(forResource: path, withExtension: "gif") else {
-      return
-    }
-    ascii.loadGIF(from: gifURL)
-    ascii.startConversion(frame)
+//   // Function to load the bundled GIF
+//   private func loadBundledGIF(path: String, frame: Int? = nil) {
+//     guard let gifURL = Bundle.main.url(forResource: path, withExtension: "gif") else {
+//       return
+//     }
+//     ascii.loadGIF(from: gifURL)
+//     ascii.startConversion(frame)
 
-    // Create gif data for history
-    let gifData = Message.GifData(
-      url: gifURL,
-      frameCount: 0,  // You might want to get this from ascii object
-      aspectRatio: ascii.aspectRatio
-    )
-    onGifLoad(gifData)
-  }
-}
+//     // Create gif data for history
+//     let gifData = Message.GifData(
+//       url: gifURL,
+//       frameCount: 0,  // You might want to get this from ascii object
+//       aspectRatio: ascii.aspectRatio
+//     )
+//     onGifLoad(gifData)
+//   }
+// }
 
 // Date formatter extension
 extension DateFormatter {
