@@ -11,7 +11,8 @@ class Ascii: ObservableObject {
   @Published var targetWidth: Int = 80  // Make this @Published instead of @State
 
   private let frameRate = 0.1
-  private let asciiChars = "  .~=#@A"
+  // More detailed ASCII character ramp for smoother gradients (dark to light)
+  private let asciiChars = "@%$*+=-:. ".reversed()
 
   private var gifSource: CGImageSource?
   private var frameCount: Int = 0
@@ -87,8 +88,6 @@ class Ascii: ObservableObject {
       // Sequential playback, use and increment currentFrameIndex
       frameIndex = currentFrameIndex % frameCount
     }
-    
-    print(frameIndex)
 
     if let cgImage = CGImageSourceCreateImageAtIndex(gifSource, frameIndex, nil) {
       let asciiString = convertImageToASCII(cgImage: cgImage)
