@@ -15,7 +15,7 @@ struct Message: Identifiable {
   let text: String
   let timestamp: Date
   let gifData: GifData?
-  
+
   struct GifData {
     let url: URL
     let frameCount: Int
@@ -24,7 +24,7 @@ struct Message: Identifiable {
 }
 
 struct ContentView: View {
-  @StateObject private var ascii = Ascii(targetWidth: 120)
+  @StateObject private var ascii = Ascii(targetWidth: 130)
   @State private var showingFilePicker = false
   @State private var selectedGIFURL: URL?
   @State private var lastFrame: Int?
@@ -44,35 +44,16 @@ struct ContentView: View {
                 fontSize: calculateFontSize(for: geometry.size)
               )
             }
-            
-            // Current live message and GIF
-            // if !userInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || ascii.currentFrame != "" {
-            //   VStack(alignment: .leading, spacing: 8) {
-            //     // if !userInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            //     //   Text(userInput)
-            //     //     .font(.system(size: calculateFontSize(for: geometry.size), design: .monospaced))
-            //     //     .foregroundColor(.green)
-            //     //     .frame(maxWidth: .infinity, alignment: .leading)
-            //     // }
-                
-            //     // if ascii.currentFrame != "" {
-            //     //   Text(ascii.currentFrame)
-            //     //     .font(.system(size: calculateFontSize(for: geometry.size), design: .monospaced))
-            //     //     .lineLimit(nil)
-            //     //     .foregroundColor(.green)
-            //     //     .aspectRatio(ascii.aspectRatio, contentMode: .fit)
-            //     //     .frame(maxWidth: .infinity)
-            //     // }
-            //   }
-            //   .padding(.horizontal)
-            // }
           }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-        ButtonGroup(ascii: ascii, onGifLoad: { gifData in
-          currentGifData = gifData
-        })
+        ButtonGroup(
+          ascii: ascii,
+          onGifLoad: { gifData in
+            currentGifData = gifData
+          }
+        )
         .padding()
 
         VStack {
@@ -98,13 +79,13 @@ struct ContentView: View {
   private func submitMessage() {
     let trimmedInput = userInput.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !trimmedInput.isEmpty || currentGifData != nil else { return }
-    
+
     let message = Message(
       text: trimmedInput,
       timestamp: Date(),
       gifData: currentGifData
     )
-    
+
     messageHistory.append(message)
     userInput = "> "
     currentGifData = nil
@@ -127,8 +108,8 @@ struct ContentView: View {
 struct MessageView: View {
   let message: Message
   let fontSize: CGFloat
-  @StateObject private var messageAscii = Ascii(targetWidth: 80)
-  
+  @StateObject private var messageAscii = Ascii(targetWidth: 130)
+
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       if !message.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -137,6 +118,7 @@ struct MessageView: View {
           .foregroundColor(.green)
           .frame(maxWidth: .infinity, alignment: .leading)
       }
+
       if let gifData = message.gifData {
         Text(messageAscii.currentFrame)
           .font(.system(size: fontSize, design: .monospaced))
@@ -164,6 +146,7 @@ struct MessageView: View {
 struct InputField: View {
   @Binding var textContent: String
   let onSubmit: () -> Void
+  @State private var dynamicH: Double = 30.0
 
   func handleContentChange(_ s: String) {
     if !s.hasPrefix(">") {
@@ -174,13 +157,16 @@ struct InputField: View {
   var body: some View {
     VStack {
       TextEditor(text: $textContent)
-        .frame(minHeight: 35, maxHeight: 100)
+        .frame(width: .infinity, height: dynamicH)
         .padding(8)
         .border(.green)
         .foregroundColor(.green)
         .tint(.green)
         .onChange(of: textContent) { result in
           handleContentChange(result)
+          withAnimation(.interpolatingSpring) {
+            dynamicH = result.count <= 75 ? 30 : 100
+          }
         }
 
       Button(action: onSubmit) {
@@ -199,7 +185,7 @@ struct InputField: View {
 private struct ButtonGroup: View {
   let ascii: Ascii
   let onGifLoad: (Message.GifData) -> Void
-  
+
   var body: some View {
     VStack {
       HStack {
@@ -210,13 +196,8 @@ private struct ButtonGroup: View {
 
         Button("Wizard") {
           ascii.stopConversion()
-            guard let videoURL = Bundle.main.url(forResource: "wizard_spider", withExtension: "mp4"),
-              let videoData = try? Data(contentsOf: videoURL) else {
-            print("Error loading wizard_spider.mp4 from bundle")
-            return
-            }
 
-          ascii.loadGIF(from: videoData)
+          loadBundledGIF(path: "veo2_wizard")
         }
         .buttonStyle(.bordered)
 
@@ -241,11 +222,11 @@ private struct ButtonGroup: View {
     }
     ascii.loadGIF(from: gifURL)
     ascii.startConversion(frame)
-    
+
     // Create gif data for history
     let gifData = Message.GifData(
       url: gifURL,
-      frameCount: 0, // You might want to get this from ascii object
+      frameCount: 0,  // You might want to get this from ascii object
       aspectRatio: ascii.aspectRatio
     )
     onGifLoad(gifData)
