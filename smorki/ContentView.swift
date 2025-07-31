@@ -66,7 +66,7 @@ struct ContentView: View {
                     Text("Your next action here")
                       .padding(.horizontal, 2)
                       .background(.black)
-                      .font(.caption)
+                      // .font(.caption)
                       .foregroundColor(.green)
                       .zIndex(3)
                       .frame(maxWidth: .infinity, alignment: .leading)

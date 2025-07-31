@@ -28,7 +28,8 @@ struct MessageView: View {
 
       if let gifData = message.gifData {
         Text(ascii.currentFrame)
-          .font(.system(size: fontSize, design: .monospaced))
+          // .font(.system(size: fontSize, design: .monospaced))
+              .font(.departure(size: fontSize))
           .lineLimit(nil)
           .foregroundColor(.green)
           .aspectRatio(gifData.aspectRatio, contentMode: .fit)
@@ -55,7 +56,7 @@ struct MessageView: View {
           Text(message.text.count < 3 ? "> The mage casts fireball" : message.text)
             .padding(.horizontal, 2)
             .background(.black)
-            .font(.caption)
+              .font(.departure(size: 12))
             .foregroundColor(.green)
             .zIndex(3)
             .frame(maxWidth: .infinity, alignment: .leading)
