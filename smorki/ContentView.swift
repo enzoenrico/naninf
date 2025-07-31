@@ -20,7 +20,8 @@ struct ContentView: View {
   @State private var messageHistory: [Message] = []
   @State private var currentGifData: Message.GifData?
   @State var dynamicH: Double = 35.0
-
+    
+    @EnvironmentObject var ai: AiManager
   var body: some View {
     GeometryReader { geometry in
       ZStack {
@@ -141,7 +142,7 @@ struct ContentView: View {
     let trimmedInput = userInput.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !trimmedInput.isEmpty || currentGifData != nil else { return }
 
-    self.loadBundledGIF(path: "veo3_wizard_refined")
+    self.loadBundledGIF(path: "veo2_wizard")
 
     let message = Message(
       text: trimmedInput,
@@ -178,10 +179,16 @@ struct InputField: View {
   }
 
   func modalToggle() {
-    showModal.toggle()
-    if !showModal {
-      onSubmit()
-    }
+      Task{
+          showModal.toggle()
+            print("calling")
+          let f = try? await AiManager().ai.generateContent("print a hello world now")
+          print(f?.text ?? "naoooo se fudeu")
+          print(" end")
+          if !showModal {
+          onSubmit()
+        }
+      }
   }
 
   var body: some View {
