@@ -13,47 +13,106 @@ import UniformTypeIdentifiers
 
 struct ContentView: View {
   @StateObject private var ascii = Ascii(targetWidth: 150)
-  @State private var showingFilePicker = false
+  @State private var showModal = false
   @State private var selectedGIFURL: URL?
   @State private var lastFrame: Int?
   @State var userInput = "> "
   @State private var messageHistory: [Message] = []
   @State private var currentGifData: Message.GifData?
+  @State var dynamicH: Double = 35.0
 
   var body: some View {
     GeometryReader { geometry in
-      VStack(spacing: 0) {
-        // Message history feed
-        ScrollViewReader { proxy in
-          ScrollView {
-            LazyVStack(alignment: .leading, spacing: 16) {
-              ForEach(messageHistory) { message in
-                MessageView(
-                  message: message,
-                  fontSize: calculateFontSize(for: geometry.size)
-                )
-                .id(message.id)
+      ZStack {
+        VStack(spacing: 0) {
+          // Message history feed
+          ScrollViewReader { proxy in
+            ScrollView {
+              LazyVStack(alignment: .leading, spacing: 16) {
+                ForEach(messageHistory) { message in
+                  MessageView(
+                    message: message,
+                    fontSize: calculateFontSize(for: geometry.size)
+                  )
+                  .id(message.id)
+                }
+              }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .onChange(of: messageHistory.count) { _ in
+              if let last = messageHistory.last {
+                withAnimation(.interpolatingSpring) {
+                  proxy.scrollTo(last.id, anchor: .bottom)
+                }
               }
             }
           }
-          .frame(maxWidth: .infinity, maxHeight: .infinity)
-          .onChange(of: messageHistory.count) { _ in
-            if let last = messageHistory.last {
-              withAnimation(.interpolatingSpring) {
-                proxy.scrollTo(last.id, anchor: .bottom)
-              }
-            }
-          }
+
+          InputField(
+            textContent: $userInput,
+            onSubmit: { submitMessage() },
+            showModal: $showModal
+          )
+          .padding()
         }
 
-        InputField(
-          textContent: $userInput,
-          onSubmit: { submitMessage() }
-        )
-        .padding()
+        if self.showModal {
+          VStack {
+            VStack(spacing: 0) {
+              RoundedRectangle(cornerRadius: 8)
+                .stroke(Color.green, lineWidth: 2)
+                .overlay(alignment: .topLeading) {
+                  VStack(alignment: .leading, spacing: 0) {
+                    Text("Your next action here")
+                      .padding(.horizontal, 2)
+                      .background(.black)
+                      .font(.caption)
+                      .foregroundColor(.green)
+                      .zIndex(3)
+                      .frame(maxWidth: .infinity, alignment: .leading)
+                      .padding(.horizontal, 8)
+                      .offset(y: -8)
+
+                    TextEditor(text: $userInput)
+                      .frame(minHeight: dynamicH, maxHeight: dynamicH)  // Use minHeight/maxHeight to hug
+                      // .padding(8)
+                      .foregroundColor(.green)
+                      .tint(.green)
+                      .onChange(of: userInput) { result in
+                        withAnimation(.interpolatingSpring) {
+                          dynamicH = result.count <= 75 ? 35 : 100
+                        }
+                      }
+                  }
+                  .padding(.horizontal, 8)
+                }
+                .padding(.horizontal)
+            }
+            .frame(minHeight: dynamicH + 32, maxHeight: dynamicH + 32)  // Use minHeight/maxHeight to hug
+
+            Button(action: {
+              showModal = false
+              submitMessage()
+            }) {
+              Text("play")
+                .frame(maxWidth: .infinity)
+                .padding()
+                .foregroundColor(.green)
+                .background {
+                  RoundedRectangle(cornerRadius: 8)
+                    .stroke(.green, lineWidth: 2)
+                }
+            }
+            .padding(.horizontal)
+
+          }
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+          .background(.black)
+          .zIndex(3)
+        }
       }
     }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    // .frame(maxWidth: .infinity, maxHeight: .infinity)
     .enableInjection()
   }
 
@@ -81,8 +140,8 @@ struct ContentView: View {
   private func submitMessage() {
     let trimmedInput = userInput.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !trimmedInput.isEmpty || currentGifData != nil else { return }
-    
-    self.loadBundledGIF(path: "veo2_wizard")
+
+    self.loadBundledGIF(path: "veo3_wizard_refined")
 
     let message = Message(
       text: trimmedInput,
@@ -95,25 +154,22 @@ struct ContentView: View {
     currentGifData = nil
   }
 
-  // Calculate font size to fill viewport width with target character count
   private func calculateFontSize(for size: CGSize) -> CGFloat {
-    let availableWidth = size.width - 32  // Account for padding
+    let availableWidth = size.width - 32
     let targetCharacterCount = CGFloat(ascii.targetWidth)
 
     let characterWidthRatio: CGFloat = 0.6
     let calculatedFontSize = availableWidth / (targetCharacterCount * characterWidthRatio)
 
-    // Ensure reasonable bounds
     return max(min(calculatedFontSize, 20), 4)
   }
 }
-
-// Individual message view with its own ASCII renderer for GIFs
 
 struct InputField: View {
   @Binding var textContent: String
   let onSubmit: () -> Void
   @State private var dynamicH: Double = 30.0
+  @Binding var showModal: Bool
 
   func handleContentChange(_ s: String) {
     if !s.hasPrefix(">") {
@@ -121,28 +177,26 @@ struct InputField: View {
     }
   }
 
+  func modalToggle() {
+    showModal.toggle()
+    if !showModal {
+      onSubmit()
+    }
+  }
+
   var body: some View {
     VStack {
-      TextEditor(text: $textContent)
-        .frame(width: .infinity, height: dynamicH)
-        .padding(8)
-        .border(.green)
-        .foregroundColor(.green)
-        .tint(.green)
-        .onChange(of: textContent) { result in
-          handleContentChange(result)
-          withAnimation(.interpolatingSpring) {
-            dynamicH = result.count <= 75 ? 30 : 100
-          }
-        }
 
-      Button(action: onSubmit) {
-        Text("Send Message")
+      Button(action: modalToggle) {
+        Text("play")
           .frame(maxWidth: .infinity)
           .padding()
-          .border(.green, width: 2)
           .foregroundColor(.green)
-          .tint(.green)
+          // .tint(.green)
+          .background {
+            RoundedRectangle(cornerRadius: 8)
+              .stroke(.green, lineWidth: 2)
+          }
       }
     }
     .enableInjection()
