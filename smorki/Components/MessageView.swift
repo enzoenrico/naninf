@@ -29,6 +29,7 @@ struct MessageView: View {
       Text(message.response)
         .foregroundColor(.green)
         .padding()
+        .id(message.id)
 
       if let gifData = message.gifData {
         Text(ascii.currentFrame)
@@ -53,7 +54,7 @@ struct MessageView: View {
       RoundedRectangle(cornerRadius: 8)
         .stroke(Color.green, lineWidth: 2)
         .overlay(alignment: .topLeading) {
-          Text(message.title)
+          Text("> " + message.title)
             .lineLimit(1)
             .padding(.horizontal, 2)
             .background(.black)
