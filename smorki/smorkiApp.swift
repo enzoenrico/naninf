@@ -18,8 +18,6 @@ struct smorkiApp: App {
     // MARK: - Initialization
     
     init() {
-        // This is the correct place to configure Firebase.
-        // It ensures that Firebase is set up before any views are created.
         FirebaseApp.configure()
     }
     

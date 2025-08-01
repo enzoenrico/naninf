@@ -5,6 +5,7 @@
 //  Created by Enzo Enrico on 30/07/25.
 //
 
+import FirebaseAI
 import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
@@ -20,8 +21,8 @@ struct ContentView: View {
   @State private var messageHistory: [Message] = []
   @State private var currentGifData: Message.GifData?
   @State var dynamicH: Double = 35.0
-    
-    @EnvironmentObject var ai: AiManager
+
+  @EnvironmentObject var ai: AiManager
   var body: some View {
     GeometryReader { geometry in
       ZStack {
@@ -51,7 +52,7 @@ struct ContentView: View {
 
           InputField(
             textContent: $userInput,
-            onSubmit: { submitMessage() },
+            onSubmit: submitMessage,
             showModal: $showModal
           )
           .padding()
@@ -92,10 +93,12 @@ struct ContentView: View {
             .frame(minHeight: dynamicH + 32, maxHeight: dynamicH + 32)  // Use minHeight/maxHeight to hug
 
             Button(action: {
-              showModal = false
-              submitMessage()
+              Task {
+                showModal = false
+                await submitMessage()
+              }
             }) {
-              Text("play")
+              Text("no touchy")
                 .frame(maxWidth: .infinity)
                 .padding()
                 .foregroundColor(.green)
@@ -138,24 +141,52 @@ struct ContentView: View {
     self.currentGifData = gifData
   }
 
-  private func submitMessage() {
+  private func submitMessage() async {
     let trimmedInput = userInput.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !trimmedInput.isEmpty || currentGifData != nil else { return }
+
+    var generated_result = "No response from model"
+    do {
+      let response = try await ai.chat.sendMessage([
+        .init(role: "user", parts: trimmedInput)
+      ]).text
+      if let response = response {
+        generated_result = response
+      }
+    } catch {
+      print("no response from the model")
+      print(error.localizedDescription)
+      return
+
+    }
 
     self.loadBundledGIF(path: "veo2_wizard")
 
     let message = Message(
-      text: trimmedInput,
+      title: trimmedInput,
+      response: generated_result,
       timestamp: Date(),
       gifData: currentGifData
     )
 
     messageHistory.append(message)
-    userInput = "> "
-    currentGifData = nil
+    // print(ai.chat.history)
+    //turn this into a function to sync both histories
+      ai.history.append(contentsOf: [
+        ModelContent(
+          role: "user",
+          parts: trimmedInput
+        ),
+        ModelContent(
+          role: "system",
+          parts: generated_result
+        ),
+      ])
+      userInput = "> "
+      currentGifData = nil
   }
 
-  private func calculateFontSize(for size: CGSize) -> CGFloat {
+  func calculateFontSize(for size: CGSize) -> CGFloat {
     let availableWidth = size.width - 32
     let targetCharacterCount = CGFloat(ascii.targetWidth)
 
@@ -168,7 +199,7 @@ struct ContentView: View {
 
 struct InputField: View {
   @Binding var textContent: String
-  let onSubmit: () -> Void
+  let onSubmit: () async -> Void
   @State private var dynamicH: Double = 30.0
   @Binding var showModal: Bool
 
@@ -179,16 +210,13 @@ struct InputField: View {
   }
 
   func modalToggle() {
-      Task{
-          showModal.toggle()
-            print("calling")
-          let f = try? await AiManager().ai.generateContent("print a hello world now")
-          print(f?.text ?? "naoooo se fudeu")
-          print(" end")
-          if !showModal {
-          onSubmit()
-        }
+    Task {
+      showModal.toggle()
+      if !showModal {
+        await onSubmit()
       }
+
+    }
   }
 
   var body: some View {
