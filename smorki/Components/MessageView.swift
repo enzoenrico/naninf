@@ -4,7 +4,8 @@ import UniformTypeIdentifiers
 
 struct Message: Identifiable {
   let id = UUID()
-  let text: String
+  let title: String
+  let response: String
   let timestamp: Date
   var gifData: GifData?
 
@@ -23,13 +24,16 @@ struct MessageView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
-
       // llm response goes here
+
+      Text(message.response)
+        .foregroundColor(.green)
+        .padding()
 
       if let gifData = message.gifData {
         Text(ascii.currentFrame)
           // .font(.system(size: fontSize, design: .monospaced))
-              .font(.departure(size: fontSize))
+          .font(.departure(size: fontSize))
           .lineLimit(nil)
           .foregroundColor(.green)
           .aspectRatio(gifData.aspectRatio, contentMode: .fit)
@@ -44,19 +48,16 @@ struct MessageView: View {
           .padding(.top)
           .padding(.bottom)
       }
-      // Text(DateFormatter.messageTime.string(from: message.timestamp))
-      //   .font(.caption2)
-      //   .foregroundColor(.gray)
-      //   .frame(maxWidth: .infinity, alignment: .trailing)
     }
     .overlay(
       RoundedRectangle(cornerRadius: 8)
         .stroke(Color.green, lineWidth: 2)
         .overlay(alignment: .topLeading) {
-          Text(message.text.count < 3 ? "> The mage casts fireball" : message.text)
+          Text(message.title)
+            .lineLimit(1)
             .padding(.horizontal, 2)
             .background(.black)
-              .font(.departure(size: 12))
+            .font(.departure(size: 12))
             .foregroundColor(.green)
             .zIndex(3)
             .frame(maxWidth: .infinity, alignment: .leading)
