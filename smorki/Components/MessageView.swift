@@ -5,14 +5,33 @@ import UniformTypeIdentifiers
 struct Message: Identifiable {
   let id = UUID()
   let title: String
-  let response: String
+  let response: String?  // Make this optional
   let timestamp: Date
   var gifData: GifData?
+  let isLoading: Bool  // Add loading state
 
   struct GifData {
     let url: URL
     let frameCount: Int
     let aspectRatio: Double
+  }
+
+  // Convenience initializer for loading state
+  init(title: String, isLoading: Bool = false) {
+    self.title = title
+    self.response = nil
+    self.timestamp = Date()
+    self.gifData = nil
+    self.isLoading = isLoading
+  }
+
+  // Full initializer for completed message
+  init(title: String, response: String, gifData: GifData? = nil) {
+    self.title = title
+    self.response = response
+    self.timestamp = Date()
+    self.gifData = gifData
+    self.isLoading = false
   }
 }
 
@@ -21,40 +40,57 @@ struct MessageView: View {
   let fontSize: CGFloat
 
   @StateObject private var ascii = Ascii(targetWidth: 140)
+  @State private var loadingAnimationIndex = 0
+
+  private let loadingCharacters = ["▁", "▂", "▃", "▄", "▅", "▆", "▇"]
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
-      // llm response goes here
+      if message.isLoading {
+        // Loading state
+        HStack {
+          Text("Generating story")
+            .foregroundColor(.green)
 
-      Text(message.response)
-        .foregroundColor(.green)
+          Text(loadingCharacters[loadingAnimationIndex])
+            .foregroundColor(.green)
+            .font(.departure(size: fontSize))
+            .onAppear {
+              startLoadingAnimation()
+            }
+        }
         .padding()
-        .id(message.id)
-
-      if let gifData = message.gifData {
-        Text(ascii.currentFrame)
-          // .font(.system(size: fontSize, design: .monospaced))
-          .font(.departure(size: fontSize))
-          .lineLimit(nil)
+      } else if let response = message.response {
+        // Actual response
+        Text(response)
           .foregroundColor(.green)
-          .aspectRatio(gifData.aspectRatio, contentMode: .fit)
-          .frame(maxWidth: .infinity)
-          .onAppear {
-            ascii.loadGIF(from: gifData.url)
-            ascii.startConversion()
-          }
-          .onDisappear {
-            ascii.stopConversion()
-          }
-          .padding(.top)
-          .padding(.bottom)
+          .padding()
+          .id(message.id)
+
+        if let gifData = message.gifData {
+          Text(ascii.currentFrame)
+            .font(.departure(size: fontSize))
+            .lineLimit(nil)
+            .foregroundColor(.green)
+            .aspectRatio(gifData.aspectRatio, contentMode: .fit)
+            .frame(maxWidth: .infinity)
+            .onAppear {
+              ascii.loadGIF(from: gifData.url)
+              ascii.startConversion()
+            }
+            .onDisappear {
+              ascii.stopConversion()
+            }
+            .padding(.top)
+            .padding(.bottom)
+        }
       }
     }
     .overlay(
       RoundedRectangle(cornerRadius: 8)
         .stroke(Color.green, lineWidth: 2)
         .overlay(alignment: .topLeading) {
-          Text("> " + message.title)
+          Text(message.title)
             .lineLimit(1)
             .padding(.horizontal, 2)
             .background(.black)
@@ -65,9 +101,24 @@ struct MessageView: View {
             .padding(.horizontal, 8)
             .offset(y: -8)
         }
+        .frame(maxWidth: .infinity)
     )
+    .frame(maxWidth: .infinity)
     .padding(.horizontal)
     .enableInjection()
+  }
+
+  private func startLoadingAnimation() {
+    Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { timer in
+      if !message.isLoading {
+        timer.invalidate()
+        return
+      }
+
+      withAnimation(.easeInOut(duration: 0.1)) {
+        loadingAnimationIndex = (loadingAnimationIndex + 1) % loadingCharacters.count
+      }
+    }
   }
 
   #if DEBUG
