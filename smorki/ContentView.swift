@@ -18,13 +18,30 @@ struct ContentView: View {
   @State private var selectedGIFURL: URL?
   @State private var lastFrame: Int?
   @State var userInput = "> "
-  @State private var messageHistory: [Message] = [
-    Message(
-      title: "The adventure starts", response: "Lorem", timestamp: Date(),
-      gifData: Message.GifData(url: URL(string: "demo.gif")!, frameCount: 27, aspectRatio: 1.0))
-  ]
+  @State private var messageHistory: [Message] = []
   @State private var currentGifData: Message.GifData?
   @State var dynamicH: Double = 35.0
+
+  // Add these state variables to your ContentView
+  @State private var showResetModal = false
+  @State private var isGameEnded = false
+
+  private func startScreen() {
+    if let gifURL = Bundle.main.url(forResource: "demo", withExtension: "gif") {
+      let placeholderGifData = Message.GifData(
+        url: gifURL,
+        frameCount: 0,
+        aspectRatio: 1.0
+      )
+      let introMessage = Message(
+        title: "> Welcome, Mage!",
+        response: "Your adventure begins now. Prepare to enter the dungeon...",
+        gifData: placeholderGifData,
+
+      )
+      messageHistory.append(introMessage)
+    }
+  }
 
   @EnvironmentObject var ai: AiManager
   var body: some View {
@@ -56,90 +73,60 @@ struct ContentView: View {
           InputField(
             textContent: $userInput,
             onSubmit: submitMessage,
-            showModal: $showModal
+            resetAdventure: resetAdventure,
+            showModal: $showModal,
+            showResetModal: $showResetModal,
+            isGameEnded: $isGameEnded
           )
           .padding()
         }
 
         if self.showModal {
-          VStack {
-            VStack(spacing: 0) {
-              RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.green, lineWidth: 2)
-                .overlay(alignment: .topLeading) {
-                  VStack(alignment: .leading, spacing: 0) {
-                    Text("Your next action here")
-                      .padding(.horizontal, 2)
-                      .background(.black)
-                      // .font(.caption)
-                      .foregroundColor(.green)
-                      .zIndex(3)
-                      .frame(maxWidth: .infinity, alignment: .leading)
-                      .padding(.horizontal, 8)
-                      .offset(y: -8)
-
-                    TextEditor(text: $userInput)
-                      .frame(minHeight: dynamicH, maxHeight: dynamicH)  // Use minHeight/maxHeight to hug
-                      // .padding(8)
-                      .foregroundColor(.green)
-                      .tint(.green)
-                      .onChange(of: userInput) { result in
-                        withAnimation(.interpolatingSpring) {
-                          dynamicH = result.count <= 75 ? 35 : 100
-                        }
-                      }
-                      .onSubmit {
-                        submitMessageSync()
-                      }
-                  }
-                  .padding(.horizontal, 8)
-                }
-                .padding(.horizontal)
-            }
-            .frame(minHeight: dynamicH + 32, maxHeight: dynamicH + 32)  // Use minHeight/maxHeight to hug
-
-            HStack(spacing: 10) {
-
-              Button(action: {
-                self.showModal = false
-              }) {
-                Text("◄ go back")
-                  .frame(maxWidth: 80)
-                  .padding()
-                  .foregroundColor(.green)
-                  .background {
-                    RoundedRectangle(cornerRadius: 8)
-                      .stroke(.green, lineWidth: 2)
-                  }
-              }
-
-              Button(action: submitMessageSync) {
-                Text("► send")
-                  .frame(maxWidth: .infinity)
-                  .padding()
-                  .foregroundColor(.green)
-                  .background {
-                    RoundedRectangle(cornerRadius: 8)
-                      .stroke(.green, lineWidth: 2)
-                  }
-              }
-            }
-            .padding(.horizontal)
-
-          }
+          ActionModal(
+            userInput: $userInput,
+            dynamicH: $dynamicH,
+            showModal: $showModal,
+            submitMessageSync: submitMessageSync
+          )
           .frame(maxWidth: .infinity, maxHeight: .infinity)
           .background(.black)
           .zIndex(3)
         }
+
+        if self.showResetModal {
+          ResetAdventureModal(isPresented: $showResetModal) {
+            resetAdventure()
+          }
+          .frame(width: .infinity, height: .infinity)
+        }
       }
     }
     // .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .onAppear {
+      if messageHistory.isEmpty {
+        startScreen()
+      }
+    }
     .enableInjection()
+
   }
 
   #if DEBUG
     @ObserveInjection var forceRedraw
   #endif
+
+  private func resetAdventure() {
+    // Send final message to end the adventure
+    let endMessage = Message(title: "> Adventure Ended", isLoading: true)
+    self.messageHistory.append(endMessage)
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+      self.messageHistory.removeAll()
+      self.isGameEnded = false
+      startScreen()
+    }
+
+  }
 
   private func loadBundledGIF(path: String) {
     guard let gifURL = Bundle.main.url(forResource: path, withExtension: "gif") else {
@@ -160,7 +147,15 @@ struct ContentView: View {
 
   private func submitMessage() async {
     let trimmedInput = userInput.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard !trimmedInput.isEmpty || currentGifData != nil else { return }
+    guard trimmedInput == "> " || !trimmedInput.isEmpty || currentGifData != nil else { return }
+
+    // Create loading message immediately
+    let loadingMessage = Message(title: trimmedInput, isLoading: true)
+    messageHistory.append(loadingMessage)
+
+    // Clear input and reset UI state
+    userInput = "> "
+    currentGifData = nil
 
     var generated_result = "No response from model"
     do {
@@ -173,21 +168,31 @@ struct ContentView: View {
     } catch {
       print("no response from the model")
       print(error.localizedDescription)
-      return
 
+      if let index = messageHistory.firstIndex(where: { $0.id == loadingMessage.id }) {
+        messageHistory[index] = Message(
+          title: trimmedInput,
+          response: "Error: Could not generate story. Please try again.",
+          gifData: nil
+        )
+      }
+      return
     }
 
+    // Load GIF after successful response
+    // update to model's gif
     self.loadBundledGIF(path: "veo3_wizard_refined")
 
-    let message = Message(
-      title: trimmedInput,
-      response: generated_result,
-      timestamp: Date(),
-      gifData: currentGifData
-    )
+    // Replace loading message with completed message
+    if let index = messageHistory.firstIndex(where: { $0.id == loadingMessage.id }) {
+      messageHistory[index] = Message(
+        title: trimmedInput,
+        response: generated_result,
+        gifData: currentGifData
+      )
+    }
 
-    messageHistory.append(message)
-    //turn this into a function to sync both histories
+    // Update AI history
     ai.history.append(contentsOf: [
       ModelContent(
         role: "user",
@@ -198,9 +203,10 @@ struct ContentView: View {
         parts: generated_result
       ),
     ])
-    userInput = "> "
+
     currentGifData = nil
   }
+
   private func submitMessageSync() {
     Task {
       showModal = false
@@ -223,8 +229,12 @@ struct ContentView: View {
 struct InputField: View {
   @Binding var textContent: String
   let onSubmit: () async -> Void
+  let resetAdventure: () -> Void
   @State private var dynamicH: Double = 30.0
   @Binding var showModal: Bool
+
+  @Binding var showResetModal: Bool
+  @Binding var isGameEnded: Bool
 
   func handleContentChange(_ s: String) {
     if !s.hasPrefix(">") {
@@ -244,8 +254,14 @@ struct InputField: View {
 
   var body: some View {
     HStack {
-      Button(action: modalToggle) {
-        Text("► act")
+      Button(action: {
+        if isGameEnded {
+          resetAdventure()
+        } else {
+          modalToggle()
+        }
+      }) {
+        Text(isGameEnded ? "► new quest" : "► act")
           .frame(maxWidth: .infinity)
           .padding()
           .foregroundColor(.green)
@@ -255,10 +271,14 @@ struct InputField: View {
               .stroke(.green, lineWidth: 2)
           }
       }
-      Button(action: modalToggle) {
-        Image(systemName: "gearshape")
+      Button(action: {
+        showResetModal = true
+      }) {
+        Image(systemName: "gear")
+          .frame(maxWidth: 20)
           .padding()
           .foregroundColor(.green)
+          // .tint(.green)
           .background {
             RoundedRectangle(cornerRadius: 8)
               .stroke(.green, lineWidth: 2)
@@ -267,4 +287,5 @@ struct InputField: View {
     }
     .enableInjection()
   }
+
 }
