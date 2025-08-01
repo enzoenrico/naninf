@@ -18,7 +18,11 @@ struct ContentView: View {
   @State private var selectedGIFURL: URL?
   @State private var lastFrame: Int?
   @State var userInput = "> "
-  @State private var messageHistory: [Message] = []
+  @State private var messageHistory: [Message] = [
+    Message(
+      title: "The adventure starts", response: "Lorem", timestamp: Date(),
+      gifData: Message.GifData(url: URL(string: "demo.gif")!, frameCount: 27, aspectRatio: 1.0))
+  ]
   @State private var currentGifData: Message.GifData?
   @State var dynamicH: Double = 35.0
 
@@ -36,7 +40,6 @@ struct ContentView: View {
                     message: message,
                     fontSize: calculateFontSize(for: geometry.size)
                   )
-                  .id(message.id)
                 }
               }
             }
@@ -85,6 +88,9 @@ struct ContentView: View {
                           dynamicH = result.count <= 75 ? 35 : 100
                         }
                       }
+                      .onSubmit {
+                        submitMessageSync()
+                      }
                   }
                   .padding(.horizontal, 8)
                 }
@@ -92,20 +98,31 @@ struct ContentView: View {
             }
             .frame(minHeight: dynamicH + 32, maxHeight: dynamicH + 32)  // Use minHeight/maxHeight to hug
 
-            Button(action: {
-              Task {
-                showModal = false
-                await submitMessage()
+            HStack(spacing: 10) {
+
+              Button(action: {
+                self.showModal = false
+              }) {
+                Text("◄ go back")
+                  .frame(maxWidth: 80)
+                  .padding()
+                  .foregroundColor(.green)
+                  .background {
+                    RoundedRectangle(cornerRadius: 8)
+                      .stroke(.green, lineWidth: 2)
+                  }
               }
-            }) {
-              Text("no touchy")
-                .frame(maxWidth: .infinity)
-                .padding()
-                .foregroundColor(.green)
-                .background {
-                  RoundedRectangle(cornerRadius: 8)
-                    .stroke(.green, lineWidth: 2)
-                }
+
+              Button(action: submitMessageSync) {
+                Text("► send")
+                  .frame(maxWidth: .infinity)
+                  .padding()
+                  .foregroundColor(.green)
+                  .background {
+                    RoundedRectangle(cornerRadius: 8)
+                      .stroke(.green, lineWidth: 2)
+                  }
+              }
             }
             .padding(.horizontal)
 
@@ -160,7 +177,7 @@ struct ContentView: View {
 
     }
 
-    self.loadBundledGIF(path: "veo2_wizard")
+    self.loadBundledGIF(path: "veo3_wizard_refined")
 
     let message = Message(
       title: trimmedInput,
@@ -170,20 +187,26 @@ struct ContentView: View {
     )
 
     messageHistory.append(message)
-    // print(ai.chat.history)
     //turn this into a function to sync both histories
-      ai.history.append(contentsOf: [
-        ModelContent(
-          role: "user",
-          parts: trimmedInput
-        ),
-        ModelContent(
-          role: "system",
-          parts: generated_result
-        ),
-      ])
-      userInput = "> "
-      currentGifData = nil
+    ai.history.append(contentsOf: [
+      ModelContent(
+        role: "user",
+        parts: trimmedInput
+      ),
+      ModelContent(
+        role: "system",
+        parts: generated_result
+      ),
+    ])
+    userInput = "> "
+    currentGifData = nil
+  }
+  private func submitMessageSync() {
+    Task {
+      showModal = false
+      await submitMessage()
+    }
+
   }
 
   func calculateFontSize(for size: CGSize) -> CGFloat {
@@ -220,10 +243,9 @@ struct InputField: View {
   }
 
   var body: some View {
-    VStack {
-
+    HStack {
       Button(action: modalToggle) {
-        Text("play")
+        Text("► act")
           .frame(maxWidth: .infinity)
           .padding()
           .foregroundColor(.green)
@@ -233,67 +255,16 @@ struct InputField: View {
               .stroke(.green, lineWidth: 2)
           }
       }
+      Button(action: modalToggle) {
+        Image(systemName: "gearshape")
+          .padding()
+          .foregroundColor(.green)
+          .background {
+            RoundedRectangle(cornerRadius: 8)
+              .stroke(.green, lineWidth: 2)
+          }
+      }
     }
     .enableInjection()
   }
-}
-
-// private struct ButtonGroup: View {
-//   let ascii: Ascii
-//   let onGifLoad: (Message.GifData) -> Void
-
-//   var body: some View {
-//     VStack {
-//       HStack {
-//         Button("Stop") {
-//           ascii.stopConversion()
-//         }
-//         .buttonStyle(.bordered)
-
-//         Button("Wizard") {
-//           ascii.stopConversion()
-
-//           loadBundledGIF(path: "veo2_wizard")
-//         }
-//         .buttonStyle(.bordered)
-
-//         Button("Demo GIF") {
-//           ascii.stopConversion()
-//           loadBundledGIF(path: "demo")
-//         }
-//         .buttonStyle(.borderedProminent)
-//       }
-//     }
-//     .enableInjection()
-//   }
-
-//   #if DEBUG
-//     @ObserveInjection var forceRedraw
-//   #endif
-
-//   // Function to load the bundled GIF
-//   private func loadBundledGIF(path: String, frame: Int? = nil) {
-//     guard let gifURL = Bundle.main.url(forResource: path, withExtension: "gif") else {
-//       return
-//     }
-//     ascii.loadGIF(from: gifURL)
-//     ascii.startConversion(frame)
-
-//     // Create gif data for history
-//     let gifData = Message.GifData(
-//       url: gifURL,
-//       frameCount: 0,  // You might want to get this from ascii object
-//       aspectRatio: ascii.aspectRatio
-//     )
-//     onGifLoad(gifData)
-//   }
-// }
-
-// Date formatter extension
-extension DateFormatter {
-  static let messageTime: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.timeStyle = .short
-    return formatter
-  }()
 }
