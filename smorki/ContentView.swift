@@ -128,6 +128,8 @@ struct ContentView: View {
 
   }
 
+
+
   private func loadBundledGIF(path: String) {
     guard let gifURL = Bundle.main.url(forResource: path, withExtension: "gif") else {
       return
