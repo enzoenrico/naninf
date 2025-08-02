@@ -1,3 +1,4 @@
+import AVFoundation  // Add this import
 import CoreImage
 import Foundation
 import ImageIO
@@ -8,14 +9,13 @@ class Ascii: ObservableObject {
   @Published var currentFrame: String = ""
   @Published var isProcessing: Bool = false
   @Published var aspectRatio: Double = 1.0
-  @Published var targetWidth: Int = 80  // Make this @Published instead of @State
+  @Published var targetWidth: Int = 80
 
   private let frameRate = 0.1
-  // More detailed ASCII character ramp for smoother gradients (dark to light)
   private let asciiChars = "@%$*+=-:. ".reversed()
 
   private var gifSource: CGImageSource?
-  private var frameCount: Int = 0
+  public var frameCount: Int = 0
   public var currentFrameIndex: Int
   private var timer: Timer?
 
@@ -59,7 +59,9 @@ class Ascii: ObservableObject {
   // Start real-time ASCII conversion
   func startConversion(_ frameIndex: Int? = nil) {
     guard gifSource != nil, frameCount > 0 else {
-      print("No GIF loaded")
+      print(
+        "No GIF or video loaded - gifSource: \(gifSource != nil), frameCount: \(frameCount)"
+      )
       return
     }
 
@@ -78,21 +80,16 @@ class Ascii: ObservableObject {
 
   // Process the next frame in sequence
   private func processNextFrame(fixedIndex: Int? = nil) {
-    guard let gifSource = gifSource else { return }
-
     let frameIndex: Int
     if let fixedIndex = fixedIndex {
-      // Use fixed frame index, don't increment
       frameIndex = min(fixedIndex, frameCount - 1)
     } else {
-      // Sequential playback, use and increment currentFrameIndex
       frameIndex = currentFrameIndex % frameCount
     }
-
-    if let cgImage = CGImageSourceCreateImageAtIndex(gifSource, frameIndex, nil) {
-      let asciiString = convertImageToASCII(cgImage: cgImage)
-
-      DispatchQueue.main.async {
+    // Handle GIF frames
+    if let gifSource = gifSource {
+      if let cgImage = CGImageSourceCreateImageAtIndex(gifSource, frameIndex, nil) {
+        let asciiString = convertImageToASCII(cgImage: cgImage)
         self.currentFrame = asciiString
       }
     }
@@ -103,17 +100,6 @@ class Ascii: ObservableObject {
     }
   }
 
-  // Convert a single frame to ASCII
-  func convertFrameToASCII(frameIndex: Int) -> String? {
-    guard let gifSource = gifSource,
-      frameIndex < frameCount,
-      let cgImage = CGImageSourceCreateImageAtIndex(gifSource, frameIndex, nil)
-    else {
-      return nil
-    }
-
-    return convertImageToASCII(cgImage: cgImage)
-  }
 
   // Core ASCII conversion function with improved aspect ratio handling
   private func convertImageToASCII(cgImage: CGImage) -> String {

@@ -52,20 +52,22 @@ struct MessageView: View {
           Text("Generating story")
             .foregroundColor(.green)
 
-          Text(loadingCharacters[loadingAnimationIndex])
-            .foregroundColor(.green)
-            .font(.departure(size: fontSize))
-            .onAppear {
-              startLoadingAnimation()
-            }
+          Text(
+            "\(loadingCharacters[loadingAnimationIndex])\(loadingCharacters[(loadingAnimationIndex + 1) % loadingCharacters.count])\(loadingCharacters[(loadingAnimationIndex + 2) % loadingCharacters.count])"
+          )
+          .foregroundColor(.green)
+          .font(.departure(size: 14))
+          .onAppear {
+            startLoadingAnimation()
+          }
         }
         .padding()
       } else if let response = message.response {
         // Actual response
         Text(response)
           .foregroundColor(.green)
+          .font(.departure(size: 14))
           .padding()
-          .id(message.id)
 
         if let gifData = message.gifData {
           Text(ascii.currentFrame)
@@ -83,6 +85,7 @@ struct MessageView: View {
             }
             .padding(.top)
             .padding(.bottom)
+            .id(message.id)
         }
       }
     }
