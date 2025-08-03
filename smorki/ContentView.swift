@@ -128,7 +128,23 @@ struct ContentView: View {
 
   }
 
+  private func loadBundledVideo(path: String) {
+    guard let videoURL = Bundle.main.url(forResource: path, withExtension: "mp4") else {
+      print("Video file not found")
+      return
+    }
 
+    ascii.loadVideo(url:  videoURL)
+    ascii.startConversion()
+
+    // Create video data for history
+    let videoData = Message.GifData(
+      url: videoURL,
+      frameCount: ascii.frameCount,
+      aspectRatio: ascii.aspectRatio
+    )
+    self.currentGifData = videoData
+  }
 
   private func loadBundledGIF(path: String) {
     guard let gifURL = Bundle.main.url(forResource: path, withExtension: "gif") else {
@@ -183,7 +199,8 @@ struct ContentView: View {
 
     // Load GIF after successful response
     // update to model's gif
-    self.loadBundledGIF(path: "veo3_wizard_refined")
+    // self.loadBundledGIF(path: "veo3_wizard_refined")
+    self.loadBundledVideo(path: "video")
 
     // Replace loading message with completed message
     if let index = messageHistory.firstIndex(where: { $0.id == loadingMessage.id }) {

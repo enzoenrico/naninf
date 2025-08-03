@@ -15,6 +15,11 @@ class Ascii: ObservableObject {
   private let asciiChars = "@%$*+=-:. ".reversed()
 
   private var gifSource: CGImageSource?
+  private var videoAsset: AVAsset?
+  private var videoImageGenerator: AVAssetImageGenerator?
+  private var videoFrameTimes: [CMTime] = []
+  private var videoDuration: CMTime = .zero
+  
   public var frameCount: Int = 0
   public var currentFrameIndex: Int
   private var timer: Timer?
@@ -25,6 +30,9 @@ class Ascii: ObservableObject {
   }
 
   func loadGIF(from url: URL) {
+    // Clear any existing video data
+    clearVideoData()
+    
     guard let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil) else {
       print("Failed to create image source from URL")
       return
@@ -39,6 +47,9 @@ class Ascii: ObservableObject {
 
   // Load GIF from Data
   func loadGIF(from data: Data) {
+    // Clear any existing video data
+    clearVideoData()
+    
     guard let imageSource = CGImageSourceCreateWithData(data as CFData, nil) else {
       print("Failed to create image source from data")
       return
@@ -51,6 +62,70 @@ class Ascii: ObservableObject {
     print("Loaded GIF with \(frameCount) frames")
   }
 
+  // New function to load MP4 videos
+  func loadVideo(url: URL) {
+    // Clear any existing GIF data
+    clearGIFData()
+    
+    let asset = AVAsset(url: url)
+    self.videoAsset = asset
+    
+    // Check if the asset has video tracks
+    guard asset.tracks(withMediaType: .video).count > 0 else {
+      print("No video tracks found in the asset")
+      return
+    }
+    
+    // Get video duration
+    self.videoDuration = asset.duration
+    let durationInSeconds = CMTimeGetSeconds(videoDuration)
+    
+    // Calculate frame times based on desired frame rate
+    let targetFPS = 10.0 // Adjust this for more/fewer frames
+    let frameInterval = 1.0 / targetFPS
+    var frameTimes: [CMTime] = []
+    
+    var currentTime = 0.0
+    while currentTime < durationInSeconds {
+      let time = CMTime(seconds: currentTime, preferredTimescale: 600)
+      frameTimes.append(time)
+      currentTime += frameInterval
+    }
+    
+    self.videoFrameTimes = frameTimes
+    self.frameCount = frameTimes.count
+    self.currentFrameIndex = 0
+    
+    // Set up image generator
+    let imageGenerator = AVAssetImageGenerator(asset: asset)
+    imageGenerator.appliesPreferredTrackTransform = true
+    imageGenerator.requestedTimeToleranceBefore = .zero
+    imageGenerator.requestedTimeToleranceAfter = .zero
+    self.videoImageGenerator = imageGenerator
+    
+    // Get aspect ratio from video
+    if let videoTrack = asset.tracks(withMediaType: .video).first {
+      let size = videoTrack.naturalSize.applying(videoTrack.preferredTransform)
+      let videoAspectRatio = Double(abs(size.width)) / Double(abs(size.height))
+      DispatchQueue.main.async {
+        self.aspectRatio = videoAspectRatio
+      }
+    }
+    
+    print("Loaded video with \(frameCount) frames at \(targetFPS) FPS")
+  }
+  
+  private func clearGIFData() {
+    gifSource = nil
+  }
+  
+  private func clearVideoData() {
+    videoAsset = nil
+    videoImageGenerator = nil
+    videoFrameTimes = []
+    videoDuration = .zero
+  }
+
   public func calculateOptimalFontSize(for size: CGSize) -> CGFloat {
     let baseSize: CGFloat = min(size.width / CGFloat(self.targetWidth) * 0.8, 12)
     return max(baseSize, 4)  // Minimum font size of 4
@@ -58,9 +133,9 @@ class Ascii: ObservableObject {
 
   // Start real-time ASCII conversion
   func startConversion(_ frameIndex: Int? = nil) {
-    guard gifSource != nil, frameCount > 0 else {
+    guard (gifSource != nil || videoAsset != nil), frameCount > 0 else {
       print(
-        "No GIF or video loaded - gifSource: \(gifSource != nil), frameCount: \(frameCount)"
+        "No GIF or video loaded - gifSource: \(gifSource != nil), videoAsset: \(videoAsset != nil), frameCount: \(frameCount)"
       )
       return
     }
@@ -86,11 +161,28 @@ class Ascii: ObservableObject {
     } else {
       frameIndex = currentFrameIndex % frameCount
     }
+    
     // Handle GIF frames
     if let gifSource = gifSource {
       if let cgImage = CGImageSourceCreateImageAtIndex(gifSource, frameIndex, nil) {
         let asciiString = convertImageToASCII(cgImage: cgImage)
-        self.currentFrame = asciiString
+        DispatchQueue.main.async {
+          self.currentFrame = asciiString
+        }
+      }
+    }
+    // Handle video frames
+    else if let videoImageGenerator = videoImageGenerator, frameIndex < videoFrameTimes.count {
+      let time = videoFrameTimes[frameIndex]
+      
+      do {
+        let cgImage = try videoImageGenerator.copyCGImage(at: time, actualTime: nil)
+        let asciiString = convertImageToASCII(cgImage: cgImage)
+        DispatchQueue.main.async {
+          self.currentFrame = asciiString
+        }
+      } catch {
+        print("Error generating frame at time \(time): \(error)")
       }
     }
 
@@ -100,16 +192,17 @@ class Ascii: ObservableObject {
     }
   }
 
-
   // Core ASCII conversion function with improved aspect ratio handling
   private func convertImageToASCII(cgImage: CGImage) -> String {
     let originalWidth = cgImage.width
     let originalHeight = cgImage.height
 
-    // Calculate and store aspect ratio for UI
+    // Calculate and store aspect ratio for UI (only update if not already set)
     let imageAspectRatio = Double(originalWidth) / Double(originalHeight)
-    DispatchQueue.main.async {
-      self.aspectRatio = imageAspectRatio
+    if aspectRatio == 1.0 {
+      DispatchQueue.main.async {
+        self.aspectRatio = imageAspectRatio
+      }
     }
 
     // Character aspect ratio compensation - characters are typically taller than wide
