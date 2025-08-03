@@ -77,7 +77,12 @@ struct MessageView: View {
             .aspectRatio(gifData.aspectRatio, contentMode: .fit)
             .frame(maxWidth: .infinity)
             .onAppear {
-              ascii.loadGIF(from: gifData.url)
+              // You need to detect whether this is a GIF or video
+              if gifData.url.pathExtension.lowercased() == "mp4" {
+                ascii.loadVideo(url: gifData.url)
+              } else {
+                ascii.loadGIF(from: gifData.url)
+              }
               ascii.startConversion()
             }
             .onDisappear {
