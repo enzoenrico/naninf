@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B933FA02E403D1100BF9095 /* FalClient in Frameworks */ = {isa = PBXBuildFile; productRef = 5B933F9F2E403D1100BF9095 /* FalClient */; };
 		5BCE8D2A2E3C1B600060A9F1 /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BCE8D292E3C1B600060A9F1 /* FirebaseAI */; };
 		5BCE8D2C2E3C1B600060A9F1 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5BCE8D2B2E3C1B600060A9F1 /* FirebaseAnalytics */; };
 /* End PBXBuildFile section */
@@ -42,6 +43,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5BCE8D2C2E3C1B600060A9F1 /* FirebaseAnalytics in Frameworks */,
+				5B933FA02E403D1100BF9095 /* FalClient in Frameworks */,
 				5BCE8D2A2E3C1B600060A9F1 /* FirebaseAI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -87,6 +89,7 @@
 			packageProductDependencies = (
 				5BCE8D292E3C1B600060A9F1 /* FirebaseAI */,
 				5BCE8D2B2E3C1B600060A9F1 /* FirebaseAnalytics */,
+				5B933F9F2E403D1100BF9095 /* FalClient */,
 			);
 			productName = smorki;
 			productReference = 5B92427E2E3A6D4200239C49 /* smorki.app */;
@@ -118,6 +121,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				5BCE8D282E3C1B600060A9F1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				5B933F9E2E403D1100BF9095 /* XCRemoteSwiftPackageReference "fal-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5B92427F2E3A6D4200239C49 /* Products */;
@@ -369,6 +373,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		5B933F9E2E403D1100BF9095 /* XCRemoteSwiftPackageReference "fal-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/fal-ai/fal-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.6;
+			};
+		};
 		5BCE8D282E3C1B600060A9F1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -380,6 +392,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5B933F9F2E403D1100BF9095 /* FalClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B933F9E2E403D1100BF9095 /* XCRemoteSwiftPackageReference "fal-swift" */;
+			productName = FalClient;
+		};
 		5BCE8D292E3C1B600060A9F1 /* FirebaseAI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5BCE8D282E3C1B600060A9F1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
