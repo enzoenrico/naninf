@@ -11,18 +11,18 @@ class Ascii: ObservableObject {
   @Published var aspectRatio: Double = 1.0
   @Published var targetWidth: Int = 80
 
-  private let frameRate = 0.1
+  private let frameRate = 0.08  // Increased frame rate for smoother playback
   private let asciiChars = "@%$*+=-:. ".reversed()
 
   private var gifSource: CGImageSource?
   private var videoAsset: AVAsset?
-  private var videoImageGenerator: AVAssetImageGenerator?
-  private var videoFrameTimes: [CMTime] = []
+  private var precomputedVideoFrames: [String] = []  // Cache ASCII frames
   private var videoDuration: CMTime = .zero
   
   public var frameCount: Int = 0
   public var currentFrameIndex: Int
   private var timer: Timer?
+  private var isPrecomputing: Bool = false
 
   init(targetWidth: Int = 80, frame: Int? = nil) {
     self.targetWidth = targetWidth
@@ -62,7 +62,7 @@ class Ascii: ObservableObject {
     print("Loaded GIF with \(frameCount) frames")
   }
 
-  // New function to load MP4 videos
+  // Optimized function to load MP4 videos
   func loadVideo(url: URL) {
     // Clear any existing GIF data
     clearGIFData()
@@ -80,28 +80,14 @@ class Ascii: ObservableObject {
     self.videoDuration = asset.duration
     let durationInSeconds = CMTimeGetSeconds(videoDuration)
     
-    // Calculate frame times based on desired frame rate
-    let targetFPS = 10.0 // Adjust this for more/fewer frames
+    // Reduce target FPS for better performance but still smooth
+    let targetFPS = 15.0 // Increased from 10 for smoother playback
     let frameInterval = 1.0 / targetFPS
-    var frameTimes: [CMTime] = []
     
-    var currentTime = 0.0
-    while currentTime < durationInSeconds {
-      let time = CMTime(seconds: currentTime, preferredTimescale: 600)
-      frameTimes.append(time)
-      currentTime += frameInterval
-    }
-    
-    self.videoFrameTimes = frameTimes
-    self.frameCount = frameTimes.count
+    // Calculate total frames
+    let totalFrames = Int(durationInSeconds * targetFPS)
+    self.frameCount = totalFrames
     self.currentFrameIndex = 0
-    
-    // Set up image generator
-    let imageGenerator = AVAssetImageGenerator(asset: asset)
-    imageGenerator.appliesPreferredTrackTransform = true
-    imageGenerator.requestedTimeToleranceBefore = .zero
-    imageGenerator.requestedTimeToleranceAfter = .zero
-    self.videoImageGenerator = imageGenerator
     
     // Get aspect ratio from video
     if let videoTrack = asset.tracks(withMediaType: .video).first {
@@ -113,6 +99,51 @@ class Ascii: ObservableObject {
     }
     
     print("Loaded video with \(frameCount) frames at \(targetFPS) FPS")
+    
+    // Start precomputing frames in background
+    precomputeVideoFrames(asset: asset, targetFPS: targetFPS, durationInSeconds: durationInSeconds)
+  }
+  
+  private func precomputeVideoFrames(asset: AVAsset, targetFPS: Double, durationInSeconds: Double) {
+    guard !isPrecomputing else { return }
+    isPrecomputing = true
+    
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      guard let self = self else { return }
+      
+      let imageGenerator = AVAssetImageGenerator(asset: asset)
+      imageGenerator.appliesPreferredTrackTransform = true
+      imageGenerator.requestedTimeToleranceBefore = CMTime(seconds: 0.1, preferredTimescale: 600)
+      imageGenerator.requestedTimeToleranceAfter = CMTime(seconds: 0.1, preferredTimescale: 600)
+      
+      var frames: [String] = []
+      let frameInterval = 1.0 / targetFPS
+      
+      var currentTime = 0.0
+      while currentTime < durationInSeconds {
+        let time = CMTime(seconds: currentTime, preferredTimescale: 600)
+        
+        do {
+          let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
+          let asciiString = self.convertImageToASCII(cgImage: cgImage)
+          frames.append(asciiString)
+        } catch {
+          // If frame generation fails, use empty frame or previous frame
+          let emptyFrame = String(repeating: " ", count: self.targetWidth * 20) // Fallback
+          frames.append(emptyFrame)
+          print("Warning: Could not generate frame at time \(currentTime): \(error.localizedDescription)")
+        }
+        
+        currentTime += frameInterval
+      }
+      
+      DispatchQueue.main.async {
+        self.precomputedVideoFrames = frames
+        self.frameCount = frames.count
+        self.isPrecomputing = false
+        print("Precomputed \(frames.count) video frames")
+      }
+    }
   }
   
   private func clearGIFData() {
@@ -121,9 +152,9 @@ class Ascii: ObservableObject {
   
   private func clearVideoData() {
     videoAsset = nil
-    videoImageGenerator = nil
-    videoFrameTimes = []
+    precomputedVideoFrames = []
     videoDuration = .zero
+    isPrecomputing = false
   }
 
   public func calculateOptimalFontSize(for size: CGSize) -> CGFloat {
@@ -153,7 +184,7 @@ class Ascii: ObservableObject {
     timer = nil
   }
 
-  // Process the next frame in sequence
+  // Optimized frame processing
   private func processNextFrame(fixedIndex: Int? = nil) {
     let frameIndex: Int
     if let fixedIndex = fixedIndex {
@@ -171,18 +202,17 @@ class Ascii: ObservableObject {
         }
       }
     }
-    // Handle video frames
-    else if let videoImageGenerator = videoImageGenerator, frameIndex < videoFrameTimes.count {
-      let time = videoFrameTimes[frameIndex]
-      
-      do {
-        let cgImage = try videoImageGenerator.copyCGImage(at: time, actualTime: nil)
-        let asciiString = convertImageToASCII(cgImage: cgImage)
-        DispatchQueue.main.async {
-          self.currentFrame = asciiString
-        }
-      } catch {
-        print("Error generating frame at time \(time): \(error)")
+    // Handle precomputed video frames
+    else if !precomputedVideoFrames.isEmpty && frameIndex < precomputedVideoFrames.count {
+      let asciiString = precomputedVideoFrames[frameIndex]
+      DispatchQueue.main.async {
+        self.currentFrame = asciiString
+      }
+    }
+    // Fallback: show loading message if frames aren't ready yet
+    else if videoAsset != nil && isPrecomputing {
+      DispatchQueue.main.async {
+        self.currentFrame = "Loading video frames..."
       }
     }
 

@@ -200,7 +200,7 @@ struct ContentView: View {
     // Load GIF after successful response
     // update to model's gif
     // self.loadBundledGIF(path: "veo3_wizard_refined")
-    self.loadBundledVideo(path: "video")
+    self.loadBundledVideo(path: "video2")
 
     // Replace loading message with completed message
     if let index = messageHistory.firstIndex(where: { $0.id == loadingMessage.id }) {
