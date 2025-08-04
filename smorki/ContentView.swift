@@ -26,6 +26,11 @@ struct ContentView: View {
   @State private var showResetModal = false
   @State private var isGameEnded = false
 
+  // Add these new state variables for the start screen animation
+  @State private var showStartAnimation = true
+  @State private var animationOpacity = 1.0
+  @State private var uiOpacity = 0.0
+
   private func startScreen() {
     if let opening = Bundle.main.url(forResource: "opening", withExtension: "mp4") {
       let placeholderGifData = Message.GifData(
@@ -50,17 +55,30 @@ struct ContentView: View {
           > Type your commands to interact with the world.
           """,
         gifData: placeholderGifData,
-
       )
       messageHistory.append(introMessage)
-      
+
+      // Start the fade transition after message is added
+      DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+
+        withAnimation(.easeInOut(duration: 1.5)) {
+          animationOpacity = 0.0
+          uiOpacity = 1.0
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+          showStartAnimation = false
+        }
+      }
     }
   }
 
   @EnvironmentObject var ai: AiManager
   var body: some View {
+
     GeometryReader { geometry in
       ZStack {
+        // Main app UI
         VStack(spacing: 0) {
           ScrollViewReader { proxy in
             ScrollView {
@@ -93,7 +111,16 @@ struct ContentView: View {
           )
           .padding()
         }
+        .opacity(uiOpacity)
 
+        // Start screen animation overlay
+        if showStartAnimation {
+          StartScreenAnimation(startSequenceEnded: $showStartAnimation)
+            .opacity(animationOpacity)
+            .zIndex(10)
+        }
+
+        // Modal code
         if self.showModal {
           ActionModal(
             userInput: $userInput,
@@ -114,14 +141,12 @@ struct ContentView: View {
         }
       }
     }
-    // .frame(maxWidth: .infinity, maxHeight: .infinity)
     .onAppear {
       if messageHistory.isEmpty {
         startScreen()
       }
     }
     .enableInjection()
-
   }
 
   #if DEBUG
@@ -136,9 +161,12 @@ struct ContentView: View {
     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
       self.messageHistory.removeAll()
       self.isGameEnded = false
+      // Reset animation states
+      self.showStartAnimation = true
+      self.animationOpacity = 1.0
+      self.uiOpacity = 0.0
       startScreen()
     }
-
   }
 
   private func loadBundledVideo() {
@@ -198,17 +226,20 @@ struct ContentView: View {
     -> GenerateContentResponse
   {
     let maxResponseLength = 1500
-    
+
     // First truncate by length, then cut before "What do you do?"
     let lengthTruncatedResult =
       generated_result.count > maxResponseLength
       ? String(generated_result.prefix(maxResponseLength)) + "..."
       : generated_result
-    
+
     // Find and cut before "What do you do?" if it exists
     let finalResult: String
-    if let whatDoYouDoRange = lengthTruncatedResult.range(of: "What do you do?", options: .caseInsensitive) {
-      finalResult = String(lengthTruncatedResult[..<whatDoYouDoRange.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+    if let whatDoYouDoRange = lengthTruncatedResult.range(
+      of: "What do you do?", options: .caseInsensitive)
+    {
+      finalResult = String(lengthTruncatedResult[..<whatDoYouDoRange.lowerBound])
+        .trimmingCharacters(in: .whitespacesAndNewlines)
     } else {
       finalResult = lengthTruncatedResult
     }
@@ -297,7 +328,7 @@ struct ContentView: View {
     // print("AI URL: \(String(describing: aiUrl))")
 
     // Load the generated video after it's ready
-    self.loadBundledVideo()  
+    self.loadBundledVideo()
 
     // Replace loading message with completed message
     if let index = messageHistory.firstIndex(where: { $0.id == loadingMessage.id }) {
@@ -402,4 +433,45 @@ struct InputField: View {
     .enableInjection()
   }
 
+}
+
+// Add this new view for the start screen animation
+struct StartScreenAnimation: View {
+  @State private var animatedText = ""
+  @State private var currentIndex = 0
+  @Binding var startSequenceEnded: Bool
+
+  private let fullText = """
+    Do qui fugiat ipsum occaecat ullamco sint aliqua enim pariatur Lorem. Lorem laborum magna aliquip non ex do dolore amet non eiusmod aute. Dolore aute nulla ea voluptate ad commodo ea non ipsum incididunt. Cillum in culpa cillum non pariatur ad ex fugiat. Excepteur officia ullamco laborum exercitation. Dolore dolor ex elit ea dolor ea reprehenderit reprehenderit veniam culpa nostrud. Sit magna veniam laborum magna cillum fugiat dolor incididunt nulla veniam commodo. Incididunt sunt labore pariatur culpa esse dolore elit commodo eu deserunt. Aute ea quis mollit officia ipsum laboris ex non ad occaecat. Consequat sint cupidatat adipisicing dolore laboris aute fugiat tempor. Pariatur in in eiusmod occaecat laboris ullamco. Irure dolore aliqua sit velit pariatur incididunt aliqua qui aute sit eu est Lorem. Nisi elit aliqua minim non nisi commodo nisi excepteur commodo sit aute. Occaecat nostrud mollit adipisicing duis adipisicing minim. Aute id eiusmod fugiat id. Ex sunt sunt dolore duis ea eiusmod voluptate duis tempor commodo ullamco. Aliquip exercitation sint ex ut ad veniam cupidatat quis veniam anim est. Non nulla id duis. Cillum deserunt ipsum ullamco cupidatat Lorem officia. Ipsum dolor mollit id enim duis occaecat ex commodo proident aliquip dolore.
+    """
+
+  var body: some View {
+    ZStack {
+      Color.black.ignoresSafeArea()
+
+      Text(animatedText)
+        .font(.system(.body, design: .monospaced))
+        .foregroundColor(.green)
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    .onAppear {
+      startTypingAnimation()
+    }
+  }
+
+  private func startTypingAnimation() {
+    self.startSequenceEnded = true
+    let characters = Array(fullText)
+
+    Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { timer in
+      if currentIndex < characters.count {
+        animatedText.append(characters[currentIndex])
+        currentIndex += 1
+      } else {
+        self.startSequenceEnded = false
+        timer.invalidate()
+      }
+    }
+  }
 }
