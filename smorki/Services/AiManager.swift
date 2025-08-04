@@ -55,6 +55,7 @@ class AiManager: ObservableObject {
           "prompt": Payload.string(prompt),
           "resolution": Payload.string("480p"),
           "fps": Payload.int(24),
+          "enable_safety": Payload.bool(false),
         ]
       ) { update in
         if case let .inProgress(logs) = update {
@@ -64,9 +65,7 @@ class AiManager: ObservableObject {
 
       print("Raw result: \(result)")
 
-      self.generatedVideoURL = result["video"].stringValue
-      print(self.generatedVideoURL ?? "No video URL found")
-      print(result["video"])
+      self.generatedVideoURL = result["video"]["url"].stringValue ?? "nil"
 
       return URL(string: self.generatedVideoURL ?? "")
 

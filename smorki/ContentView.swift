@@ -161,7 +161,7 @@ struct ContentView: View {
       return
     } else {
       print("AI-generated video URL not available, ")
-      let u = URL(string: "https://v3.fal.media/files/tiger/DFPkkt2kw3udR3jB4rMc9_output.mp4")!
+      let u = URL(string: "https://v3.fal.media/files/penguin/NNiDfSIJtOmbt4WrrlzZl_output.mp4")!
       ascii.loadVideo(url: u)
       ascii.startConversion()
 
@@ -229,7 +229,8 @@ struct ContentView: View {
 
     // self.loadBundledGIF(path: "veo3_wizard_refined")
     // self.loadBundledVideo(path: "video2")
-    // await self.ai.generateVideo(trimmedInput)
+    let aiUrl = await self.ai.generateVideo(trimmedInput)
+    print("AI URL: \(String(describing: aiUrl))")
 
     // Load the generated video after it's ready
     self.loadBundledVideo()  // path parameter won't be used for remote URLs
