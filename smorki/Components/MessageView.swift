@@ -5,11 +5,11 @@ import UniformTypeIdentifiers
 struct Message: Identifiable {
   let id = UUID()
   let title: String
-  let response: String?  // Make this optional
+  let response: String?
   let timestamp: Date
   var gifData: GifData?
-  let isLoading: Bool  // Add loading state
-
+  let isLoading: Bool
+  
   struct GifData {
     let url: URL
     let frameCount: Int
@@ -32,6 +32,66 @@ struct Message: Identifiable {
     self.timestamp = Date()
     self.gifData = gifData
     self.isLoading = false
+  }
+  
+  // Method to update message with video data
+  func withGifData(_ gifData: GifData?) -> Message {
+    var updated = self
+    updated.gifData = gifData
+    return updated
+  }
+}
+
+struct TypewriterText: View {
+  let text: String
+  let font: Font
+  let color: Color
+  let speed: Double
+  
+  @State private var displayedText: String = ""
+  @State private var currentIndex: Int = 0
+  
+  init(_ text: String, font: Font = .departure(size: 14), color: Color = .green, speed: Double = 0.05) {
+    self.text = text
+    self.font = font
+    self.color = color
+    self.speed = speed
+  }
+  
+  var body: some View {
+    Text(displayedText)
+      .font(font)
+      .foregroundColor(color)
+      .onAppear {
+        startTypewriting()
+      }
+      .onChange(of: text) { newText in
+        resetAndStart()
+      }
+  }
+  
+  private func startTypewriting() {
+    displayedText = ""
+    currentIndex = 0
+    typeNextCharacter()
+  }
+  
+  private func resetAndStart() {
+    displayedText = ""
+    currentIndex = 0
+    startTypewriting()
+  }
+  
+  private func typeNextCharacter() {
+    guard currentIndex < text.count else { return }
+    
+    let index = text.index(text.startIndex, offsetBy: currentIndex)
+    displayedText.append(text[index])
+    currentIndex += 1
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + speed) {
+      typeNextCharacter()
+    }
   }
 }
 
@@ -67,10 +127,8 @@ struct MessageView: View {
         LoadState()
           .padding()
       } else if let response = message.response {
-        // Actual response
-        Text(response)
-          .foregroundColor(.green)
-          .font(.departure(size: 14))
+        // Typewriter response text
+        TypewriterText(response, font: .departure(size: 14), speed: 0.01)
           .padding()
 
         if let gifData = message.gifData {
@@ -81,7 +139,6 @@ struct MessageView: View {
             .aspectRatio(gifData.aspectRatio, contentMode: .fit)
             .frame(maxWidth: .infinity)
             .onAppear {
-              // You need to detect whether this is a GIF or video
               if gifData.url.pathExtension.lowercased() == "mp4" {
                 ascii.loadVideo(url: gifData.url)
               } else {
@@ -102,12 +159,10 @@ struct MessageView: View {
       RoundedRectangle(cornerRadius: 8)
         .stroke(Color.green, lineWidth: 2)
         .overlay(alignment: .topLeading) {
-          Text(message.title)
+          TypewriterText(message.title, font: .departure(size: 12), speed: 0.08)
             .lineLimit(1)
             .padding(.horizontal, 2)
             .background(.black)
-            .font(.departure(size: 12))
-            .foregroundColor(.green)
             .zIndex(3)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 8)
