@@ -80,6 +80,16 @@ class AiManager: ObservableObject {
     )
   }
 
+  public func generateImage(_ prompt: String) async {
+    // just generate an image instead of the video
+    do {
+      let result = try await self.model.generateContent([prompt])
+      print(result)
+    } catch {
+      print("Error generating image: \(error.localizedDescription)")
+    }
+  }
+
   public func generateVideo(_ prompt: String) async -> URL? {
     do {
       let result = try await falModel.subscribe(

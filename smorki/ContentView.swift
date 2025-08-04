@@ -53,6 +53,7 @@ struct ContentView: View {
 
       )
       messageHistory.append(introMessage)
+      
     }
   }
 
@@ -292,8 +293,8 @@ struct ContentView: View {
     print("Starting video generation")
     print(generated_video_prompt)
     // change to generated_video_prompt
-    let aiUrl = await self.ai.generateVideo(generated_video_prompt)
-    print("AI URL: \(String(describing: aiUrl))")
+    // let aiUrl = await self.ai.generateVideo(generated_video_prompt)
+    // print("AI URL: \(String(describing: aiUrl))")
 
     // Load the generated video after it's ready
     self.loadBundledVideo()  
@@ -379,7 +380,6 @@ struct InputField: View {
           .frame(maxWidth: .infinity)
           .padding()
           .foregroundColor(.green)
-          // .tint(.green)
           .background {
             RoundedRectangle(cornerRadius: 8)
               .stroke(.green, lineWidth: 2)
