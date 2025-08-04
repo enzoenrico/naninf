@@ -27,15 +27,28 @@ struct ContentView: View {
   @State private var isGameEnded = false
 
   private func startScreen() {
-    if let gifURL = Bundle.main.url(forResource: "demo", withExtension: "gif") {
+    if let opening = Bundle.main.url(forResource: "opening", withExtension: "mp4") {
       let placeholderGifData = Message.GifData(
-        url: gifURL,
+        url: opening,
         frameCount: 0,
         aspectRatio: 1.0
       )
       let introMessage = Message(
         title: "> Welcome, Mage!",
-        response: "Your adventure begins now. Prepare to enter the dungeon...",
+        response:
+          """
+          Breathe, traveler. The way back is sealed. There is only the path forward.
+
+          Welcome to the heart of the forgotten. This place you see... it is more than mere stone and shadow. It is a living puzzle, a labyrinth of secrets designed to guard a prize of immense power: the Scroll of Aethelgard.
+
+          Our journey will not be a simple one. The main corridors may lead only to ruin and despair. You must look deeper. Examine the walls for hidden switches, listen for the echo in hollow floors, and understand that the dungeon itself will try to deceive you. New paths will reveal themselves only to a keen eye and a clever mind.
+
+          Danger lurks in every shadow, but do not let fear master you. Your courage is a light as potent as the one from my staff. Together, we will navigate its depths, uncover its long-lost ways, and claim the power that lies waiting.
+
+          Now... take the first step. Our true journey begins.
+
+          > Type your commands to interact with the world.
+          """,
         gifData: placeholderGifData,
 
       )
@@ -48,7 +61,6 @@ struct ContentView: View {
     GeometryReader { geometry in
       ZStack {
         VStack(spacing: 0) {
-          // Message history feed
           ScrollViewReader { proxy in
             ScrollView {
               LazyVStack(alignment: .leading, spacing: 16) {
@@ -133,13 +145,17 @@ struct ContentView: View {
       print("Video file not found")
       return
     }
+    
+    print("Loading video from: \(videoURL)")
 
-    ascii.loadVideo(url:  videoURL)
+    ascii.loadVideo(url: videoURL)
     ascii.startConversion()
+    
+    let vUrl = URL(string: ai.generatedVideoURL ?? "" )
 
     // Create video data for history
     let videoData = Message.GifData(
-      url: videoURL,
+      url: vUrl ?? videoURL,
       frameCount: ascii.frameCount,
       aspectRatio: ascii.aspectRatio
     )
@@ -197,10 +213,10 @@ struct ContentView: View {
       return
     }
 
-    // Load GIF after successful response
-    // update to model's gif
+    
     // self.loadBundledGIF(path: "veo3_wizard_refined")
-    self.loadBundledVideo(path: "video2")
+    // self.loadBundledVideo(path: "video2")
+    await self.ai.generateVideo(trimmedInput)
 
     // Replace loading message with completed message
     if let index = messageHistory.firstIndex(where: { $0.id == loadingMessage.id }) {
@@ -224,6 +240,7 @@ struct ContentView: View {
     ])
 
     currentGifData = nil
+    print(self.ai.generatedVideoURL)
   }
 
   private func submitMessageSync() {
