@@ -47,5 +47,10 @@ struct ResetAdventureModal: View {
                 .stroke(Color.green, lineWidth: 2)
         )
         .padding()
+        .enableInjection()
     }
+
+    #if DEBUG
+    @ObserveInjection var forceRedraw
+    #endif
 }

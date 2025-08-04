@@ -73,6 +73,11 @@ struct ActionModal: View {
 
     }
 
+      .enableInjection()
   }
+
+  #if DEBUG
+  @ObserveInjection var forceRedraw
+  #endif
 
 }

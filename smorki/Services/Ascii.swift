@@ -258,7 +258,7 @@ class Ascii: ObservableObject {
         let brightness = pixelData[pixelIndex]
 
         // Improved brightness mapping with gamma correction
-        let gammaCorrected = pow(brightness, 0.7)  // Adjust gamma for better contrast
+        let gammaCorrected = pow(brightness, 0.65)  // Adjust gamma for better contrast
         let charIndex = Int(gammaCorrected * Double(asciiChars.count - 1))
         let char = asciiChars[asciiChars.index(asciiChars.startIndex, offsetBy: charIndex)]
         asciiString.append(char)
