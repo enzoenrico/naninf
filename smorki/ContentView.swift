@@ -161,7 +161,7 @@ struct ContentView: View {
       return
     } else {
       print("AI-generated video URL not available, ")
-      let u = URL(string: "https://v3.fal.media/files/penguin/NNiDfSIJtOmbt4WrrlzZl_output.mp4")!
+      let u = URL(string: "https://v3.fal.media/files/panda/GlYLge7xLsr9K39M33kG3_output.mp4")!
       ascii.loadVideo(url: u)
       ascii.startConversion()
 
@@ -193,6 +193,55 @@ struct ContentView: View {
     self.currentGifData = gifData
   }
 
+  private func loadVideoQuery(generated_result: String, trimmedInput: String) async throws
+    -> GenerateContentResponse
+  {
+    let maxResponseLength = 1500
+    
+    // First truncate by length, then cut before "What do you do?"
+    let lengthTruncatedResult =
+      generated_result.count > maxResponseLength
+      ? String(generated_result.prefix(maxResponseLength)) + "..."
+      : generated_result
+    
+    // Find and cut before "What do you do?" if it exists
+    let finalResult: String
+    if let whatDoYouDoRange = lengthTruncatedResult.range(of: "What do you do?", options: .caseInsensitive) {
+      finalResult = String(lengthTruncatedResult[..<whatDoYouDoRange.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+    } else {
+      finalResult = lengthTruncatedResult
+    }
+
+    let escapedResult =
+      finalResult
+      .replacingOccurrences(of: "\\", with: "\\\\")
+      .replacingOccurrences(of: "\"", with: "\\\"")
+      .replacingOccurrences(of: "\n", with: "\\n")
+      .replacingOccurrences(of: "\r", with: "\\r")
+      .replacingOccurrences(of: "\t", with: "\\t")
+
+    let escapedInput =
+      trimmedInput
+      .replacingOccurrences(of: "\\", with: "\\\\")
+      .replacingOccurrences(of: "\"", with: "\\\"")
+      .replacingOccurrences(of: "\n", with: "\\n")
+      .replacingOccurrences(of: "\r", with: "\\r")
+      .replacingOccurrences(of: "\t", with: "\\t")
+
+    let video_prompt = try await ai.generatorChat.sendMessage([
+      .init(
+        parts:
+          """
+          {
+            "system_response": "\(escapedResult)",
+            "user_input": "\(escapedInput)"
+          }
+          """
+      )
+    ])
+    return video_prompt
+  }
+
   private func submitMessage() async {
     let trimmedInput = userInput.trimmingCharacters(in: .whitespacesAndNewlines)
     guard trimmedInput == "> " || !trimmedInput.isEmpty || currentGifData != nil else { return }
@@ -206,13 +255,24 @@ struct ContentView: View {
     currentGifData = nil
 
     var generated_result = "No response from model"
+    var generated_video_prompt: String = ""
     do {
       let response = try await ai.chat.sendMessage([
         .init(role: "user", parts: trimmedInput)
       ]).text
       if let response = response {
         generated_result = response
+        print("Generated response: ")
+        print(response)
       }
+      let video_prompt = try await loadVideoQuery(
+        generated_result: generated_result, trimmedInput: trimmedInput)
+      if let videoPrompt = video_prompt.text {
+        generated_video_prompt = videoPrompt
+      } else {
+        print("No video prompt generated")
+      }
+
     } catch {
       print("no response from the model")
       print(error.localizedDescription)
@@ -227,13 +287,16 @@ struct ContentView: View {
       return
     }
 
-    // self.loadBundledGIF(path: "veo3_wizard_refined")
-    // self.loadBundledVideo(path: "video2")
-    let aiUrl = await self.ai.generateVideo(trimmedInput)
+    // print("Generated video prompt: \(generated_video_prompt)")
+
+    print("Starting video generation")
+    print(generated_video_prompt)
+    // change to generated_video_prompt
+    let aiUrl = await self.ai.generateVideo(generated_video_prompt)
     print("AI URL: \(String(describing: aiUrl))")
 
     // Load the generated video after it's ready
-    self.loadBundledVideo()  // path parameter won't be used for remote URLs
+    self.loadBundledVideo()  
 
     // Replace loading message with completed message
     if let index = messageHistory.firstIndex(where: { $0.id == loadingMessage.id }) {
@@ -244,7 +307,6 @@ struct ContentView: View {
       )
     }
 
-    // Update AI history
     ai.history.append(contentsOf: [
       ModelContent(
         role: "user",
@@ -257,7 +319,6 @@ struct ContentView: View {
     ])
 
     currentGifData = nil
-    print(self.ai.generatedVideoURL)
   }
 
   private func submitMessageSync() {

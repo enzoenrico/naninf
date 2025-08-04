@@ -12,7 +12,7 @@ class Ascii: ObservableObject {
   @Published var targetWidth: Int = 80
 
   private let frameRate = 0.08  // Increased frame rate for smoother playback
-  private let asciiChars = "@%$*+=-:. ".reversed()
+  private let asciiChars = "@#%$*+=-:. ".reversed()
 
   private var gifSource: CGImageSource?
   private var videoAsset: AVAsset?
@@ -258,7 +258,7 @@ class Ascii: ObservableObject {
         let brightness = pixelData[pixelIndex]
 
         // Improved brightness mapping with gamma correction
-        let gammaCorrected = pow(brightness, 0.65)  // Adjust gamma for better contrast
+        let gammaCorrected = pow(brightness, 0.5)  // Adjust gamma for better contrast
         let charIndex = Int(gammaCorrected * Double(asciiChars.count - 1))
         let char = asciiChars[asciiChars.index(asciiChars.startIndex, offsetBy: charIndex)]
         asciiString.append(char)
