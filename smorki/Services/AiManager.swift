@@ -47,12 +47,7 @@ class AiManager: ObservableObject {
     )
   }
 
-  public func generateVideo(_ prompt: String) async {
-    DispatchQueue.main.async {
-      self.isGeneratingVideo = true
-      self.generatedVideoURL = nil
-    }
-
+  public func generateVideo(_ prompt: String) async -> URL? {
     do {
       let result = try await falModel.subscribe(
         to: "fal-ai/wan/v2.2-a14b/text-to-video/turbo",
@@ -69,17 +64,18 @@ class AiManager: ObservableObject {
 
       print("Raw result: \(result)")
 
+      self.generatedVideoURL = result["video"].stringValue
+      print(self.generatedVideoURL ?? "No video URL found")
+      print(result["video"])
 
-      DispatchQueue.main.async {
-        self.isGeneratingVideo = false
-        self.generatedVideoURL = result["video"].stringValue
-      }
+      return URL(string: self.generatedVideoURL ?? "")
 
     } catch {
       print("Error generating video: \(error.localizedDescription)")
       DispatchQueue.main.async {
         self.isGeneratingVideo = false
       }
+      return URL(string: "")
     }
   }
 
@@ -99,35 +95,4 @@ class AiManager: ObservableObject {
     return nil
   }
 
-  // Enhanced extraction method that handles Payload types
-  private func extractVideoURL(from result: [String: Payload]) -> String? {
-    // Try the main video.url path first (based on your console output)
-    if let videoPayload = result["video"] as? [String: Payload],
-      let urlPayload = videoPayload["url"],
-      case let .string(url) = urlPayload
-    {
-      return url
-    }
-
-    // Try alternative structures
-    let possibleKeys = ["video", "output", "url", "file_url", "video_url"]
-
-    for key in possibleKeys {
-      if let payload = result[key] {
-        // If it's directly a string payload
-        if case let .string(url) = payload {
-          return url
-        }
-        // If it's a nested dictionary
-        else if case let .dict(nestedDict) = payload,
-          let urlPayload = nestedDict["url"],
-          case let .string(url) = urlPayload
-        {
-          return url
-        }
-      }
-    }
-
-    return nil
-  }
 }

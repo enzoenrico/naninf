@@ -44,24 +44,28 @@ struct MessageView: View {
 
   private let loadingCharacters = ["▁", "▂", "▃", "▄", "▅", "▆", "▇"]
 
+  fileprivate func LoadState() -> HStack<TupleView<(Text, some View)>> {
+    return
+      HStack {
+        Text("Generating story")
+          .foregroundColor(.green)
+
+        Text(
+          "\(loadingCharacters[loadingAnimationIndex])\(loadingCharacters[(loadingAnimationIndex + 1) % loadingCharacters.count])\(loadingCharacters[(loadingAnimationIndex + 2) % loadingCharacters.count])"
+        )
+        .foregroundColor(.green)
+        .font(.departure(size: 14))
+        .onAppear {
+          startLoadingAnimation()
+        }
+      }
+  }
+
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       if message.isLoading {
-        // Loading state
-        HStack {
-          Text("Generating story")
-            .foregroundColor(.green)
-
-          Text(
-            "\(loadingCharacters[loadingAnimationIndex])\(loadingCharacters[(loadingAnimationIndex + 1) % loadingCharacters.count])\(loadingCharacters[(loadingAnimationIndex + 2) % loadingCharacters.count])"
-          )
-          .foregroundColor(.green)
-          .font(.departure(size: 14))
-          .onAppear {
-            startLoadingAnimation()
-          }
-        }
-        .padding()
+        LoadState()
+          .padding()
       } else if let response = message.response {
         // Actual response
         Text(response)

@@ -140,26 +140,40 @@ struct ContentView: View {
 
   }
 
-  private func loadBundledVideo(path: String) {
-    guard let videoURL = Bundle.main.url(forResource: path, withExtension: "mp4") else {
-      print("Video file not found")
+  private func loadBundledVideo() {
+    // First try to use the AI-generated video URL if available
+    if let generatedURLString = ai.generatedVideoURL,
+      let generatedURL = URL(string: generatedURLString)
+    {
+
+      print("Loading AI-generated video from: \(generatedURL)")
+
+      ascii.loadVideo(url: generatedURL)
+      ascii.startConversion()
+
+      // Create video data for history using the remote URL
+      let videoData = Message.GifData(
+        url: generatedURL,
+        frameCount: ascii.frameCount,
+        aspectRatio: ascii.aspectRatio
+      )
+      self.currentGifData = videoData
+      return
+    } else {
+      print("AI-generated video URL not available, ")
+      let u = URL(string: "https://v3.fal.media/files/tiger/DFPkkt2kw3udR3jB4rMc9_output.mp4")!
+      ascii.loadVideo(url: u)
+      ascii.startConversion()
+
+      // Create video data for history using the remote URL
+      let videoData = Message.GifData(
+        url: u,
+        frameCount: ascii.frameCount,
+        aspectRatio: ascii.aspectRatio
+      )
+      self.currentGifData = videoData
       return
     }
-    
-    print("Loading video from: \(videoURL)")
-
-    ascii.loadVideo(url: videoURL)
-    ascii.startConversion()
-    
-    let vUrl = URL(string: ai.generatedVideoURL ?? "" )
-
-    // Create video data for history
-    let videoData = Message.GifData(
-      url: vUrl ?? videoURL,
-      frameCount: ascii.frameCount,
-      aspectRatio: ascii.aspectRatio
-    )
-    self.currentGifData = videoData
   }
 
   private func loadBundledGIF(path: String) {
@@ -213,10 +227,12 @@ struct ContentView: View {
       return
     }
 
-    
     // self.loadBundledGIF(path: "veo3_wizard_refined")
     // self.loadBundledVideo(path: "video2")
-    await self.ai.generateVideo(trimmedInput)
+    // await self.ai.generateVideo(trimmedInput)
+
+    // Load the generated video after it's ready
+    self.loadBundledVideo()  // path parameter won't be used for remote URLs
 
     // Replace loading message with completed message
     if let index = messageHistory.firstIndex(where: { $0.id == loadingMessage.id }) {
