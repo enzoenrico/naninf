@@ -169,39 +169,52 @@ struct ContentView: View {
     }
   }
 
-  private func loadBundledVideo() {
-    // First try to use the AI-generated video URL if available
-    if let generatedURLString = ai.generatedVideoURL,
-      let generatedURL = URL(string: generatedURLString)
-    {
-
-      print("Loading AI-generated video from: \(generatedURL)")
-
-      ascii.loadVideo(url: generatedURL)
-      // ascii.startConversion()
-
-      // Create video data for history using the remote URL
-      let videoData = Message.GifData(
-        url: generatedURL,
-        frameCount: ascii.frameCount,
-        aspectRatio: ascii.aspectRatio
-      )
-      self.currentGifData = videoData
-      return
-    } else {
-      print("AI-generated video URL not available, ")
-      let u = URL(string: "https://v3.fal.media/files/panda/GlYLge7xLsr9K39M33kG3_output.mp4")!
-      ascii.loadVideo(url: u)
-      // ascii.startConversion()
-
-      // Create video data for history using the remote URL
-      let videoData = Message.GifData(
-        url: u,
-        frameCount: ascii.frameCount,
-        aspectRatio: ascii.aspectRatio
-      )
-      self.currentGifData = videoData
-      return
+  private func loadBundledVideo() async {
+    await withCheckedContinuation { continuation in
+        Task.detached {
+            // First try to use the AI-generated video URL if available
+            if let generatedURLString = await self.ai.generatedVideoURL,
+               let generatedURL = URL(string: generatedURLString) {
+                
+                print("Loading AI-generated video from: \(generatedURL)")
+                
+                // Load video on background thread
+                await self.ascii.loadVideo(url: generatedURL)
+                await self.ascii.startConversion() // Add this line!
+                
+                // Create video data for history using the remote URL
+                let videoData = Message.GifData(
+                    url: generatedURL,
+                    frameCount: await self.ascii.frameCount,
+                    aspectRatio: await self.ascii.aspectRatio
+                )
+                
+                await MainActor.run {
+                    self.currentGifData = videoData
+                }
+                
+            } else {
+                print("AI-generated video URL not available")
+                let u = URL(string: "https://v3.fal.media/files/panda/GlYLge7xLsr9K39M33kG3_output.mp4")!
+                
+                // Load video on background thread
+                await self.ascii.loadVideo(url: u)
+                await self.ascii.startConversion() // Add this line!
+                
+                // Create video data for history using the remote URL
+                let videoData = Message.GifData(
+                    url: u,
+                    frameCount: await self.ascii.frameCount,
+                    aspectRatio: await self.ascii.aspectRatio
+                )
+                
+                await MainActor.run {
+                    self.currentGifData = videoData
+                }
+            }
+            
+            continuation.resume()
+        }
     }
   }
 
@@ -311,7 +324,7 @@ struct ContentView: View {
     }
 
     // Actually call the function to load video/GIF data
-    loadBundledVideo() // This was commented out!
+    await loadBundledVideo() // This was commented out!
     
     // Use the loaded GIF data
     let gifDataToUse = currentGifData
