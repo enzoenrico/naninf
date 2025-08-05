@@ -18,7 +18,7 @@ class Ascii: ObservableObject {
   private var videoAsset: AVAsset?
   private var precomputedVideoFrames: [String] = []  // Cache ASCII frames
   private var videoDuration: CMTime = .zero
-  
+
   public var frameCount: Int = 0
   public var currentFrameIndex: Int
   private var timer: Timer?
@@ -32,7 +32,7 @@ class Ascii: ObservableObject {
   func loadGIF(from url: URL) {
     // Clear any existing video data
     clearVideoData()
-    
+
     guard let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil) else {
       print("Failed to create image source from URL")
       return
@@ -49,7 +49,7 @@ class Ascii: ObservableObject {
   func loadGIF(from data: Data) {
     // Clear any existing video data
     clearVideoData()
-    
+
     guard let imageSource = CGImageSourceCreateWithData(data as CFData, nil) else {
       print("Failed to create image source from data")
       return
@@ -66,90 +66,108 @@ class Ascii: ObservableObject {
   func loadVideo(url: URL) {
     // Clear any existing GIF data
     clearGIFData()
-    
+
     let asset = AVAsset(url: url)
     self.videoAsset = asset
-    
+
     // Check if the asset has video tracks
     guard asset.tracks(withMediaType: .video).count > 0 else {
       print("No video tracks found in the asset")
       return
     }
-    
+
     // Get video duration
     self.videoDuration = asset.duration
     let durationInSeconds = CMTimeGetSeconds(videoDuration)
-    
+
     // Reduce target FPS for better performance but still smooth
-    let targetFPS = 15.0 // Increased from 10 for smoother playback
-    let frameInterval = 1.0 / targetFPS
-    
+    let targetFPS = 15.0  // Increased from 10 for smoother playback
+
     // Calculate total frames
     let totalFrames = Int(durationInSeconds * targetFPS)
     self.frameCount = totalFrames
     self.currentFrameIndex = 0
-    
+
     // Get aspect ratio from video
-    if let videoTrack = asset.tracks(withMediaType: .video).first {
-      let size = videoTrack.naturalSize.applying(videoTrack.preferredTransform)
-      let videoAspectRatio = Double(abs(size.width)) / Double(abs(size.height))
-      DispatchQueue.main.async {
-        self.aspectRatio = videoAspectRatio
-      }
-    }
-    
+    // if let videoTrack = asset.tracks(withMediaType: .video).first {
+    //     let size = videoTrack.naturalSize.applying(videoTrack.preferredTransform)
+      // DispatchQueue.main.async {
+      //   self.aspectRatio = videoAspectRatio
+      // }
+    // }
+
     print("Loaded video with \(frameCount) frames at \(targetFPS) FPS")
-    
+
     // Start precomputing frames in background
     precomputeVideoFrames(asset: asset, targetFPS: targetFPS, durationInSeconds: durationInSeconds)
   }
-  
+
   private func precomputeVideoFrames(asset: AVAsset, targetFPS: Double, durationInSeconds: Double) {
     guard !isPrecomputing else { return }
     isPrecomputing = true
-    
-    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+
+    Task.detached { [weak self] in
       guard let self = self else { return }
-      
+
       let imageGenerator = AVAssetImageGenerator(asset: asset)
       imageGenerator.appliesPreferredTrackTransform = true
       imageGenerator.requestedTimeToleranceBefore = CMTime(seconds: 0.1, preferredTimescale: 600)
       imageGenerator.requestedTimeToleranceAfter = CMTime(seconds: 0.1, preferredTimescale: 600)
-      
-      var frames: [String] = []
+
+      var totalFrames: [String] = []
+      var batch: [String] = []
+      let batchSize = 10  // Process 10 frames per batch
       let frameInterval = 1.0 / targetFPS
-      
       var currentTime = 0.0
+
       while currentTime < durationInSeconds {
         let time = CMTime(seconds: currentTime, preferredTimescale: 600)
-        
+
         do {
           let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
           let asciiString = self.convertImageToASCII(cgImage: cgImage)
-          frames.append(asciiString)
+          batch.append(asciiString)
         } catch {
-          // If frame generation fails, use empty frame or previous frame
-          let emptyFrame = String(repeating: " ", count: self.targetWidth * 20) // Fallback
-          frames.append(emptyFrame)
-          print("Warning: Could not generate frame at time \(currentTime): \(error.localizedDescription)")
+          let emptyFrame = String(repeating: " ", count: self.targetWidth * 20)
+          batch.append(emptyFrame)
+          print(
+            "Warning: Could not generate frame at time \(currentTime): \(error.localizedDescription)"
+          )
         }
-        
+
+        // If we've collected the batch, update the UI on the main thread.
+        if batch.count >= batchSize {
+          await MainActor.run {
+            self.precomputedVideoFrames.append(contentsOf: batch)
+          }
+          totalFrames.append(contentsOf: batch)
+          batch.removeAll()
+        }
+
         currentTime += frameInterval
       }
-      
-      DispatchQueue.main.async {
-        self.precomputedVideoFrames = frames
-        self.frameCount = frames.count
+
+      // Append any remaining frames
+      if !batch.isEmpty {
+        await MainActor.run {
+          self.precomputedVideoFrames.append(contentsOf: batch)
+        }
+        totalFrames.append(contentsOf: batch)
+      }
+
+      // Final update on the main thread
+      await MainActor.run {
+        self.frameCount = totalFrames.count
         self.isPrecomputing = false
-        print("Precomputed \(frames.count) video frames")
+        print("Precomputed \(totalFrames.count) video frames")
       }
     }
   }
-  
+
   private func clearGIFData() {
     gifSource = nil
   }
-  
+
   private func clearVideoData() {
     videoAsset = nil
     precomputedVideoFrames = []
@@ -164,7 +182,7 @@ class Ascii: ObservableObject {
 
   // Start real-time ASCII conversion
   func startConversion(_ frameIndex: Int? = nil) {
-    guard (gifSource != nil || videoAsset != nil), frameCount > 0 else {
+    guard gifSource != nil || videoAsset != nil, frameCount > 0 else {
       print(
         "No GIF or video loaded - gifSource: \(gifSource != nil), videoAsset: \(videoAsset != nil), frameCount: \(frameCount)"
       )
@@ -192,7 +210,7 @@ class Ascii: ObservableObject {
     } else {
       frameIndex = currentFrameIndex % frameCount
     }
-    
+
     // Handle GIF frames
     if let gifSource = gifSource {
       if let cgImage = CGImageSourceCreateImageAtIndex(gifSource, frameIndex, nil) {
@@ -230,9 +248,7 @@ class Ascii: ObservableObject {
     // Calculate and store aspect ratio for UI (only update if not already set)
     let imageAspectRatio = Double(originalWidth) / Double(originalHeight)
     if aspectRatio == 1.0 {
-      DispatchQueue.main.async {
-        self.aspectRatio = imageAspectRatio
-      }
+      self.aspectRatio = imageAspectRatio
     }
 
     // Character aspect ratio compensation - characters are typically taller than wide

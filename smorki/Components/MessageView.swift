@@ -9,7 +9,7 @@ struct Message: Identifiable {
   let timestamp: Date
   var gifData: GifData?
   let isLoading: Bool
-  
+
   struct GifData {
     let url: URL
     let frameCount: Int
@@ -33,7 +33,7 @@ struct Message: Identifiable {
     self.gifData = gifData
     self.isLoading = false
   }
-  
+
   // Method to update message with video data
   func withGifData(_ gifData: GifData?) -> Message {
     var updated = self
@@ -47,17 +47,19 @@ struct TypewriterText: View {
   let font: Font
   let color: Color
   let speed: Double
-  
+
   @State private var displayedText: String = ""
   @State private var currentIndex: Int = 0
-  
-  init(_ text: String, font: Font = .departure(size: 14), color: Color = .green, speed: Double = 0.05) {
+
+  init(
+    _ text: String, font: Font = .departure(size: 14), color: Color = .green, speed: Double = 0.05
+  ) {
     self.text = text
     self.font = font
     self.color = color
     self.speed = speed
   }
-  
+
   var body: some View {
     Text(displayedText)
       .font(font)
@@ -69,26 +71,26 @@ struct TypewriterText: View {
         resetAndStart()
       }
   }
-  
+
   private func startTypewriting() {
     displayedText = ""
     currentIndex = 0
     typeNextCharacter()
   }
-  
+
   private func resetAndStart() {
     displayedText = ""
     currentIndex = 0
     startTypewriting()
   }
-  
+
   private func typeNextCharacter() {
     guard currentIndex < text.count else { return }
-    
+
     let index = text.index(text.startIndex, offsetBy: currentIndex)
     displayedText.append(text[index])
     currentIndex += 1
-    
+
     DispatchQueue.main.asyncAfter(deadline: .now() + speed) {
       typeNextCharacter()
     }
@@ -139,12 +141,14 @@ struct MessageView: View {
             .aspectRatio(gifData.aspectRatio, contentMode: .fit)
             .frame(maxWidth: .infinity)
             .onAppear {
-              if gifData.url.pathExtension.lowercased() == "mp4" {
-                ascii.loadVideo(url: gifData.url)
-              } else {
-                ascii.loadGIF(from: gifData.url)
+              Task {
+                // if gifData.url.pathExtension.lowercased() == "mp4" {
+                //   ascii.loadVideo(url: gifData.url)
+                // } else {
+                //   ascii.loadGIF(from: gifData.url)
+                // }
+                ascii.startConversion()
               }
-              ascii.startConversion()
             }
             .onDisappear {
               ascii.stopConversion()

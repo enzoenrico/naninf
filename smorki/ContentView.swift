@@ -178,7 +178,7 @@ struct ContentView: View {
       print("Loading AI-generated video from: \(generatedURL)")
 
       ascii.loadVideo(url: generatedURL)
-      ascii.startConversion()
+      // ascii.startConversion()
 
       // Create video data for history using the remote URL
       let videoData = Message.GifData(
@@ -192,7 +192,7 @@ struct ContentView: View {
       print("AI-generated video URL not available, ")
       let u = URL(string: "https://v3.fal.media/files/panda/GlYLge7xLsr9K39M33kG3_output.mp4")!
       ascii.loadVideo(url: u)
-      ascii.startConversion()
+      // ascii.startConversion()
 
       // Create video data for history using the remote URL
       let videoData = Message.GifData(
@@ -276,80 +276,64 @@ struct ContentView: View {
 
   private func submitMessage() async {
     let trimmedInput = userInput.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard trimmedInput == "> " || !trimmedInput.isEmpty || currentGifData != nil else { return }
+    guard trimmedInput != "> " && !trimmedInput.isEmpty else { return }
 
-    // Create loading message immediately
-    let loadingMessage = Message(title: trimmedInput, isLoading: true)
-    messageHistory.append(loadingMessage)
-
-    // Clear input and reset UI state
-    userInput = "> "
-    currentGifData = nil
+    // Create loading message immediately on main thread
+    await MainActor.run {
+        let loadingMessage = Message(title: trimmedInput, isLoading: true)
+        messageHistory.append(loadingMessage)
+        userInput = "> "
+    }
 
     var generated_result = "No response from model"
-    var generated_video_prompt: String = ""
     do {
-      let response = try await ai.chat.sendMessage([
-        .init(role: "user", parts: trimmedInput)
-      ]).text
-      if let response = response {
-        generated_result = response
-        print("Generated response: ")
-        print(response)
-      }
-      let video_prompt = try await loadVideoQuery(
-        generated_result: generated_result, trimmedInput: trimmedInput)
-      if let videoPrompt = video_prompt.text {
-        generated_video_prompt = videoPrompt
-      } else {
-        print("No video prompt generated")
-      }
-
+        let response = try await ai.chat.sendMessage([
+            .init(role: "user", parts: trimmedInput)
+        ]).text
+        if let response = response {
+            generated_result = response
+            print("Generated response:")
+            print(response)
+        }
     } catch {
-      print("no response from the model")
-      print(error.localizedDescription)
-
-      if let index = messageHistory.firstIndex(where: { $0.id == loadingMessage.id }) {
-        messageHistory[index] = Message(
-          title: trimmedInput,
-          response: "Error: Could not generate story. Please try again.",
-          gifData: nil
-        )
-      }
-      return
+        print("No response from the model")
+        print(error.localizedDescription)
+        await MainActor.run {
+            if let index = messageHistory.firstIndex(where: { $0.isLoading }) {
+                messageHistory[index] = Message(
+                    title: trimmedInput,
+                    response: "Error: Could not generate story. Please try again.",
+                    gifData: nil
+                )
+            }
+        }
+        return
     }
 
-    // print("Generated video prompt: \(generated_video_prompt)")
+    // Actually call the function to load video/GIF data
+    loadBundledVideo() // This was commented out!
+    
+    // Use the loaded GIF data
+    let gifDataToUse = currentGifData
 
-    print("Starting video generation")
-    print(generated_video_prompt)
-    // change to generated_video_prompt
-    // let aiUrl = await self.ai.generateVideo(generated_video_prompt)
-    // print("AI URL: \(String(describing: aiUrl))")
-
-    // Load the generated video after it's ready
-    self.loadBundledVideo()
-
-    // Replace loading message with completed message
-    if let index = messageHistory.firstIndex(where: { $0.id == loadingMessage.id }) {
-      messageHistory[index] = Message(
-        title: trimmedInput,
-        response: generated_result,
-        gifData: currentGifData
-      )
+    // Update the message history
+    await MainActor.run {
+        if let index = messageHistory.firstIndex(where: { $0.isLoading }) {
+            messageHistory[index] = Message(
+                title: trimmedInput,
+                response: generated_result,
+                gifData: gifDataToUse
+            )
+        }
+        
+        // Update AI history
+        ai.history.append(contentsOf: [
+            ModelContent(role: "user", parts: trimmedInput),
+            ModelContent(role: "system", parts: generated_result)
+        ])
     }
 
-    ai.history.append(contentsOf: [
-      ModelContent(
-        role: "user",
-        parts: trimmedInput
-      ),
-      ModelContent(
-        role: "system",
-        parts: generated_result
-      ),
-    ])
-
+    // Clear currentGifData after use
     currentGifData = nil
   }
 
@@ -442,7 +426,7 @@ struct StartScreenAnimation: View {
   @Binding var startSequenceEnded: Bool
 
   private let fullText = """
-    Do qui fugiat ipsum occaecat ullamco sint aliqua enim pariatur Lorem. Lorem laborum magna aliquip non ex do dolore amet non eiusmod aute. Dolore aute nulla ea voluptate ad commodo ea non ipsum incididunt. Cillum in culpa cillum non pariatur ad ex fugiat. Excepteur officia ullamco laborum exercitation. Dolore dolor ex elit ea dolor ea reprehenderit reprehenderit veniam culpa nostrud. Sit magna veniam laborum magna cillum fugiat dolor incididunt nulla veniam commodo. Incididunt sunt labore pariatur culpa esse dolore elit commodo eu deserunt. Aute ea quis mollit officia ipsum laboris ex non ad occaecat. Consequat sint cupidatat adipisicing dolore laboris aute fugiat tempor. Pariatur in in eiusmod occaecat laboris ullamco. Irure dolore aliqua sit velit pariatur incididunt aliqua qui aute sit eu est Lorem. Nisi elit aliqua minim non nisi commodo nisi excepteur commodo sit aute. Occaecat nostrud mollit adipisicing duis adipisicing minim. Aute id eiusmod fugiat id. Ex sunt sunt dolore duis ea eiusmod voluptate duis tempor commodo ullamco. Aliquip exercitation sint ex ut ad veniam cupidatat quis veniam anim est. Non nulla id duis. Cillum deserunt ipsum ullamco cupidatat Lorem officia. Ipsum dolor mollit id enim duis occaecat ex commodo proident aliquip dolore.
+    Welcome to the dungeon
     """
 
   var body: some View {
@@ -464,7 +448,7 @@ struct StartScreenAnimation: View {
     self.startSequenceEnded = true
     let characters = Array(fullText)
 
-    Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { timer in
+    Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
       if currentIndex < characters.count {
         animatedText.append(characters[currentIndex])
         currentIndex += 1
