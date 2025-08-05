@@ -141,12 +141,14 @@ struct MessageView: View {
             .aspectRatio(gifData.aspectRatio, contentMode: .fit)
             .frame(maxWidth: .infinity)
             .onAppear {
-              Task {
-                // if gifData.url.pathExtension.lowercased() == "mp4" {
-                //   ascii.loadVideo(url: gifData.url)
-                // } else {
-                //   ascii.loadGIF(from: gifData.url)
-                // }
+              // Load the video/gif from the gifData URL
+              if gifData.url.pathExtension.lowercased() == "mp4" {
+                Task {
+                  await ascii.loadVideo(url: gifData.url)
+                  await ascii.startConversion()
+                }
+              } else {
+                ascii.loadGIF(from: gifData.url)
                 ascii.startConversion()
               }
             }
