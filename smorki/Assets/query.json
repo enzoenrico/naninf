@@ -36,3 +36,20 @@ Output:
 
 ---
 
+
+Negative prompt
+
+{
+  "continuousVideoPrompts_Negative": [
+    {
+      "promptId": "neg_prompt_universal_v1",
+      "subject": "Deformed, mutated, disfigured, malformed body parts, extra limbs, missing limbs, fused fingers, too many fingers, distorted face, blurry face, bad anatomy, ugly.",
+      "context": "Blurry background, low-resolution, flat textures, unrealistic, incoherent scenery, floating objects.",
+      "action": "Jerky motion, unnatural movement, stiff animation, flickering, glitching, sliding feet, non-physical movement.",
+      "style": "Cartoon, anime, 3d render, CGI, plastic look, low quality, jpeg artifacts, compression artifacts, noisy, grainy, watermark, signature, text, username, logo.",
+      "cameraMotion": "Shaky camera, unstable, erratic movement, vibrating.",
+      "composition": "Badly framed, cropped, out of frame, cluttered, awkward composition, asymmetrical.",
+      "ambiance": "Flat lighting, overexposed, underexposed, harsh shadows, unnatural colors, oversaturated, desaturated, bland."
+    }
+  ]
+}

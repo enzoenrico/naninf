@@ -8,7 +8,7 @@ struct Message: Identifiable {
   let response: String?
   let timestamp: Date
   var gifData: GifData?
-  let isLoading: Bool
+  @State var isLoading: Bool
 
   struct GifData {
     let url: URL
@@ -51,6 +51,8 @@ struct TypewriterText: View {
   @State private var displayedText: String = ""
   @State private var currentIndex: Int = 0
 
+  @State private var appeared = false
+
   init(
     _ text: String, font: Font = .departure(size: 14), color: Color = .green, speed: Double = 0.05
   ) {
@@ -65,7 +67,9 @@ struct TypewriterText: View {
       .font(font)
       .foregroundColor(color)
       .onAppear {
-        startTypewriting()
+        if !self.appeared {
+          startTypewriting()
+        }
       }
       .onChange(of: text) { newText in
         resetAndStart()
@@ -75,6 +79,7 @@ struct TypewriterText: View {
   private func startTypewriting() {
     displayedText = ""
     currentIndex = 0
+    appeared = true
     typeNextCharacter()
   }
 
@@ -103,6 +108,7 @@ struct MessageView: View {
 
   @StateObject private var ascii = Ascii(targetWidth: 140)
   @State private var loadingAnimationIndex = 0
+  @State private var hasLoadedMedia = false  // Add this state
 
   private let loadingCharacters = ["▁", "▂", "▃", "▄", "▅", "▆", "▇"]
 
@@ -125,11 +131,10 @@ struct MessageView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
-      if message.isLoading {
+      if message.isLoading{
         LoadState()
           .padding()
       } else if let response = message.response {
-        // Typewriter response text
         TypewriterText(response, font: .departure(size: 14), speed: 0.01)
           .padding()
 
@@ -141,6 +146,10 @@ struct MessageView: View {
             .aspectRatio(gifData.aspectRatio, contentMode: .fit)
             .frame(maxWidth: .infinity)
             .onAppear {
+              // Only load if not already loaded
+              guard !hasLoadedMedia else { return }
+              hasLoadedMedia = true
+
               // Load the video/gif from the gifData URL
               if gifData.url.pathExtension.lowercased() == "mp4" {
                 Task {
@@ -157,7 +166,7 @@ struct MessageView: View {
             }
             .padding(.top)
             .padding(.bottom)
-            .id(message.id)
+            .id(message.id)  // Ensure stable identity
         }
       }
     }
@@ -183,7 +192,7 @@ struct MessageView: View {
 
   private func startLoadingAnimation() {
     Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { timer in
-      if !message.isLoading {
+      if message.isLoading {
         timer.invalidate()
         return
       }

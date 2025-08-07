@@ -11,12 +11,12 @@ class Ascii: ObservableObject {
   @Published var aspectRatio: Double = 1.0
   @Published var targetWidth: Int = 80
 
-  private let frameRate = 0.08  // Increased frame rate for smoother playback
-  private let asciiChars = "@#%$*+=-:. ".reversed()
+  private let frameRate = 0.08  
+  private let asciiChars = "  .*░▒▓█"
 
   private var gifSource: CGImageSource?
   private var videoAsset: AVAsset?
-  private var precomputedVideoFrames: [String] = []  // Cache ASCII frames
+  private var precomputedVideoFrames: [String] = []  
   private var videoDuration: CMTime = .zero
 
   public var frameCount: Int = 0
@@ -91,9 +91,9 @@ class Ascii: ObservableObject {
     // Get aspect ratio from video
     // if let videoTrack = asset.tracks(withMediaType: .video).first {
     //     let size = videoTrack.naturalSize.applying(videoTrack.preferredTransform)
-      // DispatchQueue.main.async {
-      //   self.aspectRatio = videoAspectRatio
-      // }
+    // DispatchQueue.main.async {
+    //   self.aspectRatio = videoAspectRatio
+    // }
     // }
 
     print("Loaded video with \(frameCount) frames at \(targetFPS) FPS")
