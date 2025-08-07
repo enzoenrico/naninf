@@ -83,11 +83,12 @@ struct ContentView: View {
           ScrollViewReader { proxy in
             ScrollView {
               LazyVStack(alignment: .leading, spacing: 16) {
-                ForEach(messageHistory) { message in
+                ForEach(messageHistory, id: \.id) { message in  // Explicit id
                   MessageView(
                     message: message,
                     fontSize: calculateFontSize(for: geometry.size)
                   )
+                  .id(message.id)  // Stable view identity
                 }
               }
             }
@@ -95,7 +96,7 @@ struct ContentView: View {
             .onChange(of: messageHistory.count) { _ in
               if let last = messageHistory.last {
                 withAnimation(.interpolatingSpring) {
-                  proxy.scrollTo(last.id, anchor: .top)
+                  proxy.scrollTo(last.id, anchor: .bottom)
                 }
               }
             }
@@ -107,7 +108,8 @@ struct ContentView: View {
             resetAdventure: resetAdventure,
             showModal: $showModal,
             showResetModal: $showResetModal,
-            isGameEnded: $isGameEnded
+            isGameEnded: $isGameEnded,
+
           )
           .padding()
         }
@@ -169,49 +171,46 @@ struct ContentView: View {
     }
   }
 
-  private func loadBundledVideo() async {
+  private func loadBundledVideo(prompt: String) async {
     await withCheckedContinuation { continuation in
       Task.detached {
-        // First try to use the AI-generated video URL if available
-        if let generatedURLString = await self.ai.generatedVideoURL,
-          let generatedURL = URL(string: generatedURLString)
-        {
-
-          print("Loading AI-generated video from: \(generatedURL)")
-
-          // Load video on background thread
-          await self.ascii.loadVideo(url: generatedURL)
-          await self.ascii.startConversion()  // Add this line!
-
-          // Create video data for history using the remote URL
-          let videoData = Message.GifData(
-            url: generatedURL,
-            frameCount: await self.ascii.frameCount,
-            aspectRatio: await self.ascii.aspectRatio
-          )
-
-          await MainActor.run {
-            self.currentGifData = videoData
+        var videoURL: URL?
+        if let imageAsset = await self.ai.generateImage(prompt) {
+          print("Image successful")
+          // Save UIImage to temporary directory and get its URL
+          if let data = imageAsset.pngData() {
+            let tempDir = FileManager.default.temporaryDirectory
+            let fileURL = tempDir.appendingPathComponent(UUID().uuidString + ".png")
+            try? data.write(to: fileURL)
+            videoURL = fileURL
+            print(fileURL)
           }
+        }
+        // Final fallback to hardcoded video
+        else {
+          print("No AI video available, using fallback video")
+          videoURL = URL(
+            string: "https://v3.fal.media/files/panda/GlYLge7xLsr9K39M33kG3_output.mp4")!
+        }
 
-        } else {
-          print("AI-generated video URL not available")
-          let u = URL(string: "https://v3.fal.media/files/panda/GlYLge7xLsr9K39M33kG3_output.mp4")!
+        guard let finalURL = videoURL else {
+          continuation.resume()
+          return
+        }
 
-          // Load video on background thread
-          await self.ascii.loadVideo(url: u)
-          await self.ascii.startConversion()  // Add this line!
+        // Load video on background thread
+        await self.ascii.loadVideo(url: finalURL)
+        await self.ascii.startConversion()
 
-          // Create video data for history using the remote URL
-          let videoData = Message.GifData(
-            url: u,
-            frameCount: await self.ascii.frameCount,
-            aspectRatio: await self.ascii.aspectRatio
-          )
+        // Create video data for history using the loaded URL
+        let videoData = Message.GifData(
+          url: finalURL,
+          frameCount: await self.ascii.frameCount,
+          aspectRatio: await self.ascii.aspectRatio
+        )
 
-          await MainActor.run {
-            self.currentGifData = videoData
-          }
+        await MainActor.run {
+          self.currentGifData = videoData
         }
 
         continuation.resume()
@@ -300,6 +299,7 @@ struct ContentView: View {
     }
 
     var generated_result = "No response from model"
+
     do {
       let response = try await ai.chat.sendMessage([
         .init(role: "user", parts: trimmedInput)
@@ -324,13 +324,17 @@ struct ContentView: View {
       return
     }
 
-    // Actually call the function to load video/GIF data
-    await loadBundledVideo()  // This was commented out!
+    if let img_prompt = try? await loadVideoQuery(
+      generated_result: generated_result, trimmedInput: trimmedInput)
+    {
+      await loadBundledVideo(prompt: img_prompt.text!)
+    } else {
+      print("no image prompt generated")
+      return
+    }
 
-    // Use the loaded GIF data
     let gifDataToUse = currentGifData
 
-    // Update the message history
     await MainActor.run {
       if let index = messageHistory.firstIndex(where: { $0.isLoading }) {
         messageHistory[index] = Message(
@@ -340,14 +344,12 @@ struct ContentView: View {
         )
       }
 
-      // Update AI history
       ai.history.append(contentsOf: [
         ModelContent(role: "user", parts: trimmedInput),
         ModelContent(role: "system", parts: generated_result),
       ])
     }
 
-    // Clear currentGifData after use
     currentGifData = nil
   }
 
@@ -414,6 +416,8 @@ struct InputField: View {
               .stroke(.green, lineWidth: 2)
           }
       }
+      .disabled(self.isGameEnded)
+
       Button(action: {
         showResetModal = true
       }) {
