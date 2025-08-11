@@ -30,7 +30,6 @@ class Ascii: ObservableObject {
   }
 
   func loadGIF(from url: URL) {
-    // Clear any existing video data
     clearVideoData()
 
     guard let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil) else {
@@ -45,9 +44,7 @@ class Ascii: ObservableObject {
     print("Loaded GIF with \(frameCount) frames")
   }
 
-  // Load GIF from Data
   func loadGIF(from data: Data) {
-    // Clear any existing video data
     clearVideoData()
 
     guard let imageSource = CGImageSourceCreateWithData(data as CFData, nil) else {

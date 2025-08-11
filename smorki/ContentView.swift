@@ -83,12 +83,12 @@ struct ContentView: View {
           ScrollViewReader { proxy in
             ScrollView {
               LazyVStack(alignment: .leading, spacing: 16) {
-                ForEach(messageHistory, id: \.id) { message in  // Explicit id
+                ForEach(messageHistory, id: \.id) { message in
                   MessageView(
                     message: message,
                     fontSize: calculateFontSize(for: geometry.size)
                   )
-                  .id(message.id)  // Stable view identity
+                  .id(message.id)
                 }
               }
             }
@@ -104,7 +104,7 @@ struct ContentView: View {
 
           InputField(
             textContent: $userInput,
-            onSubmit: submitMessage,
+            onSubmit: { await submitMessage(nil) },
             resetAdventure: resetAdventure,
             showModal: $showModal,
             showResetModal: $showResetModal,
@@ -128,7 +128,8 @@ struct ContentView: View {
             userInput: $userInput,
             dynamicH: $dynamicH,
             showModal: $showModal,
-            submitMessageSync: submitMessageSync
+            submitMessageSync: submitMessageSync,
+            options: extractOptions(from: messageHistory.last?.response ?? "")
           )
           .frame(maxWidth: .infinity, maxHeight: .infinity)
           .background(.black)
@@ -287,8 +288,8 @@ struct ContentView: View {
     return video_prompt
   }
 
-  private func submitMessage() async {
-    let trimmedInput = userInput.trimmingCharacters(in: .whitespacesAndNewlines)
+  private func submitMessage(_ val: String?) async {
+    let trimmedInput = val ?? userInput.trimmingCharacters(in: .whitespacesAndNewlines)
     guard trimmedInput != "> " && !trimmedInput.isEmpty else { return }
 
     // Create loading message immediately on main thread
@@ -353,10 +354,10 @@ struct ContentView: View {
     currentGifData = nil
   }
 
-  private func submitMessageSync() {
+  private func submitMessageSync(_ val: String? = nil) {
     Task {
       showModal = false
-      await submitMessage()
+      await submitMessage(val)
     }
 
   }
@@ -476,4 +477,22 @@ struct StartScreenAnimation: View {
       }
     }
   }
+}
+
+private func extractOptions(from response: String) -> [String] {
+  guard let range = response.range(of: "What do you do?", options: .caseInsensitive) else {
+    return []
+  }
+  let tail = response[range.upperBound...]
+  let parsed =
+    tail
+    .components(separatedBy: .newlines)
+    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+    .map { $0.replacingOccurrences(of: #"^>\s*"#, with: "", options: .regularExpression) }
+    .filter { !$0.isEmpty }
+    .filter {
+      $0.range(of: #"^[A-Z]\.\s"#, options: .regularExpression) != nil
+    }
+  print(parsed)
+  return parsed
 }
