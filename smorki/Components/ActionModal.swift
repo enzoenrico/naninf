@@ -106,7 +106,7 @@ struct ActionModal: View {
         }()
 
         Button(action: { submitMessageSync(option_text) }) {
-          TypewriterText("> " + option_text)
+          Text("> " + option_text)
             .frame(maxWidth: .infinity)
             .padding()
             .foregroundColor(.green)
@@ -115,7 +115,7 @@ struct ActionModal: View {
               RoundedRectangle(cornerRadius: 8)
                 .stroke(.green, lineWidth: 2)
                 .overlay(alignment: .topLeading) {
-                  TypewriterText("> " + option_id)
+                  Text("> " + option_id)
                     .font(.departure(size: 10))
                     .lineLimit(1)
                     .padding(.horizontal, 2)

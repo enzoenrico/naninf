@@ -14,6 +14,7 @@ import UniformTypeIdentifiers
 
 struct ContentView: View {
   @StateObject private var ascii = Ascii(targetWidth: 150)
+  @EnvironmentObject private var obs: Observability
   @State private var showModal = false
   @State private var selectedGIFURL: URL?
   @State private var lastFrame: Int?
@@ -99,6 +100,7 @@ struct ContentView: View {
                   proxy.scrollTo(last.id, anchor: .bottom)
                 }
               }
+              obs.logEvent("new message" )
             }
           }
 
@@ -115,12 +117,12 @@ struct ContentView: View {
         }
         .opacity(uiOpacity)
 
-        // Start screen animation overlay
-        if showStartAnimation {
-          StartScreenAnimation(startSequenceEnded: $showStartAnimation)
-            .opacity(animationOpacity)
-            .zIndex(10)
-        }
+        // // Start screen animation overlay
+        // if showStartAnimation {
+        //   StartScreenAnimation(startSequenceEnded: $showStartAnimation)
+        //     .opacity(animationOpacity)
+        //     .zIndex(10)
+        // }
 
         // Modal code
         if self.showModal {
@@ -148,6 +150,9 @@ struct ContentView: View {
       if messageHistory.isEmpty {
         startScreen()
       }
+    }
+    .onDisappear {
+      obs.logEvent("session_ended", parameters: ["message_history": self.messageHistory])
     }
     .enableInjection()
   }
@@ -439,45 +444,45 @@ struct InputField: View {
 }
 
 // Add this new view for the start screen animation
-struct StartScreenAnimation: View {
-  @State private var animatedText = ""
-  @State private var currentIndex = 0
-  @Binding var startSequenceEnded: Bool
+// struct StartScreenAnimation: View {
+//   @State private var animatedText = ""
+//   @State private var currentIndex = 0
+//   @Binding var startSequenceEnded: Bool
 
-  private let fullText = """
-    Welcome to the dungeon
-    """
+//   private let fullText = """
+//     Welcome to the dungeon
+//     """
 
-  var body: some View {
-    ZStack {
-      Color.black.ignoresSafeArea()
+//   var body: some View {
+//     ZStack {
+//       Color.black.ignoresSafeArea()
 
-      Text(animatedText)
-        .font(.system(.body, design: .monospaced))
-        .foregroundColor(.green)
-        .multilineTextAlignment(.center)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-    .onAppear {
-      startTypingAnimation()
-    }
-  }
+//       Text(animatedText)
+//         .font(.system(.body, design: .monospaced))
+//         .foregroundColor(.green)
+//         .multilineTextAlignment(.center)
+//         .frame(maxWidth: .infinity, maxHeight: .infinity)
+//     }
+//     .onAppear {
+//       startTypingAnimation()
+//     }
+//   }
 
-  private func startTypingAnimation() {
-    self.startSequenceEnded = true
-    let characters = Array(fullText)
+//   private func startTypingAnimation() {
+//     self.startSequenceEnded = true
+//     let characters = Array(fullText)
 
-    Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
-      if currentIndex < characters.count {
-        animatedText.append(characters[currentIndex])
-        currentIndex += 1
-      } else {
-        self.startSequenceEnded = false
-        timer.invalidate()
-      }
-    }
-  }
-}
+//     Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
+//       if currentIndex < characters.count {
+//         animatedText.append(characters[currentIndex])
+//         currentIndex += 1
+//       } else {
+//         self.startSequenceEnded = false
+//         timer.invalidate()
+//       }
+//     }
+//   }
+// }
 
 private func extractOptions(from response: String) -> [String] {
   guard let range = response.range(of: "What do you do?", options: .caseInsensitive) else {
