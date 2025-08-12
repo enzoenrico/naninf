@@ -131,7 +131,7 @@ struct MessageView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
-      if message.isLoading{
+      if message.isLoading {
         LoadState()
           .padding()
       } else if let response = message.response {
@@ -192,13 +192,13 @@ struct MessageView: View {
 
   private func startLoadingAnimation() {
     Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { timer in
-      if message.isLoading {
+      if !message.isLoading {
         timer.invalidate()
         return
       }
 
       withAnimation(.easeInOut(duration: 0.1)) {
-        loadingAnimationIndex = (loadingAnimationIndex + 1) % loadingCharacters.count
+        loadingAnimationIndex = (loadingAnimationIndex) % 7
       }
     }
   }
