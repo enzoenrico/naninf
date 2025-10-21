@@ -1,6 +1,4 @@
-import Foundation
 import SwiftUI
-import UniformTypeIdentifiers
 
 struct Message: Identifiable {
   let id = UUID()

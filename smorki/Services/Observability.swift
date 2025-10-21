@@ -49,24 +49,4 @@ public final class Observability: ObservableObject {
     shared.logScreenView(screenName: screenName, screenClass: screenClass)
   }
 
-  // MARK: - Typed helpers for common events
-
-  public enum Method: String { case email, apple, google, facebook, phone, github, unknown }
-
-  public static func logSignUp(method: Method) {
-    Analytics.logEvent(
-      AnalyticsEventSignUp,
-      parameters: [
-        AnalyticsParameterMethod: method.rawValue
-      ])
-  }
-
-  public static func logLogin(method: Method) {
-    Analytics.logEvent(
-      AnalyticsEventLogin,
-      parameters: [
-        AnalyticsParameterMethod: method.rawValue
-      ])
-  }
-
 }

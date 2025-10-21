@@ -2,10 +2,10 @@ import SwiftUI
 
 struct ActionModal: View {
   @Binding var userInput: String
-  @Binding var dynamicH: Double
   @Binding var showModal: Bool
   let submitMessageSync: (_ val: String?) -> Void
   @State var disabled: Bool = false
+  @State private var dynamicH: Double = 35.0
   var options: [String]
 
   var body: some View {

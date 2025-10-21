@@ -7,21 +7,14 @@
 
 import FirebaseAI
 import SwiftUI
-import UIKit
-import UniformTypeIdentifiers
-
-// Message model to store history
 
 struct ContentView: View {
   @StateObject private var ascii = Ascii(targetWidth: 150)
   @EnvironmentObject private var obs: Observability
   @State private var showModal = false
-  @State private var selectedGIFURL: URL?
-  @State private var lastFrame: Int?
   @State var userInput = "> "
   @State private var messageHistory: [Message] = []
   @State private var currentGifData: Message.GifData?
-  @State var dynamicH: Double = 35.0
 
   // Add these state variables to your ContentView
   @State private var showResetModal = false
@@ -117,18 +110,10 @@ struct ContentView: View {
         }
         .opacity(uiOpacity)
 
-        // // Start screen animation overlay
-        // if showStartAnimation {
-        //   StartScreenAnimation(startSequenceEnded: $showStartAnimation)
-        //     .opacity(animationOpacity)
-        //     .zIndex(10)
-        // }
 
-        // Modal code
         if self.showModal {
           ActionModal(
             userInput: $userInput,
-            dynamicH: $dynamicH,
             showModal: $showModal,
             submitMessageSync: submitMessageSync,
             options: extractOptions(from: messageHistory.last?.response ?? "")
@@ -162,14 +147,12 @@ struct ContentView: View {
   #endif
 
   private func resetAdventure() {
-    // Send final message to end the adventure
     let endMessage = Message(title: "> Adventure Ended", isLoading: true)
     self.messageHistory.append(endMessage)
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
       self.messageHistory.removeAll()
       self.isGameEnded = false
-      // Reset animation states
       self.showStartAnimation = true
       self.animationOpacity = 1.0
       self.uiOpacity = 0.0
@@ -183,7 +166,6 @@ struct ContentView: View {
         var videoURL: URL?
         if let imageAsset = await self.ai.generateImage(prompt) {
           print("Image successful")
-          // Save UIImage to temporary directory and get its URL
           if let data = imageAsset.pngData() {
             let tempDir = FileManager.default.temporaryDirectory
             let fileURL = tempDir.appendingPathComponent(UUID().uuidString + ".png")
@@ -192,7 +174,6 @@ struct ContentView: View {
             print(fileURL)
           }
         }
-        // Final fallback to hardcoded video
         else {
           print("No AI video available, using fallback video")
           videoURL = URL(
@@ -382,7 +363,6 @@ struct InputField: View {
   @Binding var textContent: String
   let onSubmit: () async -> Void
   let resetAdventure: () -> Void
-  @State private var dynamicH: Double = 30.0
   @Binding var showModal: Bool
 
   @Binding var showResetModal: Bool
@@ -431,7 +411,6 @@ struct InputField: View {
           .frame(maxWidth: 20)
           .padding()
           .foregroundColor(.green)
-          // .tint(.green)
           .background {
             RoundedRectangle(cornerRadius: 8)
               .stroke(.green, lineWidth: 2)
@@ -443,46 +422,6 @@ struct InputField: View {
 
 }
 
-// Add this new view for the start screen animation
-// struct StartScreenAnimation: View {
-//   @State private var animatedText = ""
-//   @State private var currentIndex = 0
-//   @Binding var startSequenceEnded: Bool
-
-//   private let fullText = """
-//     Welcome to the dungeon
-//     """
-
-//   var body: some View {
-//     ZStack {
-//       Color.black.ignoresSafeArea()
-
-//       Text(animatedText)
-//         .font(.system(.body, design: .monospaced))
-//         .foregroundColor(.green)
-//         .multilineTextAlignment(.center)
-//         .frame(maxWidth: .infinity, maxHeight: .infinity)
-//     }
-//     .onAppear {
-//       startTypingAnimation()
-//     }
-//   }
-
-//   private func startTypingAnimation() {
-//     self.startSequenceEnded = true
-//     let characters = Array(fullText)
-
-//     Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
-//       if currentIndex < characters.count {
-//         animatedText.append(characters[currentIndex])
-//         currentIndex += 1
-//       } else {
-//         self.startSequenceEnded = false
-//         timer.invalidate()
-//       }
-//     }
-//   }
-// }
 
 private func extractOptions(from response: String) -> [String] {
   guard let range = response.range(of: "What do you do?", options: .caseInsensitive) else {

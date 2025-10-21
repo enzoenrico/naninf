@@ -65,21 +65,5 @@ class AiManager: ObservableObject {
     }
   }
 
-  // Helper function to extract string from Payload
-  private func extractString(from payload: Payload) -> String? {
-    if case let .string(value) = payload {
-      return value
-    }
-    return nil
-  }
-
-  // Helper function to extract int from Payload
-  private func extractInt(from payload: Payload) -> Int? {
-    if case let .int(value) = payload {
-      return value
-    }
-    return nil
-  }
-
 }
 
