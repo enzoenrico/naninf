@@ -13,26 +13,26 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		5B92427E2E3A6D4200239C49 /* smorki.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = smorki.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B92427E2E3A6D4200239C49 /* naninf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = naninf.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		5BF84F862E3C0F1800FB7FCE /* Exceptions for "smorki" folder in "smorki" target */ = {
+		5BF84F862E3C0F1800FB7FCE /* Exceptions for "naninf" folder in "naninf" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 5B92427D2E3A6D4200239C49 /* smorki */;
+			target = 5B92427D2E3A6D4200239C49 /* naninf */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		5B9242802E3A6D4200239C49 /* smorki */ = {
+		5B9242802E3A6D4200239C49 /* naninf */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				5BF84F862E3C0F1800FB7FCE /* Exceptions for "smorki" folder in "smorki" target */,
+				5BF84F862E3C0F1800FB7FCE /* Exceptions for "naninf" folder in "naninf" target */,
 			);
-			path = smorki;
+			path = naninf;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -54,7 +54,7 @@
 		5B9242752E3A6D4200239C49 = {
 			isa = PBXGroup;
 			children = (
-				5B9242802E3A6D4200239C49 /* smorki */,
+				5B9242802E3A6D4200239C49 /* naninf */,
 				5B92427F2E3A6D4200239C49 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -62,7 +62,7 @@
 		5B92427F2E3A6D4200239C49 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5B92427E2E3A6D4200239C49 /* smorki.app */,
+				5B92427E2E3A6D4200239C49 /* naninf.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,9 +70,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		5B92427D2E3A6D4200239C49 /* smorki */ = {
+		5B92427D2E3A6D4200239C49 /* naninf */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5B9242892E3A6D4300239C49 /* Build configuration list for PBXNativeTarget "smorki" */;
+			buildConfigurationList = 5B9242892E3A6D4300239C49 /* Build configuration list for PBXNativeTarget "naninf" */;
 			buildPhases = (
 				5B92427A2E3A6D4200239C49 /* Sources */,
 				5B92427B2E3A6D4200239C49 /* Frameworks */,
@@ -83,16 +83,16 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				5B9242802E3A6D4200239C49 /* smorki */,
+				5B9242802E3A6D4200239C49 /* naninf */,
 			);
-			name = smorki;
+			name = naninf;
 			packageProductDependencies = (
 				5BCE8D292E3C1B600060A9F1 /* FirebaseAI */,
 				5BCE8D2B2E3C1B600060A9F1 /* FirebaseAnalytics */,
 				5B933F9F2E403D1100BF9095 /* FalClient */,
 			);
 			productName = smorki;
-			productReference = 5B92427E2E3A6D4200239C49 /* smorki.app */;
+			productReference = 5B92427E2E3A6D4200239C49 /* naninf.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -110,7 +110,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 5B9242792E3A6D4200239C49 /* Build configuration list for PBXProject "smorki" */;
+			buildConfigurationList = 5B9242792E3A6D4200239C49 /* Build configuration list for PBXProject "naninf" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -128,7 +128,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				5B92427D2E3A6D4200239C49 /* smorki */,
+				5B92427D2E3A6D4200239C49 /* naninf */,
 			);
 		};
 /* End PBXProject section */
@@ -294,14 +294,14 @@
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = smorki/Info.plist;
+				INFOPLIST_FILE = naninf/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NanInf;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.role-playing-games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 26;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -334,14 +334,14 @@
 				EMIT_FRONTEND_COMMAND_LINES = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = smorki/Info.plist;
+				INFOPLIST_FILE = naninf/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NanInf;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.role-playing-games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 26;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -362,7 +362,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		5B9242792E3A6D4200239C49 /* Build configuration list for PBXProject "smorki" */ = {
+		5B9242792E3A6D4200239C49 /* Build configuration list for PBXProject "naninf" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5B9242872E3A6D4300239C49 /* Debug */,
@@ -371,7 +371,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5B9242892E3A6D4300239C49 /* Build configuration list for PBXNativeTarget "smorki" */ = {
+		5B9242892E3A6D4300239C49 /* Build configuration list for PBXNativeTarget "naninf" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5B92428A2E3A6D4300239C49 /* Debug */,
