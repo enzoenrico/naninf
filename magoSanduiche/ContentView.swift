@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
 	@State var userInput: String = ""
+	@State var isClosed: Bool = false
 	var body: some View {
 		VStack {
 
@@ -42,7 +43,15 @@ struct ContentView: View {
 					TypeWriterView(
 						"Sint anim pariatur est qui adipisicing commodo ex nisi consequat reprehenderit. Id cupidatat voluptate fugiat consequat officia non voluptate do commodo mollit ullamco nostrud cillum. Nulla esse laboris culpa Lorem ut fugiat anim occaecat nisi magna. Ullamco sint non occaecat cupidatat pariatur eu velit aliqua excepteur. Commodo aliquip elit nostrud et et enim sint exercitation dolore. Amet magna Lorem nisi tempor. Do dolore occaecat occaecat velit adipisicing. Duis amet qui ut velit elit. Consectetur magna laboris nostrud in veniam ut occaecat aliqua velit velit cupidatat cupidatat nulla eiusmod eiusmod. Excepteur duis in dolor in."
 					)
-                    .frame(width: .infinity)
+				}
+				.padding(.horizontal, 4)
+				.offset(y: -20)
+				.frame(width: .infinity)
+				.frame(height: isClosed ? 50 : .infinity)
+				.onTapGesture {
+					withAnimation(.easeInOut) {
+						isClosed.toggle()
+					}
 				}
 			}
 		}

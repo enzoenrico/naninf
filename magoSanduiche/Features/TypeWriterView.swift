@@ -18,15 +18,20 @@ struct TypeWriterView: View {
 	}
 
 	var body: some View {
-		Text(String(temp))
-			.fontDesign(.monospaced)
-			.task { await buildContent() }  // fires at appear
-			.onTapGesture {
-				Task {
-					await buildContent()
+		ScrollView {
+			Text(String(temp))
+				.fontDesign(.monospaced)
+				.task { await buildContent() }  // fires at appear
+				// TODO: remove later
+				.onTapGesture {
+					Task {
+						await buildContent()
+					}
 				}
-			}
-			.enableInjection()
+				.padding(2)
+		}
+		.clipped()
+		.enableInjection()
 	}
 
 	#if DEBUG
@@ -50,19 +55,19 @@ struct TypeWriterView: View {
 
 	private func buildContent() async {
 		for idx in content.indices {
-				temp[idx] = content[idx]
+			temp[idx] = content[idx]
 
-				try? await Task.sleep(for: .milliseconds(25))
+			try? await Task.sleep(for: .milliseconds(25))
 
-				Task { @MainActor in
-					let target = 2
-					await swapLetter(
-						at: idx,
-						target: 1,
-					)
-				}
+			Task { @MainActor in
+				let target = 2
+				await swapLetter(
+					at: idx,
+					target: target,
+				)
+			}
 
-				try? await Task.sleep(for: .milliseconds(25))
+			try? await Task.sleep(for: .milliseconds(25))
 		}
 	}
 }

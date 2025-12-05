@@ -22,13 +22,13 @@ extension View {
 									.font(.caption2)
 									.foregroundStyle(.accent)
 									.padding(.horizontal, 4)
-                                    .padding(.vertical, 0)
+									.padding(.vertical, 0)
 									.background(Color.background)
 									.offset(x: -geo.size.width / 3, y: -geo.size.height / 2)
 									.lineLimit(1)
 									.zIndex(.greatestFiniteMagnitude)
 							}
-							RoundedRectangle(cornerRadius: 8)
+							RoundedRectangle(cornerRadius: 0)
 								.stroke(.accent, lineWidth: 3)
 								.foregroundStyle(.clear)
 						}
