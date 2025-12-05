@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 extension View {
-	public func drawBorder(_ desc: String? = nil) -> some View {
+	func drawBorder(_ desc: String? = nil) -> some View {
 		VStack {
 			self
 				.overlay(
@@ -24,7 +24,7 @@ extension View {
 									.padding(.horizontal, 4)
 									.padding(.vertical, 0)
 									.background(Color.background)
-									.offset(x: -geo.size.width / 3, y: -geo.size.height / 2)
+									.offset(x: -geo.size.width / 2.5, y: -geo.size.height / 2)
 									.lineLimit(1)
 									.zIndex(.greatestFiniteMagnitude)
 							}

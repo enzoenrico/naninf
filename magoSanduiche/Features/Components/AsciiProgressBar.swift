@@ -23,17 +23,17 @@ enum BarTypes: String {
 struct AsciiProgressBar: View {
 	var barType: BarTypes
 	var progress: Int
-	var maxProgress: Int = 48 
+	var maxProgress: Int = 18
 
-	init(_ barType: BarTypes, progress: Int = 100) {
+	init(_ barType: BarTypes, progress: Int = 2) {
 		self.barType = barType
 		self.progress = progress
 	}
 
 	var body: some View {
-		HStack(alignment: .center, spacing: -5) {
+		HStack(alignment: .center, spacing: 5) {
 			Text(barType.label)
-            .foregroundStyle(.accent)
+				.foregroundStyle(.accent)
 			Bar(
 				progress: progress,
 				maxProgress: maxProgress
@@ -52,30 +52,47 @@ struct AsciiProgressBar: View {
 		let progress: Int
 		let maxProgress: Int
 
+		private let chars = ["█", "▓", "▒", "░"]
+		private let fontSize: CGFloat = 16
+		private var charWidth: CGFloat { fontSize * 0.65 }
+
 		var body: some View {
-			Text(populateBar())
-                .bold()
-				.kerning(-1.5)
-				.frame(maxWidth: .infinity)
+			GeometryReader { geo in
+				let charCount = calculateCharCount(for: geo.size.width)
+				Text(populateBar(charCount: charCount))
+					.font(.system(size: fontSize, design: .monospaced))
+					.frame(height: geo.size.height, alignment: .center)
+
+			}
+			.enableInjection()
 		}
 
-		private func populateBar() -> AttributedString {
-			let clampedValue = max(0, min(progress, maxProgress))
+		private func calculateCharCount(for width: CGFloat) -> Int {
+			max(1, Int(width / charWidth))
+		}
+
+		private func populateBar(charCount: Int) -> AttributedString {
+			let progressRatio = Double(progress) / Double(maxProgress)
+			let filledCount = Int(Double(charCount) * progressRatio)
 			var attributedString = AttributedString()
 
-			for _ in 0...clampedValue {
-				var filledBar = AttributedString("|")
-				filledBar.foregroundColor = Color.accent
-				attributedString += filledBar
-			}
-
-			for _ in clampedValue...maxProgress {
-				var emptyBar = AttributedString("|")
-				emptyBar.foregroundColor = .gray
-				attributedString += emptyBar
+			for i in 0..<charCount {
+				var char = chooseChar(i, totalChars: charCount)
+				char.foregroundColor = i < filledCount ? Color.accent : Color.gray
+				attributedString += char
 			}
 
 			return attributedString
+		}
+
+		private func chooseChar(_ idx: Int, totalChars: Int) -> AttributedString {
+			let sectionWidth = Double(totalChars) / Double(self.chars.count)
+			let sectionIdx = min(
+				chars.count - 1,
+				Int(Double(idx) / sectionWidth)
+			)
+
+			return AttributedString("\(self.chars[sectionIdx])")
 		}
 
 		#if DEBUG

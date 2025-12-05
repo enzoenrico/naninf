@@ -12,7 +12,7 @@ struct magoSanduicheApp: App {
 	var body: some Scene {
 		WindowGroup {
 			ContentView()
-				.ignoresSafeArea()
+				.background(Color.background)
 		}
 	}
 }

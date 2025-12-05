@@ -19,17 +19,21 @@ struct TypeWriterView: View {
 
 	var body: some View {
 		ScrollView {
-			Text(String(temp))
-				.fontDesign(.monospaced)
-				.task { await buildContent() }  // fires at appear
-				// TODO: remove later
-				.onTapGesture {
-					Task {
-						await buildContent()
-					}
+			VStack {
+				Text(String(temp))
+					.font(.system(size: 12))
+					.fontDesign(.monospaced)
+					.foregroundStyle(Color.accent)
+					.task { await buildContent() }  // fires at appear
+			}
+			// TODO: remove later
+			.onTapGesture {
+				Task {
+					await buildContent()
 				}
-				.padding(2)
+			}
 		}
+		.frame(maxWidth: .infinity)
 		.clipped()
 		.enableInjection()
 	}
@@ -45,7 +49,7 @@ struct TypeWriterView: View {
 		}
 		let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		temp[index] = letters.randomElement()!
-		try? await Task.sleep(for: .milliseconds(50))
+		try? await Task.sleep(for: .milliseconds(15))
 		await swapLetter(at: index, target: target - 1)
 	}
 
@@ -57,8 +61,6 @@ struct TypeWriterView: View {
 		for idx in content.indices {
 			temp[idx] = content[idx]
 
-			try? await Task.sleep(for: .milliseconds(25))
-
 			Task { @MainActor in
 				let target = 2
 				await swapLetter(
@@ -67,7 +69,7 @@ struct TypeWriterView: View {
 				)
 			}
 
-			try? await Task.sleep(for: .milliseconds(25))
+			try? await Task.sleep(for: .milliseconds(15))
 		}
 	}
 }
