@@ -21,16 +21,10 @@ struct TypeWriterView: View {
 		ScrollView {
 			VStack {
 				Text(String(temp))
-					.font(.system(size: 12))
+					.font(.body)
 					.fontDesign(.monospaced)
 					.foregroundStyle(Color.accent)
 					.task { await buildContent() }  // fires at appear
-			}
-			// TODO: remove later
-			.onTapGesture {
-				Task {
-					await buildContent()
-				}
 			}
 		}
 		.frame(maxWidth: .infinity)

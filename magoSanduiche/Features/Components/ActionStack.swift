@@ -15,9 +15,8 @@ struct ActionStack<Content: View>: View {
 	var body: some View {
 		VStack(alignment: .center, spacing: 10) {
 			content()
-				.drawBorder("Actions")
-				.frame(width: .infinity)
-
+				.drawBorder("> Actions")
+				.frame(width: .infinity, height: .infinity)
 		}
 		.enableInjection()
 	}

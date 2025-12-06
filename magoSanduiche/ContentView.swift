@@ -9,23 +9,26 @@ import SwiftUI
 
 struct ContentView: View {
 	@State var userInput: String = ""
-	@State var isClosed: Bool = false
+	@State var isLarger: Bool = false
 	@State var showContextualButton: Bool = false
 
 	var body: some View {
 		VStack {
 			GameHeader()
 				.frame(height: 50)
+				.zIndex(2)
 
 			VStack {
-                VStack{
-                    Image(.bread)  // change to rendered
-                        .interpolation(.none)
-                        .resizable()
-                        .scaledToFill()
-                        .padding()
-                }
-                .clipped()
+				VStack {
+					Image(.bread)  // change to rendered
+						.interpolation(.none)
+						.resizable()
+						.scaledToFill()
+						.padding()
+						.frame(height: isLarger ? 10 : .infinity)
+				}
+				.clipped()
+				.drawBorder()
 
 				ActionStack {
 					TypeWriterView(
@@ -33,25 +36,24 @@ struct ContentView: View {
 					)
 					.padding()
 				}
-				.offset(y: -20)
+				.offset(y: isLarger ? 0 : -20)
 				.frame(width: .infinity)
-				.frame(height: isClosed ? 50 : .infinity)
 				.onTapGesture {
 					withAnimation(.easeInOut) {
-						isClosed.toggle()
+						isLarger.toggle()
 					}
 				}
-				.border(.red, width: 1)
+				.padding(.horizontal, isLarger ? 0 : 8)
+				.padding(.vertical, isLarger ? 8 : 0)
 
-				Spacer()
+				// Spacer()
 
-				if !showContextualButton {
+				if showContextualButton {
 					ContextualButton(action: .write)
 						.padding(.bottom, 8)
 				}
 			}
-			.padding(.horizontal, 8)
-			.drawBorder("Game")
+			// .drawBorder("Game")
 		}
 		// .ignoresSafeArea()
 		.background(Color.background)
