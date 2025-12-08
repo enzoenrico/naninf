@@ -30,20 +30,14 @@ enum ContextualActions {
 }
 
 struct ContextualButton: View {
-	var action: ContextualActions
-	private func callContextualAction() {
-		switch self.action {
-		// TODO: implement the action switch
-		default:
-			print("hello world")
-		}
-	}
+	var type: ContextualActions
+	var action: () -> Void
 
 	var body: some View {
 		Button(
-			action: { callContextualAction() },
+			action:  action ,
 			label: {
-                Label(action.buttonValue, image: action.buttonImage.rawValue)
+				Label(type.buttonValue, image: type.buttonImage.rawValue)
 					.foregroundStyle(Color.accent)
 					.padding(8)
 					.frame(maxWidth: .infinity)

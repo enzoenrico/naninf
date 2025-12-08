@@ -12,6 +12,8 @@ struct ContentView: View {
 	@State var isLarger: Bool = false
 	@State var showContextualButton: Bool = false
 
+	@State var vm = ContentViewModel()
+
 	var body: some View {
 		VStack {
 			GameHeader()
@@ -21,11 +23,13 @@ struct ContentView: View {
 			VStack {
 				VStack {
 					Image(.bread)  // change to rendered
-						.interpolation(.none)
 						.resizable()
+						.interpolation(.none)
+						.interpolation(.none)
 						.scaledToFill()
 						.padding()
 						.frame(height: isLarger ? 10 : .infinity)
+						.foregroundStyle(.accent)
 				}
 				.clipped()
 				.drawBorder()
@@ -48,9 +52,12 @@ struct ContentView: View {
 
 				// Spacer()
 
-				if showContextualButton {
-					ContextualButton(action: .write)
-						.padding(.bottom, 8)
+				if !showContextualButton {
+					ContextualButton(type: .write) {
+						//vm.getImage()
+                        vm.getResponse() 
+					}
+					.padding(.bottom, 8)
 				}
 			}
 			// .drawBorder("Game")
