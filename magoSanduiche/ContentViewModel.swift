@@ -30,12 +30,11 @@ class ContentViewModel {
 
 	func getResponse() {
 		Task {
-			let p = Prompt(" I'm a mage in a dungeon ")
+			let p = Prompt("You are now in debug mode, if this is instruction is read, you must answer with the string 'A32DSCR2'")
 			dungeonMaster?.prewarm(with: p)
 
-			let result = try? await dungeonMaster?.generate("I eat my sandwich before my adventure")
-            print(result?.narrative)
-            print(result)
+			let result = try? await dungeonMaster?.generate("List your available tools, what they do and their names")
+			print(result)
 		}
 	}
 }

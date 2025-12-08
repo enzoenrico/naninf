@@ -16,8 +16,8 @@ struct PromptOutput {
 	)
 	var narrative: String
 
-	//@Guide(description: "The tools called and their output. Insert the tool's name and it's result.")
-	//var toolResults: [String: String]
+	@Guide(description: "The tools called and their output. Insert the tool's name and it's result.")
+	var toolResults: String
 
 	@Guide(
 		description:

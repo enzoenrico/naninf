@@ -35,7 +35,7 @@ struct ContextualButton: View {
 
 	var body: some View {
 		Button(
-			action:  action ,
+			action: action,
 			label: {
 				Label(type.buttonValue, image: type.buttonImage.rawValue)
 					.foregroundStyle(Color.accent)

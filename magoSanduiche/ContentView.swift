@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
 	@State var userInput: String = ""
-	@State var isLarger: Bool = false
+	@State var textFocus: Bool = true
 	@State var showContextualButton: Bool = false
 
 	@State var vm = ContentViewModel()
@@ -28,7 +28,7 @@ struct ContentView: View {
 						.interpolation(.none)
 						.scaledToFill()
 						.padding()
-						.frame(height: isLarger ? 10 : .infinity)
+						.frame(height: textFocus ? 10 : .infinity)
 						.foregroundStyle(.accent)
 				}
 				.clipped()
@@ -40,15 +40,15 @@ struct ContentView: View {
 					)
 					.padding()
 				}
-				.offset(y: isLarger ? 0 : -20)
+				.offset(y: textFocus ? 0 : -20)
 				.frame(width: .infinity)
 				.onTapGesture {
 					withAnimation(.easeInOut) {
-						isLarger.toggle()
+						textFocus.toggle()
 					}
 				}
-				.padding(.horizontal, isLarger ? 0 : 8)
-				.padding(.vertical, isLarger ? 8 : 0)
+				.padding(.horizontal, textFocus ? 0 : 8)
+				.padding(.vertical, textFocus ? 8 : 0)
 
 				// Spacer()
 
