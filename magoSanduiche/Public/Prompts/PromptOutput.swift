@@ -5,6 +5,7 @@
 //  Created by Enzo Enrico on 08/12/25.
 //
 
+import OpenAISession
 import Foundation
 import FoundationModels
 
@@ -24,4 +25,19 @@ struct PromptOutput {
 			"Three distinct options representing different approaches and paths the mage can follow, these approaches can be aggressive, stealthy, intellectual, whatever fits the situation"
 	)
 	var options: [String]
+}
+
+struct DungeonMasterOutput: StructuredOutput {
+    static let name = "dungeonMasterOutput"
+    
+    @Generable
+    struct Schema {
+        let output: PromptOutput
+    }
+}
+
+@SessionSchema
+struct DungeonMasterSessionSchema {
+    @Tool var rollDice = RollDice()
+    @StructuredOutput(DungeonMasterOutput.self) var dmOutput
 }

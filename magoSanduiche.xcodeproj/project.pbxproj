@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5B979D052EE89ABD008A6E88 /* ExampleCode in Frameworks */ = {isa = PBXBuildFile; productRef = 5B979D042EE89ABD008A6E88 /* ExampleCode */; };
+		5B979D072EE89ABD008A6E88 /* OpenAISession in Frameworks */ = {isa = PBXBuildFile; productRef = 5B979D062EE89ABD008A6E88 /* OpenAISession */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		5BE1F30E2EDE1B63004ACDF5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -29,9 +34,22 @@
 		5BE1F3172EDE1B63004ACDF5 /* magoSanduicheUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = magoSanduicheUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		5B979D412EE8A33C008A6E88 /* Exceptions for "magoSanduiche" folder in "magoSanduiche" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 5BE1F2FF2EDE1B62004ACDF5 /* magoSanduiche */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		5BE1F3022EDE1B62004ACDF5 /* magoSanduiche */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5B979D412EE8A33C008A6E88 /* Exceptions for "magoSanduiche" folder in "magoSanduiche" target */,
+			);
 			path = magoSanduiche;
 			sourceTree = "<group>";
 		};
@@ -52,6 +70,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B979D052EE89ABD008A6E88 /* ExampleCode in Frameworks */,
+				5B979D072EE89ABD008A6E88 /* OpenAISession in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +132,8 @@
 			);
 			name = magoSanduiche;
 			packageProductDependencies = (
+				5B979D042EE89ABD008A6E88 /* ExampleCode */,
+				5B979D062EE89ABD008A6E88 /* OpenAISession */,
 			);
 			productName = magoSanduiche;
 			productReference = 5BE1F3002EDE1B62004ACDF5 /* magoSanduiche.app */;
@@ -195,6 +217,9 @@
 			);
 			mainGroup = 5BE1F2F72EDE1B62004ACDF5;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5B979D032EE89ABD008A6E88 /* XCRemoteSwiftPackageReference "SwiftAgent" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5BE1F3012EDE1B62004ACDF5 /* Products */;
 			projectDirPath = "";
@@ -407,6 +432,7 @@
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = magoSanduiche/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -444,6 +470,7 @@
 				EMIT_FRONTEND_COMMAND_LINES = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = magoSanduiche/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -600,6 +627,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5B979D032EE89ABD008A6E88 /* XCRemoteSwiftPackageReference "SwiftAgent" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftedMind/SwiftAgent.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5B979D042EE89ABD008A6E88 /* ExampleCode */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B979D032EE89ABD008A6E88 /* XCRemoteSwiftPackageReference "SwiftAgent" */;
+			productName = ExampleCode;
+		};
+		5B979D062EE89ABD008A6E88 /* OpenAISession */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B979D032EE89ABD008A6E88 /* XCRemoteSwiftPackageReference "SwiftAgent" */;
+			productName = OpenAISession;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5BE1F2F82EDE1B62004ACDF5 /* Project object */;
 }

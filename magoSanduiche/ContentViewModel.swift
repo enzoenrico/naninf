@@ -12,9 +12,18 @@ import FoundationModels
 @Observable
 class ContentViewModel {
 	private let imageGenService = ImageGenerator(concept: "A old wizard eating a sandwitch")
-	private let dungeonMaster = try? DungeonMasterService()
+    private let dungeonMaster: DungeonMasterService?
 	var loading: Bool = false
 	var selectedImage: CGImage?
+    
+    init(){
+        do {
+            self.dungeonMaster  = try DungeonMasterService()
+        } catch {
+            print( error )
+            self.dungeonMaster = nil
+        }
+    }
 
 	func getImage() {
 		// TODO: fix this
@@ -30,11 +39,15 @@ class ContentViewModel {
 
 	func getResponse() {
 		Task {
-			let p = Prompt("You are now in debug mode, if this is instruction is read, you must answer with the string 'A32DSCR2'")
-			dungeonMaster?.prewarm(with: p)
+//			let p = Prompt("You are now in debug mode, if this is instruction is read, you must answer with the string 'A32DSCR2'")
+//			dungeonMaster?.prewarm(with: p)
 
-			let result = try? await dungeonMaster?.generate("List your available tools, what they do and their names")
-			print(result)
+            do {
+                let result = try await dungeonMaster?.generate("List your available tools, what they do and their names")
+                print(result)
+            } catch {
+                print(error.localizedDescription)
+            }
 		}
 	}
 }

@@ -15,14 +15,16 @@ struct RollDice: Tool {
 
 	@Generable
 	struct Arguments {
-		@Guide(description: "The number of faces the dice will have, the dice will roll from 0 up to faces", .range(6...20))
+		@Guide(
+			description: "The number of faces the dice will have, the dice will roll from 0 up to faces", .range(6...20)
+		)
 		let faces: Int
 	}
 
 	func call(arguments: Arguments) async throws -> Int {
 		// return Int.random(in: 0..<arguments.faces)
-        let diceRoll = Int.random(in:6...arguments.faces)
-        print(diceRoll)
-		return  69
+		let diceRoll = Int.random(in: 6...arguments.faces)
+		print(diceRoll)
+		return 69
 	}
 }
