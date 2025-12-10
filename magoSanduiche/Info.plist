@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Monocraft.otf</string>
+	</array>
 	<key>OPENAI_API_KEY</key>
 	<string>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</string>
 </dict>

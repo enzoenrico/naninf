@@ -10,7 +10,7 @@ import Foundation
 import FoundationModels
 
 @Observable
-class ContentViewModel {
+class GameViewModel {
 	private let imageGenService = ImageGenerator(concept: "A old wizard eating a sandwitch")
     private let dungeonMaster: DungeonMasterService?
 	var loading: Bool = false

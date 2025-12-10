@@ -13,6 +13,7 @@ struct magoSanduicheApp: App {
 		WindowGroup {
 			ContentView()
 				.background(Color.background)
+            .font(.monocraft())
 		}
 	}
 }

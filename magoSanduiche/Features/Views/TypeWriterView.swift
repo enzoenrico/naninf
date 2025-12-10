@@ -21,8 +21,7 @@ struct TypeWriterView: View {
 		ScrollView {
 			VStack {
 				Text(String(temp))
-					.font(.body)
-					.fontDesign(.monospaced)
+                    .font(.monocraft())
 					.foregroundStyle(Color.accent)
 					.task { await buildContent() }  // fires at appear
 			}
