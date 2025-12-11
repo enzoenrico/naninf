@@ -60,7 +60,7 @@ struct AsciiProgressBar: View {
 			GeometryReader { geo in
 				let charCount = calculateCharCount(for: geo.size.width)
 				Text(populateBar(charCount: charCount))
-					.font(.system(size: fontSize, design: .monospaced))
+					.font(.monocraft(relativeTo: .callout))
 					.frame(height: geo.size.height, alignment: .center)
 
 			}
@@ -72,27 +72,18 @@ struct AsciiProgressBar: View {
 		}
 
 		private func populateBar(charCount: Int) -> AttributedString {
-			let progressRatio = Double(progress) / Double(maxProgress)
-			let filledCount = Int(Double(charCount) * progressRatio)
 			var attributedString = AttributedString()
-
 			for i in 0..<charCount {
-				var char = chooseChar(i, totalChars: charCount)
-				char.foregroundColor = i < filledCount ? Color.accent : Color.gray
+				let filledChar = i >= progress - 1 ? self.chars[1] : self.chars[0]
+				let emptyChar = self.chars[3]
+				let charVal = i <= progress ? filledChar : emptyChar
+
+				var char = AttributedString(charVal)
+				char.foregroundColor = i <= progress ? Color.accent : Color.gray
 				attributedString += char
 			}
 
 			return attributedString
-		}
-
-		private func chooseChar(_ idx: Int, totalChars: Int) -> AttributedString {
-			let sectionWidth = Double(totalChars) / Double(self.chars.count)
-			let sectionIdx = min(
-				chars.count - 1,
-				Int(Double(idx) / sectionWidth)
-			)
-
-			return AttributedString("\(self.chars[sectionIdx])")
 		}
 
 		#if DEBUG

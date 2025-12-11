@@ -19,7 +19,7 @@ extension View {
 						ZStack {
 							if let desc {
 								Text(desc)
-									.font(.caption2)
+									.font(.monocraft(relativeTo: .caption))
 									.foregroundStyle(.accent)
 									.padding(.horizontal, 4)
 									.padding(.vertical, 0)

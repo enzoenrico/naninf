@@ -9,19 +9,21 @@ import SwiftUI
 import TipKit
 
 struct GameView: View {
-	@State var userInput: String = ""
-	@State var textFocus: Bool = true
-	@State var showContextualButton: Bool = false
-
+	@Environment(AppCoordinator.self) private var coordinator
 	@State private var actionAreaTip = ActionAreaTip()
 	@State private var imageSectionTip = ImageSectionTip()
 	@State private var actionButtonTip = ActionButtonTip()
 	@State private var statBarsTip = StatBarsTip()
 	@State private var tipsConfigured = false
+	@AppStorage("hasSeenGameTips") private var hasSeenGameTips = false
 
 	@State var vm = GameViewModel()
 
 	var body: some View {
+		@Bindable var coordinator = coordinator
+
+		let shouldShowTips = !hasSeenGameTips
+
 		let sceneImage = VStack {
 			Image(.bread)  // change to rendered
 				.resizable()
@@ -29,7 +31,7 @@ struct GameView: View {
 				.interpolation(.none)
 				.scaledToFill()
 				.padding()
-				.frame(height: textFocus ? 10 : .infinity)
+				.frame(height: coordinator.isImageCollapsed ? 0 : .infinity)
 				.foregroundStyle(.accent)
 		}
 		.clipped()
@@ -37,57 +39,68 @@ struct GameView: View {
 
 		VStack {
 			GameHeader()
-				.popoverTip(statBarsTip, arrowEdge: .bottom)
+				.popoverTipIf(statBarsTip, arrowEdge: .bottom, when: shouldShowTips)
 				.frame(height: 50)
 				.zIndex(2)
 
 			VStack {
-				if textFocus {
-					sceneImage
+				if coordinator.isImageCollapsed {
+					Spacer(minLength: 0)
 				} else {
 					sceneImage
-						.popoverTip(imageSectionTip, arrowEdge: .top)
+						.popoverTipIf(imageSectionTip, arrowEdge: .top, when: shouldShowTips)
 				}
 
 				ActionStack {
 					TypeWriterView(
-						"Sint anim pariatur est qui adipisicing commodo ex nisi consequat reprehenderit. Id cupidatat voluptate fugiat consequat officia non voluptate do commodo mollit ullamco nostrud cillum. Nulla esse laboris culpa Lorem ut fugiat anim occaecat nisi magna. Ullamco sint non occaecat cupidatat pariatur eu velit aliqua excepteur. Commodo aliquip elit nostrud et et enim sint exercitation dolore. Amet magna Lorem nisi tempor. Do dolore occaecat occaecat velit adipisicing. Duis amet qui ut velit elit. Consectetur magna laboris nostrud in veniam ut occaecat aliqua velit velit cupidatat cupidatat nulla eiusmod eiusmod. Excepteur duis in dolor in."
-					)
+						// Introduction.intro
+						"bunda liquida"
+					) {
+						coordinator.handleTypewriterCompletion()
+					}
 					.padding()
+					if coordinator.isContextualInputVisible {
+						InputBox(with: $vm.contextualInput)
+					}
 				}
-				.popoverTip(actionAreaTip, arrowEdge: .top)
-				.offset(y: textFocus ? 0 : -20)
+				.popoverTipIf(actionAreaTip, arrowEdge: .top, when: shouldShowTips)
+				.offset(y: coordinator.isImageCollapsed ? 0 : -20)
 				.frame(width: .infinity)
 				.onTapGesture {
 					withAnimation(.easeInOut) {
-						textFocus.toggle()
+						coordinator.toggleImageVisibility()
 					}
 				}
-				.padding(.horizontal, textFocus ? 0 : 8)
-				.padding(.vertical, textFocus ? 8 : 0)
+				.padding(.horizontal, coordinator.isImageCollapsed ? 0 : 8)
+				.padding(.vertical, coordinator.isImageCollapsed ? 8 : 0)
 
 				// Spacer()
 
-				if !showContextualButton {
-					ContextualButton(type: .write) {
-						//vm.getImage()
-                        vm.getResponse() 
+				if coordinator.showActionButton {
+					ContextualButton(type: .write, isInputVisible: coordinator.isContextualInputVisible) {
+						withAnimation(.easeInOut) {
+							coordinator.handleContextualAction(.write) {
+								//vm.submitGameAction(coordinator.contextualInput)
+                                vm.getResponse(for: vm.contextualInput)
+							}
+						}
+						// vm.getResponse()
 					}
-					.popoverTip(actionButtonTip, arrowEdge: .top)
+					.popoverTipIf(actionButtonTip, arrowEdge: .bottom, when: shouldShowTips)
 					.padding(.bottom, 8)
 				}
 			}
-			// .drawBorder("Game")
 		}
-		// .ignoresSafeArea()
-            .navigationBarBackButtonHidden()
-            .ignoresSafeArea()
+		.navigationBarBackButtonHidden()
+		.ignoresSafeArea()
 		.padding()
 		.background(Color.background)
 		.tipViewStyle(AsciiTipStyle())
 		.task {
 			guard !tipsConfigured else { return }
-			try? await Tips.configure([.displayFrequency(.immediate)])
+			guard shouldShowTips else { return }
+			try? Tips.configure([.displayFrequency(.immediate)])
+			hasSeenGameTips = true
 			tipsConfigured = true
 		}
 		.enableInjection()
@@ -98,6 +111,18 @@ struct GameView: View {
 	#endif
 }
 
+private extension View {
+	@ViewBuilder
+	func popoverTipIf<T: Tip>(_ tip: T, arrowEdge: Edge = .top, when condition: Bool) -> some View {
+		if condition {
+			self.popoverTip(tip, arrowEdge: arrowEdge)
+		} else {
+			self
+		}
+	}
+}
+
 #Preview {
 	GameView()
+		.environment(AppCoordinator())
 }

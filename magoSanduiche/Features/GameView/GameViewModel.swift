@@ -12,18 +12,22 @@ import FoundationModels
 @Observable
 class GameViewModel {
 	private let imageGenService = ImageGenerator(concept: "A old wizard eating a sandwitch")
-    private let dungeonMaster: DungeonMasterService?
+	private let dungeonMaster: DungeonMasterService?
+
 	var loading: Bool = false
 	var selectedImage: CGImage?
-    
-    init(){
-        do {
-            self.dungeonMaster  = try DungeonMasterService()
-        } catch {
-            print( error )
-            self.dungeonMaster = nil
-        }
-    }
+	var hasCompletedInitialText = false
+
+	var contextualInput = ""
+
+	init() {
+		do {
+			self.dungeonMaster = try DungeonMasterService()
+		} catch {
+			print(error)
+			self.dungeonMaster = nil
+		}
+	}
 
 	func getImage() {
 		// TODO: fix this
@@ -37,17 +41,23 @@ class GameViewModel {
 		}
 	}
 
-	func getResponse() {
+	func getResponse(for prompt: String) -> Bool {
 		Task {
-//			let p = Prompt("You are now in debug mode, if this is instruction is read, you must answer with the string 'A32DSCR2'")
-//			dungeonMaster?.prewarm(with: p)
-
-            do {
-                let result = try await dungeonMaster?.generate("List your available tools, what they do and their names")
-                print(result)
-            } catch {
-                print(error.localizedDescription)
-            }
+			do {
+                print("Started prompt")
+				let result = try await dungeonMaster?.generate(prompt)
+				print(result)
+			} catch {
+				print(error.localizedDescription)
+			}
 		}
+        return true
+	}
+
+	func submitGameAction(_ rawInput: String) -> Bool {
+		let trimmed = rawInput.trimmingCharacters(in: .whitespacesAndNewlines)
+		guard !trimmed.isEmpty else { return false }
+		print("Submitted contextual input: \(trimmed)")
+		return true
 	}
 }

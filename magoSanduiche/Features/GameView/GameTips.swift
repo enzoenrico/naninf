@@ -9,14 +9,14 @@ import SwiftUI
 import TipKit
 
 struct ActionAreaTip: Tip {
-    var title: Text { Text("Action log") }
-    var message: Text? { Text("AI feedback, dice rolls, and events land here.") }
+    var title: Text { Text("Your actions") }
+    var message: Text? { Text("Everything that happens in the world is shown here") }
     var image: Image? { Image(systemName: "text.justify.left") }
 }
 
 struct ImageSectionTip: Tip {
-    var title: Text { Text("Scene snapshots") }
-    var message: Text? { Text("Open the image view to see a visual of recent actions.") }
+    var title: Text { Text("See the world") }
+    var message: Text? { Text("Images are generated to show important characters, actions and events") }
     var image: Image? { Image(systemName: "photo.on.rectangle") }
 }
 
@@ -27,8 +27,8 @@ struct ActionButtonTip: Tip {
 }
 
 struct StatBarsTip: Tip {
-    var title: Text { Text("Track HP and MP") }
-    var message: Text? { Text("These bars show your current health and mana.") }
+    var title: Text { Text("Health and mana") }
+    var message: Text? { Text("Keep track of your health and mana, so the dungeon does not get the best of you") }
     var image: Image? { Image(systemName: "heart.text.square") }
 }
 
@@ -55,6 +55,5 @@ struct AsciiTipStyle: TipViewStyle {
         }
         .padding(10)
         .background(Color.background)
-        .drawBorder("> Tutorial")
     }
 }

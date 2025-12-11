@@ -10,10 +10,13 @@ import SwiftUI
 
 struct TypeWriterView: View {
 	var content: [Character]
+	var onFinished: (() -> Void)?
 	@State private var temp: [Character]
+	@State private var hasFinishedTyping = false
 
-	init(_ content: String) {
+	init(_ content: String, onFinished: (() -> Void)? = nil) {
 		self.content = content.map { $0 }
+		self.onFinished = onFinished
 		_temp = State(initialValue: Array(repeating: " ", count: self.content.count))
 	}
 
@@ -26,6 +29,7 @@ struct TypeWriterView: View {
 					.task { await buildContent() }  // fires at appear
 			}
 		}
+        .defaultScrollAnchor(.bottom)
 		.frame(maxWidth: .infinity)
 		.clipped()
 		.enableInjection()
@@ -42,7 +46,7 @@ struct TypeWriterView: View {
 		}
 		let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		temp[index] = letters.randomElement()!
-		try? await Task.sleep(for: .milliseconds(15))
+		try? await Task.sleep(for: .milliseconds(5))
 		await swapLetter(at: index, target: target - 1)
 	}
 
@@ -51,18 +55,27 @@ struct TypeWriterView: View {
 	}
 
 	private func buildContent() async {
+		guard !hasFinishedTyping else { return }
+
+		guard !content.isEmpty else {
+			hasFinishedTyping = true
+			onFinished?()
+			return
+		}
+
 		for idx in content.indices {
 			temp[idx] = content[idx]
 
-			Task { @MainActor in
-				let target = 2
-				await swapLetter(
-					at: idx,
-					target: target,
-				)
-			}
+			let target = 2
+			await swapLetter(
+				at: idx,
+				target: target
+			)
 
-			try? await Task.sleep(for: .milliseconds(15))
+			try? await Task.sleep(for: .milliseconds(5))
 		}
+
+		hasFinishedTyping = true
+		onFinished?()
 	}
 }

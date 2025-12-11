@@ -11,10 +11,10 @@ enum ContextualActions {
 	case write
 	case roll
 
-	var buttonValue: String {
+	func buttonValue(isInputVisible: Bool) -> String {
 		switch self {
 		case .write:
-			"What's your next action?"
+			isInputVisible ? "Send your action" : "What's your next action?"
 		case .roll:
 			"Roll the dice"
 		}
@@ -31,13 +31,14 @@ enum ContextualActions {
 
 struct ContextualButton: View {
 	var type: ContextualActions
+	var isInputVisible: Bool = false
 	var action: () -> Void
 
 	var body: some View {
 		Button(
 			action: action,
 			label: {
-				Label(type.buttonValue, image: type.buttonImage.rawValue)
+				Label(type.buttonValue(isInputVisible: isInputVisible), image: type.buttonImage.rawValue)
 					.foregroundStyle(Color.accent)
 					.padding(8)
 					.frame(maxWidth: .infinity)
