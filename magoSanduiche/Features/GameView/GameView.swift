@@ -17,9 +17,10 @@ struct GameView: View {
 	@State private var tipsConfigured = false
 	@AppStorage("hasSeenGameTips") private var hasSeenGameTips = false
 
-	@State var vm = GameViewModel()
+	@State private var vm = GameViewModel()
 
 	var body: some View {
+		@Bindable var vm = vm
 		@Bindable var coordinator = coordinator
 
 		let shouldShowTips = !hasSeenGameTips
@@ -52,23 +53,34 @@ struct GameView: View {
 				}
 
 				ActionStack {
-					TypeWriterView(
-						// Introduction.intro
-						"bunda liquida"
-					) {
-						coordinator.handleTypewriterCompletion()
-					}
-					.padding()
-					if coordinator.isContextualInputVisible {
-						InputBox(with: $vm.contextualInput)
+					if coordinator.isDicePromptVisible {
+						VStack(alignment: .leading, spacing: 6) {
+							Text("Roll the dice.")
+								.font(.monocraft(relativeTo: .subheadline))
+						}
+						.padding(8)
+						.drawBorder()
+					} else {
+						TypeWriterView(
+							vm.narrativeText
+						) {
+							coordinator.handleTypewriterCompletion()
+						}
+						.padding()
+						if coordinator.isContextualInputVisible {
+							InputBox(
+								with: Binding(get: { vm.contextualInput }, set: { vm.contextualInput = $0 }),
+								isDisabled: vm.loading
+							)
+						}
 					}
 				}
 				.popoverTipIf(actionAreaTip, arrowEdge: .top, when: shouldShowTips)
 				.offset(y: coordinator.isImageCollapsed ? 0 : -20)
-				.frame(width: .infinity)
+				.frame(maxWidth: .infinity)
 				.onTapGesture {
 					withAnimation(.easeInOut) {
-						coordinator.toggleImageVisibility()
+						coordinator.toggleImage()
 					}
 				}
 				.padding(.horizontal, coordinator.isImageCollapsed ? 0 : 8)
@@ -77,14 +89,22 @@ struct GameView: View {
 				// Spacer()
 
 				if coordinator.showActionButton {
-					ContextualButton(type: .write, isInputVisible: coordinator.isContextualInputVisible) {
-						withAnimation(.easeInOut) {
-							coordinator.handleContextualAction(.write) {
-								//vm.submitGameAction(coordinator.contextualInput)
-                                vm.getResponse(for: vm.contextualInput)
+					ContextualButton(
+						type: vm.contextAction,
+						isInputVisible: coordinator.isContextualInputVisible,
+						isLoading: vm.loading
+					) {
+						guard !vm.loading else { return }
+						Task {
+							withAnimation(.easeInOut) {
+								coordinator.handleContextualAction(vm.contextAction) {
+									if vm.contextAction == .write {
+										vm.getResponse(for: vm.contextualInput)
+									}
+									return false
+								}
 							}
 						}
-						// vm.getResponse()
 					}
 					.popoverTipIf(actionButtonTip, arrowEdge: .bottom, when: shouldShowTips)
 					.padding(.bottom, 8)
@@ -97,6 +117,7 @@ struct GameView: View {
 		.background(Color.background)
 		.tipViewStyle(AsciiTipStyle())
 		.task {
+			vm.attachCoordinator(coordinator)
 			guard !tipsConfigured else { return }
 			guard shouldShowTips else { return }
 			try? Tips.configure([.displayFrequency(.immediate)])

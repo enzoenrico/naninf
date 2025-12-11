@@ -23,7 +23,7 @@ struct GameHeader: View {
 
 			VStack(alignment: .leading) {
 				AsciiProgressBar(.health, progress: 10)  // add viewmodel values
-				AsciiProgressBar(.mana, progress: 60)  // add viewmodel values
+				AsciiProgressBar(.mana, progress: 20)  // add viewmodel values
 			}
 			.frame(height: 75)
 		}

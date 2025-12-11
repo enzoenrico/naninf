@@ -17,6 +17,7 @@ final class AppCoordinator {
 	var path = NavigationPath()
 	var isImageCollapsed = true
 	var isContextualInputVisible = false
+	var isDicePromptVisible = false
 	var hasCompletedInitialText = false
     var showActionButton: Bool = false
 
@@ -32,15 +33,24 @@ final class AppCoordinator {
 				if didSubmit { resetContextualInputState() }
 			} else {
 				isContextualInputVisible = true
+				isDicePromptVisible = false
 				isImageCollapsed = true
 			}
 		case .roll:
-			break
+			if isContextualInputVisible {
+				let didSubmit = onSubmit()
+				if didSubmit { resetContextualInputState() }
+			} else {
+				isContextualInputVisible = false
+				isDicePromptVisible = true
+				isImageCollapsed = false
+			}
 		}
 	}
 
 	private func resetContextualInputState() {
 		isContextualInputVisible = false
+		isDicePromptVisible = false
 		isImageCollapsed = true
 	}
 
@@ -51,6 +61,12 @@ final class AppCoordinator {
             showActionButton = true
 		}
 	}
+
+    func toggleImage() {
+        if hasCompletedInitialText {
+            isImageCollapsed.toggle()
+        }
+    }
 
 	func navigate(to route: AppRoute) {
 		path.append(route)
@@ -77,8 +93,7 @@ struct AppCoordinatorView: View {
 					switch route {
 					case .onboarding:
 						// OnboardingView()
-						var gameVm = GameViewModel()
-						GameView(vm: gameVm)
+						GameView()
 					case .gameDetail:
 						GameView()
 					}

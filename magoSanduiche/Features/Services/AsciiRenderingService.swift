@@ -9,7 +9,6 @@
 //import CoreImage
 //import SwiftUI
 
-//@available(*, deprecated, message: "do not use it yet")
 //class Ascii: ObservableObject {
 //    @Published var currentFrame: String = ""
 //    @Published var isPlaying: Bool = false

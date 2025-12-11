@@ -49,6 +49,12 @@ class Prompts {
   * **Logic:** Wait for the result (or use the tool output if automated). High numbers succeed; low numbers fail.
   * *Combat Rolls:* To hit an enemy, the player must roll. To dodge, the player must roll.
   
+  
+  **E. Decide player action**
+  * **Trigger:** When a player input is needed, if this input is a dice roll or a action input as text
+  * **Usage:** Call `decide_action`
+  * **Logic:** Wait for the result (or use the tool output if automated). This will decide if the dice roll screen or the text input should appear for the player
+  
   ### 3. RESPONSE FORMAT
   Every response must follow this strict structure:
   

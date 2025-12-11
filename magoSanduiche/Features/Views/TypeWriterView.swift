@@ -21,15 +21,22 @@ struct TypeWriterView: View {
 	}
 
 	var body: some View {
-		ScrollView {
+    ScrollView {
 			VStack {
 				Text(String(temp))
-                    .font(.monocraft())
+					.font(.monocraft())
 					.foregroundStyle(Color.accent)
 					.task { await buildContent() }  // fires at appear
+					.onChange(of: content) { oldState, newState in
+							hasFinishedTyping = false
+							temp = Array(repeating: " ", count: newState.count)
+							Task {
+								await buildContent()
+							}
+					}
 			}
 		}
-        .defaultScrollAnchor(.bottom)
+		.defaultScrollAnchor(.bottom)
 		.frame(maxWidth: .infinity)
 		.clipped()
 		.enableInjection()
@@ -44,7 +51,7 @@ struct TypeWriterView: View {
 			returnToOriginal(at: index)
 			return
 		}
-		let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ$#@|&*~`.<>/?"
 		temp[index] = letters.randomElement()!
 		try? await Task.sleep(for: .milliseconds(5))
 		await swapLetter(at: index, target: target - 1)

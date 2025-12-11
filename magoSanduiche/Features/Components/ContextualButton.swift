@@ -32,19 +32,35 @@ enum ContextualActions {
 struct ContextualButton: View {
 	var type: ContextualActions
 	var isInputVisible: Bool = false
+	var isLoading: Bool = false
 	var action: () -> Void
 
 	var body: some View {
 		Button(
-			action: action,
+			action: {
+				guard !isLoading else { return }
+				action()
+			},
 			label: {
-				Label(type.buttonValue(isInputVisible: isInputVisible), image: type.buttonImage.rawValue)
-					.foregroundStyle(Color.accent)
-					.padding(8)
-					.frame(maxWidth: .infinity)
-					.labelStyle(.tintedIcon(color: .accent))
+				HStack(spacing: 8) {
+					if isLoading {
+						ProgressView()
+							.progressViewStyle(.circular)
+							.tint(.accent)
+					} else {
+						Image(type.buttonImage.rawValue)
+							.renderingMode(.template)
+							.foregroundStyle(Color.accent)
+					}
+
+					Text(isLoading ? "Writing the story..." : type.buttonValue(isInputVisible: isInputVisible))
+						.foregroundStyle(Color.accent)
+				}
+				.padding(8)
+				.frame(maxWidth: .infinity)
 			}
 		)
+		.disabled(isLoading)
 		.drawBorder()
 		.enableInjection()
 	}
