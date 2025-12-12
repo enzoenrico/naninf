@@ -23,7 +23,6 @@ struct RollDice: Tool {
 
 	func call(arguments: Arguments) async throws -> Int {
 		let diceRoll = Int.random(in: 0...arguments.faces)
-        print(diceRoll)
 		return diceRoll
 	}
 }

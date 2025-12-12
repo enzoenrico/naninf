@@ -89,5 +89,5 @@ struct AsciiProgressBar: View {
 		#if DEBUG
 			@ObserveInjection var forceRedraw
 		#endif
-	}
+	} 
 }
