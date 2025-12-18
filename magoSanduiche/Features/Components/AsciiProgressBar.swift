@@ -60,7 +60,7 @@ struct AsciiProgressBar: View {
 			GeometryReader { geo in
 				let charCount = calculateCharCount(for: geo.size.width)
 				Text(populateBar(charCount: charCount))
-					.font(.monocraft(relativeTo: .callout))
+                    .font(.monocraft(size: 16))
 					.frame(height: geo.size.height, alignment: .center)
 
 			}

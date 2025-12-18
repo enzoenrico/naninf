@@ -23,6 +23,9 @@ extension Font {
 		return Font.custom("Monocraft", size: pointSize, relativeTo: style)
 			.weight(weight)
 	}
+    static func monocraft(size: CGFloat) -> Font {
+        return Font.custom("Monocraft", size: size)
+    }
 }
 
 private extension Font.TextStyle {
