@@ -6,7 +6,6 @@
 
 import CoreGraphics
 import Foundation
-import FoundationModels
 
 @Observable
 class GameViewModel {

@@ -1,34 +1,45 @@
-////
-////  DecideAction.swift
-////  magoSanduiche
-////
-////  Created by Enzo Enrico on 11/12/25.
-////
+//
+//  DecideAction.swift
+//  magoSanduiche
+//
+//  Created by Enzo Enrico on 11/12/25.
+//
 
 import Foundation
-import FoundationModels
+import OpenAI
 
-struct DecideAction: Tool {
-	let name = "decideAction"
-	let description =
-		"When a player input is needed, if this input is a dice roll or a action input as text, you must decide and call this tool to make the action screen pop up to the player."
+struct DecideActionTool: ExecutableTool {
+    static let name = "decideAction"
 
-	let onActionRequested: (Int) -> Void
+    /// Callback to notify when an action is requested.
+    /// This needs to be set before the tool is used.
+    nonisolated(unsafe) static var onActionRequested: ((Int) -> Void)?
 
-	init(onActionRequested: @escaping (Int) -> Void) {
-		self.onActionRequested = onActionRequested
-	}
+    static let definition = ChatQuery.ChatCompletionToolParam(
+        function: .init(
+            name: name,
+            description: "When a player input is needed, if this input is a dice roll or a action input as text, you must decide and call this tool to make the action screen pop up to the player. Use 0 for text input and 1 for dice roll."
+        )
+    )
 
-	@Generable
-	struct Arguments {
-		@Guide(
-			description: "If the player must roll a dice or submit text input, use the number 0 for text input and the number 1 for rolling the dice"
-		)
-		let action: Int 
-	}
+    struct Arguments: Codable {
+        let action: Int
+    }
 
-	func call(arguments: Arguments) async throws -> Int {
-		onActionRequested(arguments.action)
-		return 1
-	}
+    static func execute(arguments: String) async throws -> String {
+        let decoder = JSONDecoder()
+        guard let data = arguments.data(using: .utf8) else {
+            return "Error: Invalid arguments"
+        }
+
+        let args = try decoder.decode(Arguments.self, from: data)
+
+        // Notify via callback on main actor
+        await MainActor.run {
+            onActionRequested?(args.action)
+        }
+
+        let actionType = args.action == 0 ? "text input" : "dice roll"
+        return "Action requested: \(actionType)"
+    }
 }

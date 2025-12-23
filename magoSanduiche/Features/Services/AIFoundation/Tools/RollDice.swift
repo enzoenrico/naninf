@@ -6,23 +6,33 @@
 //
 
 import Foundation
-import FoundationModels
+import OpenAI
 
-struct RollDice: Tool {
-	let name = "rollDice"
-	let description =
-		"Rolls a dice, getting a number between 0 - x, for the action to act accordingly, basing the number for the actions success, damage, etc..."
+struct RollDiceTool: ExecutableTool {
+	static let name = "rollDice"
 
-	@Generable
-	struct Arguments {
-		@Guide(
-			description: "The number of faces the dice will have, the dice will roll from 0 up to faces", .range(6...20)
+	static let definition = ChatQuery.ChatCompletionToolParam(
+		function: .init(
+			name: name,
+			description:
+				"Rolls a dice, getting a number between 0 - x, for the action to act accordingly, basing the number for the actions success, damage, etc..."
 		)
+	)
+
+	struct Arguments: Codable {
 		let faces: Int
 	}
 
-	func call(arguments: Arguments) async throws -> Int {
-		let diceRoll = Int.random(in: 0...arguments.faces)
-		return diceRoll
+	static func execute(arguments: String) async throws -> String {
+		let decoder = JSONDecoder()
+		guard let data = arguments.data(using: .utf8) else {
+			return "Error: Invalid arguments"
+		}
+
+		let args = try decoder.decode(Arguments.self, from: data)
+		let clampedFaces = max(args.faces, 0)
+		let diceRoll = Int.random(in: 0...clampedFaces)
+
+		return "Rolled a d\(clampedFaces): \(diceRoll)"
 	}
 }
