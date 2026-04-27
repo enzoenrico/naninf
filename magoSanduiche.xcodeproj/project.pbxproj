@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5B979D052EE89ABD008A6E88 /* ExampleCode in Frameworks */ = {isa = PBXBuildFile; productRef = 5B979D042EE89ABD008A6E88 /* ExampleCode */; };
-		5B979D072EE89ABD008A6E88 /* OpenAISession in Frameworks */ = {isa = PBXBuildFile; productRef = 5B979D062EE89ABD008A6E88 /* OpenAISession */; };
+		5B51D8822EFAA23000EB5908 /* OpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B51D8812EFAA23000EB5908 /* OpenAI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +28,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5B8EA3292EF999EF0063B517 /* Demo.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Demo.xcodeproj; sourceTree = "<group>"; };
+		5B8EA4302EF999EF0063B517 /* SwiftRefactorExtension.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = SwiftRefactorExtension.xcodeproj; sourceTree = "<group>"; };
 		5BE1F3002EDE1B62004ACDF5 /* magoSanduiche.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = magoSanduiche.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BE1F30D2EDE1B63004ACDF5 /* magoSanduicheTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = magoSanduicheTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BE1F3172EDE1B63004ACDF5 /* magoSanduicheUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = magoSanduicheUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -70,8 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B979D052EE89ABD008A6E88 /* ExampleCode in Frameworks */,
-				5B979D072EE89ABD008A6E88 /* OpenAISession in Frameworks */,
+				5B51D8822EFAA23000EB5908 /* OpenAI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,6 +92,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5B8EA4032EF999EF0063B517 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5B8EA7172EF999EF0063B517 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		5BE1F2F72EDE1B62004ACDF5 = {
 			isa = PBXGroup;
 			children = (
@@ -132,8 +146,7 @@
 			);
 			name = magoSanduiche;
 			packageProductDependencies = (
-				5B979D042EE89ABD008A6E88 /* ExampleCode */,
-				5B979D062EE89ABD008A6E88 /* OpenAISession */,
+				5B51D8812EFAA23000EB5908 /* OpenAI */,
 			);
 			productName = magoSanduiche;
 			productReference = 5BE1F3002EDE1B62004ACDF5 /* magoSanduiche.app */;
@@ -218,11 +231,21 @@
 			mainGroup = 5BE1F2F72EDE1B62004ACDF5;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				5B979D032EE89ABD008A6E88 /* XCRemoteSwiftPackageReference "SwiftAgent" */,
+				5B51D8802EFAA23000EB5908 /* XCRemoteSwiftPackageReference "OpenAI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5BE1F3012EDE1B62004ACDF5 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 5B8EA4032EF999EF0063B517 /* Products */;
+					ProjectRef = 5B8EA3292EF999EF0063B517 /* Demo.xcodeproj */;
+				},
+				{
+					ProductGroup = 5B8EA7172EF999EF0063B517 /* Products */;
+					ProjectRef = 5B8EA4302EF999EF0063B517 /* SwiftRefactorExtension.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				5BE1F2FF2EDE1B62004ACDF5 /* magoSanduiche */,
@@ -433,16 +456,20 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = magoSanduiche/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NanInf;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.adventure-games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				MARKETING_VERSION = 2.0;
 				OTHER_LDFLAGS = (
 					"-Xlinker",
 					"-interposable",
@@ -471,16 +498,20 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = magoSanduiche/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NanInf;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.adventure-games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kyou.naninf;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -629,26 +660,21 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		5B979D032EE89ABD008A6E88 /* XCRemoteSwiftPackageReference "SwiftAgent" */ = {
+		5B51D8802EFAA23000EB5908 /* XCRemoteSwiftPackageReference "OpenAI" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwiftedMind/SwiftAgent.git";
+			repositoryURL = "https://github.com/MacPaw/OpenAI";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.7;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		5B979D042EE89ABD008A6E88 /* ExampleCode */ = {
+		5B51D8812EFAA23000EB5908 /* OpenAI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 5B979D032EE89ABD008A6E88 /* XCRemoteSwiftPackageReference "SwiftAgent" */;
-			productName = ExampleCode;
-		};
-		5B979D062EE89ABD008A6E88 /* OpenAISession */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 5B979D032EE89ABD008A6E88 /* XCRemoteSwiftPackageReference "SwiftAgent" */;
-			productName = OpenAISession;
+			package = 5B51D8802EFAA23000EB5908 /* XCRemoteSwiftPackageReference "OpenAI" */;
+			productName = OpenAI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

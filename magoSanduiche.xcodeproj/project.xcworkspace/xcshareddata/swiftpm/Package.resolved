@@ -1,22 +1,13 @@
 {
-  "originHash" : "ea7fd64a52b36e5491299a35516dff4105c3fd82ac6f5404a579e009d3633453",
+  "originHash" : "c351aabe13067917247f7926404d096603b95663248b51124280feb61a2edf30",
   "pins" : [
-    {
-      "identity" : "eventsource",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mattt/EventSource",
-      "state" : {
-        "revision" : "ca2a9d90cbe49e09b92f4b6ebd922c03ebea51d0",
-        "version" : "1.3.0"
-      }
-    },
     {
       "identity" : "openai",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/MacPaw/OpenAI.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "4ed3ea99ff9dfd2a760509ddb31020f4b153ef93"
+        "revision" : "28884fcfb15946b119b6eb3498e5a900c1d8d595",
+        "version" : "0.4.7"
       }
     },
     {
@@ -35,24 +26,6 @@
       "state" : {
         "revision" : "7cdf33371bf89b23b9cf4fd3ce8d3c825c28fbe8",
         "version" : "1.9.0"
-      }
-    },
-    {
-      "identity" : "swift-syntax",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/swiftlang/swift-syntax.git",
-      "state" : {
-        "revision" : "4799286537280063c85a32f09884cfbca301b1a1",
-        "version" : "602.0.0"
-      }
-    },
-    {
-      "identity" : "swiftagent",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwiftedMind/SwiftAgent.git",
-      "state" : {
-        "branch" : "main",
-        "revision" : "fcc42fbb274de0372688019bbee8100715fdbb87"
       }
     }
   ],

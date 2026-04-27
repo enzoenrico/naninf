@@ -55,7 +55,7 @@ struct GameView: View {
 				ActionStack {
 					if coordinator.isDicePromptVisible {
 						VStack(alignment: .leading, spacing: 6) {
-							Text("Roll the dice.")
+							Text("Roll the dice, little wizard.")
 								.font(.monocraft(relativeTo: .subheadline))
 						}
 						.padding(8)
@@ -69,9 +69,16 @@ struct GameView: View {
 						.padding()
 						if coordinator.isContextualInputVisible {
 							InputBox(
-								with: Binding(get: { vm.contextualInput }, set: { vm.contextualInput = $0 }),
+								with: Binding(
+									get: { vm.contextualInput }, set: { vm.contextualInput = $0 }),
 								isDisabled: vm.loading
 							)
+							.frame(width: coordinator.isContextualInputVisible ? .infinity : 0)
+							//.opacity(coordinator.isContextualInputVisible ? 1 : 0)
+							.clipped()
+							.animation(
+								.easeInOut(duration: 0.3),
+								value: coordinator.isContextualInputVisible)
 						}
 					}
 				}
@@ -132,9 +139,11 @@ struct GameView: View {
 	#endif
 }
 
-private extension View {
+extension View {
 	@ViewBuilder
-	func popoverTipIf<T: Tip>(_ tip: T, arrowEdge: Edge = .top, when condition: Bool) -> some View {
+	fileprivate func popoverTipIf<T: Tip>(_ tip: T, arrowEdge: Edge = .top, when condition: Bool)
+		-> some View
+	{
 		if condition {
 			self.popoverTip(tip, arrowEdge: arrowEdge)
 		} else {

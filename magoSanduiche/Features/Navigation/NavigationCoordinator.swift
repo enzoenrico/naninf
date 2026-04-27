@@ -15,14 +15,41 @@ enum AppRoute: Hashable {
 @Observable
 final class AppCoordinator {
 	var path = NavigationPath()
-	var isImageCollapsed = true
-	var isContextualInputVisible = false
+	private var _isUpdatingState = false
+	
+	var isImageCollapsed = true {
+		didSet {
+			guard !_isUpdatingState else { return }
+			// When image is opened (collapsed = false), hide contextual input
+			if !isImageCollapsed && isContextualInputVisible {
+				_isUpdatingState = true
+				isContextualInputVisible = false
+				_isUpdatingState = false
+			}
+		}
+	}
+	
+	var isContextualInputVisible = false {
+		didSet {
+			guard !_isUpdatingState else { return }
+			// Contextual input can only be visible when image is collapsed
+			// If trying to show input when image is open, collapse the image first
+			if isContextualInputVisible && !isImageCollapsed {
+				_isUpdatingState = true
+				isImageCollapsed = true
+				_isUpdatingState = false
+			}
+		}
+	}
+	
 	var isDicePromptVisible = false
 	var hasCompletedInitialText = false
-    var showActionButton: Bool = false
+	var showActionButton: Bool = false
 
 	func toggleImageVisibility() {
-		if !isContextualInputVisible { isImageCollapsed.toggle() }
+		if !isContextualInputVisible {
+			isImageCollapsed = !isImageCollapsed
+		}
 	}
 
 	func handleContextualAction(_ type: ContextualActions, onSubmit: () -> Bool) {
@@ -58,15 +85,23 @@ final class AppCoordinator {
 		withAnimation(.easeInOut) {
 			hasCompletedInitialText = true
 			isImageCollapsed = false
-            showActionButton = true
+			showActionButton = true
 		}
 	}
 
-    func toggleImage() {
-        if hasCompletedInitialText {
-            isImageCollapsed.toggle()
-        }
-    }
+	func toggleImage() {
+		if hasCompletedInitialText {
+			withAnimation(.easeInOut) {
+				if isImageCollapsed {
+					// Opening image - hide contextual input
+					isImageCollapsed = false
+				} else {
+					// Closing image - can show contextual input if it was visible before
+					isImageCollapsed = true
+				}
+			}
+		}
+	}
 
 	func navigate(to route: AppRoute) {
 		path.append(route)

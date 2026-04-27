@@ -45,9 +45,9 @@ class GameViewModel {
 		guard !loading else { return false }
 		loading = true
 
-		 Task {
+		Task {
 			await fetchNarrative(for: trimmed)
-		 }
+		}
 
 		return true
 	}
@@ -92,7 +92,7 @@ class GameViewModel {
 	}
 
 	private func handleAction(_ option: Int) {
-		Task {
+		Task { @MainActor in
 			guard let coordinator else { return }
 			switch option {
 			case 0:
