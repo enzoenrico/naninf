@@ -9,35 +9,15 @@ import SwiftUI
 
 struct OnboardingView: View {
 	@Environment(AppCoordinator.self) private var coordinator
-	@State private var currentIndex = 0
-
-	private let pages: [OnboardingPage] = [
-		.init(
-			title: "Welcome, player.",
-			message:
-				"Every choice you make shapes the story. As a lone mage in a dangerous dungeon, you must explore it's contents to it's fullest and make out victorious.",
-			image: .cards
-		),
-		.init(
-			title: "A world truly yours.",
-			message:
-				"Do anything, from casting a light spell to stopping for a sandwich, the dungeon master talks to you and adapts the world and story to give you all of the freedoom you can want.",
-			image: .ink
-		),
-		.init(
-			title: "Will you survive the dungeon?",
-			message:
-				"Embrace the randomness and possibility, become the one who wins against the dungeon.",
-			image: .dice
-		)
-	]
+	@State private var vm = OnboardingViewModel()
 
 	var body: some View {
-		@Bindable var coordinator = coordinator
-		VStack(spacing: 24) {
-			TabView(selection: $currentIndex) {
-				ForEach(pages.indices, id: \.self) { index in
-					OnboardingCard(page: pages[index])
+		@Bindable var vm = vm
+
+		VStack(spacing: 18) {
+			TabView(selection: $vm.currentIndex) {
+				ForEach(vm.pages.indices, id: \.self) { index in
+					OnboardingCard(page: vm.pages[index])
 						.tag(index)
 						.padding(.horizontal, 16)
 				}
@@ -45,67 +25,47 @@ struct OnboardingView: View {
 			.tabViewStyle(.page)
 			.indexViewStyle(.page(backgroundDisplayMode: .always))
 
+//			PrologueCommandPanel(
+//				command: vm.currentPage.command,
+//				isFinalCommand: vm.isOnFinalPage
+//			)
+//			.padding(.horizontal, 24)
+
 			Button(action: handlePrimaryAction) {
-				Text(primaryButtonTitle)
+				Text(vm.primaryButtonTitle)
 					.font(.monocraft(relativeTo: .headline, weight: .semibold))
 					.frame(maxWidth: .infinity)
-					.padding(.vertical, 12)
+					.padding(.vertical, 14)
 			}
-			.tint(.accent)
-			.drawBorder()
+			.buttonStyle(OnboardingPrimaryButtonStyle())
 			.padding(.horizontal, 24)
 		}
-		.padding(.vertical, 32)
-		.background(Color.background)
-		.enableInjection()
-	}
-
-	private var primaryButtonTitle: String {
-		currentIndex == pages.count - 1 ? "Start Adventure" : "Next"
-	}
-
-	private func handlePrimaryAction() {
-		if currentIndex < pages.count - 1 {
-			withAnimation { currentIndex += 1 }
-		} else {
-			coordinator.navigate(to: .gameDetail)
+		.padding(.vertical, 28)
+		.background {
+			ZStack {
+				Color.background
+				LinearGradient(
+					colors: [Color.accent.opacity(0.10), Color.clear, Color.terminalMana.opacity(0.08)],
+					startPoint: .topLeading,
+					endPoint: .bottomTrailing
+				)
+			}
+			.ignoresSafeArea()
 		}
+		.enableInjection()
 	}
 
 	#if DEBUG
 		@ObserveInjection var forceRedraw
 	#endif
-}
 
-private struct OnboardingPage: Identifiable {
-	let id = UUID()
-	let title: String
-	let message: String
-	let image: ImageResource
-}
-
-private struct OnboardingCard: View {
-	let page: OnboardingPage
-
-	var body: some View {
-		VStack(spacing: 16) {
-			Image(page.image)
-				.resizable()
-				.interpolation(.none)
-				.scaledToFit()
-				.frame(height: 150)
-				.foregroundStyle(.accent)
-
-			Text(page.title)
-				.font(.monocraft(relativeTo: .title2, weight: .semibold))
-				.multilineTextAlignment(.center)
-
-			Text(page.message)
-				.font(.monocraft(relativeTo: .body))
-				.multilineTextAlignment(.center)
-				.foregroundStyle(.secondary)
+	private func handlePrimaryAction() {
+		if vm.isOnFinalPage {
+			coordinator.navigate(to: .game)
+		} else {
+			withAnimation {
+				_ = vm.advance()
+			}
 		}
-		.padding(24)
-		.frame(maxWidth: .infinity, maxHeight: .infinity)
 	}
 }

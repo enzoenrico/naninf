@@ -11,9 +11,9 @@ import SwiftUI
 struct magoSanduicheApp: App {
 	var body: some Scene {
 		WindowGroup {
-			ContentView()
+			RootView()
 				.background(Color.background)
-            .font(.monocraft())
+				.font(.monocraft())
 		}
 	}
 }
@@ -46,13 +46,7 @@ struct magoSanduicheApp: App {
 			#endif
 			let bundlePath = "/Applications/InjectionIII.app/Contents/Resources/" + bundleName
 			guard let bundle = Bundle(path: bundlePath), bundle.load() else {
-				return print(
-					"""
-					⚠️ Could not load injection bundle from \(bundlePath). \
-					Have you downloaded the InjectionIII.app from either \
-					https://github.com/johnno1962/InjectionIII/releases \
-					or the Mac App Store?
-					""")
+				return
 			}
 		}()
 
