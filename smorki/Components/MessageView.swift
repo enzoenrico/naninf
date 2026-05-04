@@ -8,7 +8,7 @@ struct Message: Identifiable {
   let response: String?
   let timestamp: Date
   var gifData: GifData?
-  @State var isLoading: Bool
+  var isLoading: Bool
 
   struct GifData {
     let url: URL
@@ -16,7 +16,6 @@ struct Message: Identifiable {
     let aspectRatio: Double
   }
 
-  // Convenience initializer for loading state
   init(title: String, isLoading: Bool = false) {
     self.title = title
     self.response = nil
@@ -25,7 +24,6 @@ struct Message: Identifiable {
     self.isLoading = isLoading
   }
 
-  // Full initializer for completed message
   init(title: String, response: String, gifData: GifData? = nil) {
     self.title = title
     self.response = response
@@ -34,12 +32,6 @@ struct Message: Identifiable {
     self.isLoading = false
   }
 
-  // Method to update message with video data
-  func withGifData(_ gifData: GifData?) -> Message {
-    var updated = self
-    updated.gifData = gifData
-    return updated
-  }
 }
 
 struct TypewriterText: View {
@@ -108,31 +100,34 @@ struct MessageView: View {
 
   @StateObject private var ascii = Ascii(targetWidth: 140)
   @State private var loadingAnimationIndex = 0
-  @State private var hasLoadedMedia = false  // Add this state
+  @State private var loadingTimer: Timer?
+  @State private var hasLoadedMedia = false
 
   private let loadingCharacters = ["▁", "▂", "▃", "▄", "▅", "▆", "▇"]
 
-  fileprivate func LoadState() -> HStack<TupleView<(Text, some View)>> {
-    return
-      HStack {
-        Text("Generating story")
-          .foregroundColor(.green)
-
-        Text(
-          "\(loadingCharacters[loadingAnimationIndex])\(loadingCharacters[(loadingAnimationIndex + 1) % loadingCharacters.count])\(loadingCharacters[(loadingAnimationIndex + 2) % loadingCharacters.count])"
-        )
+  private var loadingState: some View {
+    HStack {
+      Text("Generating story")
         .foregroundColor(.green)
-        .font(.departure(size: 14))
-        .onAppear {
-          startLoadingAnimation()
-        }
+
+      Text(
+        "\(loadingCharacters[loadingAnimationIndex])\(loadingCharacters[(loadingAnimationIndex + 1) % loadingCharacters.count])\(loadingCharacters[(loadingAnimationIndex + 2) % loadingCharacters.count])"
+      )
+      .foregroundColor(.green)
+      .font(.departure(size: 14))
+      .onAppear {
+        startLoadingAnimation()
       }
+      .onDisappear {
+        stopLoadingAnimation()
+      }
+    }
   }
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       if message.isLoading {
-        LoadState()
+        loadingState
           .padding()
       } else if let response = message.response {
         TypewriterText(response, font: .departure(size: 14), speed: 0.01)
@@ -146,11 +141,9 @@ struct MessageView: View {
             .aspectRatio(gifData.aspectRatio, contentMode: .fit)
             .frame(maxWidth: .infinity)
             .onAppear {
-              // Only load if not already loaded
               guard !hasLoadedMedia else { return }
               hasLoadedMedia = true
 
-              // Load the video/gif from the gifData URL
               if gifData.url.pathExtension.lowercased() == "mp4" {
                 Task {
                   await ascii.loadVideo(url: gifData.url)
@@ -166,7 +159,7 @@ struct MessageView: View {
             }
             .padding(.top)
             .padding(.bottom)
-            .id(message.id)  // Ensure stable identity
+            .id(message.id)
         }
       }
     }
@@ -191,16 +184,18 @@ struct MessageView: View {
   }
 
   private func startLoadingAnimation() {
-    Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { timer in
-      if !message.isLoading {
-        timer.invalidate()
-        return
-      }
+    stopLoadingAnimation()
 
+    loadingTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
       withAnimation(.easeInOut(duration: 0.1)) {
-        loadingAnimationIndex = (loadingAnimationIndex) % 7
+        loadingAnimationIndex = (loadingAnimationIndex + 1) % loadingCharacters.count
       }
     }
+  }
+
+  private func stopLoadingAnimation() {
+    loadingTimer?.invalidate()
+    loadingTimer = nil
   }
 
   #if DEBUG

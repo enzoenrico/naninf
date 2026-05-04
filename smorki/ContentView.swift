@@ -10,26 +10,20 @@ import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
 
-// Message model to store history
+private let actionPromptMarker = "What do you do?"
 
 struct ContentView: View {
   @StateObject private var ascii = Ascii(targetWidth: 150)
   @EnvironmentObject private var obs: Observability
   @State private var showModal = false
-  @State private var selectedGIFURL: URL?
-  @State private var lastFrame: Int?
   @State var userInput = "> "
   @State private var messageHistory: [Message] = []
   @State private var currentGifData: Message.GifData?
   @State var dynamicH: Double = 35.0
 
-  // Add these state variables to your ContentView
   @State private var showResetModal = false
   @State private var isGameEnded = false
 
-  // Add these new state variables for the start screen animation
-  @State private var showStartAnimation = true
-  @State private var animationOpacity = 1.0
   @State private var uiOpacity = 0.0
 
   private func startScreen() {
@@ -59,16 +53,10 @@ struct ContentView: View {
       )
       messageHistory.append(introMessage)
 
-      // Start the fade transition after message is added
       DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
 
         withAnimation(.easeInOut(duration: 1.5)) {
-          animationOpacity = 0.0
           uiOpacity = 1.0
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-          showStartAnimation = false
         }
       }
     }
@@ -79,7 +67,6 @@ struct ContentView: View {
 
     GeometryReader { geometry in
       ZStack {
-        // Main app UI
         VStack(spacing: 0) {
           ScrollViewReader { proxy in
             ScrollView {
@@ -100,7 +87,7 @@ struct ContentView: View {
                   proxy.scrollTo(last.id, anchor: .bottom)
                 }
               }
-              obs.logEvent("new message" )
+              obs.logNewMessage(messageCount: messageHistory.count)
             }
           }
 
@@ -117,14 +104,6 @@ struct ContentView: View {
         }
         .opacity(uiOpacity)
 
-        // // Start screen animation overlay
-        // if showStartAnimation {
-        //   StartScreenAnimation(startSequenceEnded: $showStartAnimation)
-        //     .opacity(animationOpacity)
-        //     .zIndex(10)
-        // }
-
-        // Modal code
         if self.showModal {
           ActionModal(
             userInput: $userInput,
@@ -152,7 +131,7 @@ struct ContentView: View {
       }
     }
     .onDisappear {
-      obs.logEvent("session_ended", parameters: ["message_history": self.messageHistory])
+      obs.logSessionEnded(messageCount: messageHistory.count)
     }
     .enableInjection()
   }
@@ -162,16 +141,12 @@ struct ContentView: View {
   #endif
 
   private func resetAdventure() {
-    // Send final message to end the adventure
     let endMessage = Message(title: "> Adventure Ended", isLoading: true)
     self.messageHistory.append(endMessage)
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
       self.messageHistory.removeAll()
       self.isGameEnded = false
-      // Reset animation states
-      self.showStartAnimation = true
-      self.animationOpacity = 1.0
       self.uiOpacity = 0.0
       startScreen()
     }
@@ -183,7 +158,6 @@ struct ContentView: View {
         var videoURL: URL?
         if let imageAsset = await self.ai.generateImage(prompt) {
           print("Image successful")
-          // Save UIImage to temporary directory and get its URL
           if let data = imageAsset.pngData() {
             let tempDir = FileManager.default.temporaryDirectory
             let fileURL = tempDir.appendingPathComponent(UUID().uuidString + ".png")
@@ -192,7 +166,6 @@ struct ContentView: View {
             print(fileURL)
           }
         }
-        // Final fallback to hardcoded video
         else {
           print("No AI video available, using fallback video")
           videoURL = URL(
@@ -204,11 +177,9 @@ struct ContentView: View {
           return
         }
 
-        // Load video on background thread
         await self.ascii.loadVideo(url: finalURL)
         await self.ascii.startConversion()
 
-        // Create video data for history using the loaded URL
         let videoData = Message.GifData(
           url: finalURL,
           frameCount: await self.ascii.frameCount,
@@ -224,38 +195,19 @@ struct ContentView: View {
     }
   }
 
-  private func loadBundledGIF(path: String) {
-    guard let gifURL = Bundle.main.url(forResource: path, withExtension: "gif") else {
-      return
-    }
-
-    ascii.loadGIF(from: gifURL)
-    ascii.startConversion()
-
-    // Create gif data for history
-    let gifData = Message.GifData(
-      url: gifURL,
-      frameCount: 0,
-      aspectRatio: ascii.aspectRatio
-    )
-    self.currentGifData = gifData
-  }
-
   private func loadVideoQuery(generated_result: String, trimmedInput: String) async throws
     -> GenerateContentResponse
   {
     let maxResponseLength = 1500
 
-    // First truncate by length, then cut before "What do you do?"
     let lengthTruncatedResult =
       generated_result.count > maxResponseLength
       ? String(generated_result.prefix(maxResponseLength)) + "..."
       : generated_result
 
-    // Find and cut before "What do you do?" if it exists
     let finalResult: String
     if let whatDoYouDoRange = lengthTruncatedResult.range(
-      of: "What do you do?", options: .caseInsensitive)
+      of: actionPromptMarker, options: .caseInsensitive)
     {
       finalResult = String(lengthTruncatedResult[..<whatDoYouDoRange.lowerBound])
         .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -297,7 +249,6 @@ struct ContentView: View {
     let trimmedInput = val ?? userInput.trimmingCharacters(in: .whitespacesAndNewlines)
     guard trimmedInput != "> " && !trimmedInput.isEmpty else { return }
 
-    // Create loading message immediately on main thread
     await MainActor.run {
       let loadingMessage = Message(title: trimmedInput, isLoading: true)
       messageHistory.append(loadingMessage)
@@ -388,12 +339,6 @@ struct InputField: View {
   @Binding var showResetModal: Bool
   @Binding var isGameEnded: Bool
 
-  func handleContentChange(_ s: String) {
-    if !s.hasPrefix(">") {
-      textContent = ">" + s
-    }
-  }
-
   func modalToggle() {
     Task {
       showModal.toggle()
@@ -431,7 +376,6 @@ struct InputField: View {
           .frame(maxWidth: 20)
           .padding()
           .foregroundColor(.green)
-          // .tint(.green)
           .background {
             RoundedRectangle(cornerRadius: 8)
               .stroke(.green, lineWidth: 2)
@@ -443,61 +387,30 @@ struct InputField: View {
 
 }
 
-// Add this new view for the start screen animation
-// struct StartScreenAnimation: View {
-//   @State private var animatedText = ""
-//   @State private var currentIndex = 0
-//   @Binding var startSequenceEnded: Bool
+struct ActionOption: Identifiable {
+  let id: String
+  let text: String
+}
 
-//   private let fullText = """
-//     Welcome to the dungeon
-//     """
-
-//   var body: some View {
-//     ZStack {
-//       Color.black.ignoresSafeArea()
-
-//       Text(animatedText)
-//         .font(.system(.body, design: .monospaced))
-//         .foregroundColor(.green)
-//         .multilineTextAlignment(.center)
-//         .frame(maxWidth: .infinity, maxHeight: .infinity)
-//     }
-//     .onAppear {
-//       startTypingAnimation()
-//     }
-//   }
-
-//   private func startTypingAnimation() {
-//     self.startSequenceEnded = true
-//     let characters = Array(fullText)
-
-//     Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
-//       if currentIndex < characters.count {
-//         animatedText.append(characters[currentIndex])
-//         currentIndex += 1
-//       } else {
-//         self.startSequenceEnded = false
-//         timer.invalidate()
-//       }
-//     }
-//   }
-// }
-
-private func extractOptions(from response: String) -> [String] {
-  guard let range = response.range(of: "What do you do?", options: .caseInsensitive) else {
+private func extractOptions(from response: String) -> [ActionOption] {
+  guard let range = response.range(of: actionPromptMarker, options: .caseInsensitive) else {
     return []
   }
+
   let tail = response[range.upperBound...]
-  let parsed =
-    tail
+
+  return tail
     .components(separatedBy: .newlines)
     .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
     .map { $0.replacingOccurrences(of: #"^>\s*"#, with: "", options: .regularExpression) }
     .filter { !$0.isEmpty }
-    .filter {
-      $0.range(of: #"^[A-Z]\.\s"#, options: .regularExpression) != nil
+    .compactMap { option in
+      guard let match = option.range(of: #"^[A-Z]\.\s"#, options: .regularExpression) else {
+        return nil
+      }
+
+      let id = String(option[match]).trimmingCharacters(in: .whitespaces)
+      let text = option[match.upperBound...].trimmingCharacters(in: .whitespaces)
+      return ActionOption(id: id, text: text)
     }
-  print(parsed)
-  return parsed
 }

@@ -6,7 +6,7 @@ struct ActionModal: View {
   @Binding var showModal: Bool
   let submitMessageSync: (_ val: String?) -> Void
   @State var disabled: Bool = false
-  var options: [String]
+  var options: [ActionOption]
 
   var body: some View {
     VStack {
@@ -26,8 +26,7 @@ struct ActionModal: View {
                 .offset(y: -8)
 
               TextEditor(text: $userInput)
-                .frame(minHeight: dynamicH, maxHeight: dynamicH)  // Use minHeight/maxHeight to hug
-                // .padding(8)
+                .frame(minHeight: dynamicH, maxHeight: dynamicH)
                 .foregroundColor(.green)
                 .tint(.green)
                 .onChange(of: userInput) { result in
@@ -86,27 +85,9 @@ struct ActionModal: View {
           .font(.departure(size: 12))
       }
 
-      ForEach(options, id: \.self) { option in
-        let option_id: String = {
-          if let match = option.range(of: #"^[A-C]\."#, options: .regularExpression) {
-            return String(option[match])
-          } else {
-            return ""
-          }
-        }()
-
-        let option_text: String = {
-          if let match = option.range(of: #"^[A-C]\."#, options: .regularExpression) {
-            var text = option
-            text.removeSubrange(match)
-            return text.trimmingCharacters(in: .whitespaces)
-          } else {
-            return option
-          }
-        }()
-
-        Button(action: { submitMessageSync(option_text) }) {
-          Text("> " + option_text)
+      ForEach(options) { option in
+        Button(action: { submitMessageSync(option.text) }) {
+          Text("> " + option.text)
             .frame(maxWidth: .infinity)
             .padding()
             .foregroundColor(.green)
@@ -115,7 +96,7 @@ struct ActionModal: View {
               RoundedRectangle(cornerRadius: 8)
                 .stroke(.green, lineWidth: 2)
                 .overlay(alignment: .topLeading) {
-                  Text("> " + option_id)
+                  Text("> " + option.id)
                     .font(.departure(size: 10))
                     .lineLimit(1)
                     .padding(.horizontal, 2)

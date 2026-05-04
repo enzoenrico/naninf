@@ -11,18 +11,12 @@ import SwiftUI
 @main
 struct smorkiApp: App {
 
-  // MARK: - Properties
-
   @StateObject var firebase = AiManager()
-  @StateObject var observability: Observability = Observability()
-
-  // MARK: - Initialization
+  @StateObject var observability = Observability()
 
   init() {
     FirebaseApp.configure()
   }
-
-  // MARK: - Body
 
   var body: some Scene {
     WindowGroup {
