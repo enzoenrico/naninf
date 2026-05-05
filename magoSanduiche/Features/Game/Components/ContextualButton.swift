@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Foundation
 
 struct ContextualButton: View {
 	var type: GameAction
@@ -21,7 +22,12 @@ struct ContextualButton: View {
 		} label: {
 			HStack(spacing: 8) {
 				if isLoading {
-					LoadingDots()
+					TerminalGlyphLoader(
+						style: .spinner,
+						textStyle: .headline,
+						weight: .bold,
+						color: .terminalWarning
+					)
 				} else {
 					Image(type.buttonImage.rawValue)
 						.renderingMode(.template)
@@ -38,7 +44,7 @@ struct ContextualButton: View {
 		}
 		.disabled(isLoading)
 		.buttonStyle(TerminalButtonStyle(isLoading: isLoading))
-		.accessibilityLabel(buttonTitle.replacingOccurrences(of: "> ", with: ""))
+		.accessibilityLabel(buttonAccessibilityTitle)
 		.enableInjection()
 	}
 
@@ -50,39 +56,41 @@ struct ContextualButton: View {
 		if isLoading {
 			switch phase {
 			case .rollingDice:
-				"> FATE IS ROLLING"
+				String(localized: "nan_button_loading_fate_rolling")
 			case .awaitingDungeonMaster:
-				"> WRITING THE STORY"
+				String(localized: "nan_button_loading_story")
 			default:
-				"> PROCESSING"
+				String(localized: "nan_button_loading_processing")
 			}
 		} else {
 			type.buttonTitle(isInputVisible: isInputVisible)
 		}
 	}
-}
 
-private struct LoadingDots: View {
-	@State private var activeDot = 0
-
-	var body: some View {
-		HStack(spacing: 2) {
-			ForEach(0..<3, id: \.self) { index in
-				Text(".")
-					.font(.monocraft(relativeTo: .headline, weight: .bold))
-					.opacity(activeDot == index ? 1 : 0.28)
+	private var buttonAccessibilityTitle: String {
+		if isLoading {
+			switch phase {
+			case .rollingDice:
+				String(localized: "nan_a11y_button_fate_rolling")
+			case .awaitingDungeonMaster:
+				String(localized: "nan_a11y_button_writing_story")
+			default:
+				String(localized: "nan_a11y_button_processing")
 			}
-		}
-		.task {
-			while !Task.isCancelled {
-				try? await Task.sleep(for: .milliseconds(180))
-				activeDot = (activeDot + 1) % 3
+		} else {
+			switch type {
+			case .write:
+				isInputVisible ? String(localized: "nan_a11y_action_send_command") : String(localized: "nan_a11y_action_write_command")
+			case .roll:
+				String(localized: "nan_a11y_action_roll_d20")
 			}
 		}
 	}
 }
 
 private struct TerminalButtonStyle: ButtonStyle {
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+
 	let isLoading: Bool
 
 	func makeBody(configuration: Configuration) -> some View {
@@ -95,7 +103,7 @@ private struct TerminalButtonStyle: ButtonStyle {
 			.scaleEffect(configuration.isPressed ? 0.985 : 1)
 			.opacity(isLoading ? 0.78 : 1)
 			.shadow(color: Color.accent.opacity(configuration.isPressed ? 0.18 : 0.35), radius: 10)
-			.animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+			.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.quickPressAnimation), value: configuration.isPressed)
 	}
 }
 

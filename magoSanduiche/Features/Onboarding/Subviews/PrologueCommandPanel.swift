@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Foundation
 
 struct PrologueCommandPanel: View {
 	let command: String
@@ -13,7 +14,7 @@ struct PrologueCommandPanel: View {
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 8) {
-			Text("> PROLOGUE TERMINAL")
+			Text(String(localized: "nan_prologue_terminal_title"))
 				.font(.monocraft(relativeTo: .caption, weight: .semibold))
 				.foregroundStyle(isFinalCommand ? Color.terminalWarning : Color.accent)
 
@@ -28,7 +29,11 @@ struct PrologueCommandPanel: View {
 				BlinkingCursor()
 			}
 
-			Text(isFinalCommand ? "The dungeon is listening." : "Learn the language of the dungeon.")
+			Text(
+				isFinalCommand
+					? String(localized: "nan_prologue_footer_final")
+					: String(localized: "nan_prologue_footer_learning")
+			)
 				.font(.monocraft(relativeTo: .caption))
 				.foregroundStyle(Color.terminalMutedText)
 		}

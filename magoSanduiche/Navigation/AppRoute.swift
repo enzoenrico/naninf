@@ -6,6 +6,10 @@
 //
 
 enum AppRoute: Hashable {
+	case home
 	case onboarding
 	case game
+	case profile
+	case load
+	case about
 }

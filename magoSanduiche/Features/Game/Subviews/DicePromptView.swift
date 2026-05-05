@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct DicePromptView: View {
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+
 	let diceValue: Int
 	let resultText: String
 	let isRolling: Bool
@@ -23,12 +25,12 @@ struct DicePromptView: View {
 					.monospacedDigit()
 					.frame(width: 96, height: 96)
 					.background(Color.terminalActiveSurface)
-					.drawBorder("> D20", color: isRolling ? .terminalWarning : .accent, lineWidth: 2)
-					.scaleEffect(isRolling ? 1.06 : 1)
-					.animation(.easeInOut(duration: 0.12), value: diceValue)
+					.drawBorder(String(localized: "nan_dice_panel_title"), color: isRolling ? .terminalWarning : .accent, lineWidth: 2)
+					.scaleEffect(isRolling && !reduceMotion ? 1.04 : 1)
+					.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.quickPressAnimation), value: diceValue)
 
 				VStack(alignment: .leading, spacing: 8) {
-					Text(isRolling ? "Fate is moving." : "Roll the dice, little wizard.")
+					Text(isRolling ? String(localized: "nan_dice_flavor_rolling") : String(localized: "nan_dice_flavor_idle"))
 						.font(.monocraft(relativeTo: .headline, weight: .semibold))
 						.foregroundStyle(Color.accent)
 					Text(resultText)

@@ -5,6 +5,8 @@
 //  Created by Enzo Enrico on 06/12/25.
 //
 
+import Foundation
+
 enum GameUIPhase: Equatable {
 	case reading
 	case ready
@@ -16,34 +18,34 @@ enum GameUIPhase: Equatable {
 	var statusLine: String {
 		switch self {
 		case .reading:
-			"> BOOTING DUNGEON SESSION"
+			String(localized: "nan_phase_status_reading")
 		case .ready:
-			"> AWAITING PLAYER INPUT"
+			String(localized: "nan_phase_status_ready")
 		case .composing:
-			"> COMPOSE YOUR NEXT COMMAND"
+			String(localized: "nan_phase_status_composing")
 		case .awaitingDungeonMaster:
-			"> The dungeon master is thinking..."
+			String(localized: "nan_phase_status_dm_thinking")
 		case .rollingDice:
-			"> FATE ENGINE SPINNING"
+			String(localized: "nan_phase_status_rolling")
 		case .result:
-			"> Consequence received"
+			String(localized: "nan_phase_status_result")
 		}
 	}
 
 	var actionTitle: String {
 		switch self {
 		case .reading:
-			"> Transmission"
+			String(localized: "nan_phase_action_reading")
 		case .ready:
-			"> Command Line"
+			String(localized: "nan_phase_action_ready")
 		case .composing:
-			"> Write Command"
+			String(localized: "nan_phase_action_composing")
 		case .awaitingDungeonMaster:
-			"> Processing"
+			String(localized: "nan_phase_action_processing")
 		case .rollingDice:
-			"> Roll Check"
+			String(localized: "nan_phase_action_roll_check")
 		case .result:
-			"> Dungeon Log"
+			String(localized: "nan_phase_action_result")
 		}
 	}
 }

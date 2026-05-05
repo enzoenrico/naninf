@@ -11,7 +11,7 @@ import SwiftUI
 struct magoSanduicheApp: App {
 	var body: some Scene {
 		WindowGroup {
-			RootView()
+			AppStartupGate()
 				.background(Color.background)
 				.font(.monocraft())
 		}

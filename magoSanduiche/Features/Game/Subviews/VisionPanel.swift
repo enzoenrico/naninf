@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Foundation
 
 struct VisionPanel: View {
 	let isCollapsed: Bool
@@ -24,24 +25,53 @@ struct VisionPanel: View {
 				.foregroundStyle(.accent)
 				.opacity(isLoading ? 0.55 : 1)
 
-				Text(phase == .awaitingDungeonMaster ? "rendering next omen" : "tap to collapse")
+				Text(phase == .awaitingDungeonMaster ? String(localized: "nan_vision_overlay_loading") : String(localized: "nan_vision_overlay_idle"))
 					.font(.monocraft(relativeTo: .caption2))
 			.foregroundStyle(Color.accent)
 			.padding(10)
 
 			if isLoading {
-				Rectangle()
-					.fill(Color.accent.opacity(0.12))
-					.frame(height: 24)
-					.offset(y: 90)
-					.blur(radius: 8)
+				VisionLoadingOverlay()
+					.padding(10)
+					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
 			}
 		}
 		.frame(maxWidth: .infinity)
-		.drawBorder("> Scene Feed", color: .terminalMana, lineWidth: 1)
+		.drawBorder(String(localized: "nan_vision_panel_title"), color: .terminalMana, lineWidth: 1)
 		.clipped()
-		.accessibilityLabel("Vision terminal")
-		.accessibilityHint("Tap to collapse the scene panel")
+		.accessibilityLabel(
+			isLoading
+				? String(localized: "nan_vision_a11y_loading")
+				: String(localized: "nan_vision_a11y_ready")
+		)
+		.accessibilityHint(String(localized: "nan_vision_a11y_hint_collapse"))
+	}
+}
+
+private struct VisionLoadingOverlay: View {
+	var body: some View {
+		VStack(alignment: .leading, spacing: 8) {
+			HStack(spacing: 6) {
+				Text(String(localized: "nan_vision_loading_title"))
+					.font(.monocraft(relativeTo: .caption2, weight: .semibold))
+				TerminalGlyphLoader(
+					style: .blocks,
+					textStyle: .caption2,
+					weight: .bold,
+					color: .terminalWarning
+				)
+			}
+			.foregroundStyle(Color.terminalWarning)
+
+			Text(String(localized: "nan_vision_loading_ram"))
+				.font(.monocraft(relativeTo: .caption2))
+				.foregroundStyle(Color.accent.opacity(0.72))
+		}
+		.padding(.horizontal, 8)
+		.padding(.vertical, 7)
+		.background(Color.background.opacity(0.82))
+		.drawBorder(nil, color: .terminalWarning.opacity(0.75), lineWidth: 1)
+		.accessibilityHidden(true)
 	}
 }
 
@@ -51,7 +81,7 @@ struct CollapsedVisionBar: View {
 	var body: some View {
 		Button(action: action) {
 			HStack {
-				Text("> VISION TERMINAL COLLAPSED")
+				Text(String(localized: "nan_vision_collapsed_title"))
 					.font(.monocraft(relativeTo: .caption, weight: .semibold))
 				Spacer()
 				Text("OPEN")
@@ -64,6 +94,6 @@ struct CollapsedVisionBar: View {
 		}
 		.buttonStyle(.plain)
 		.drawBorder(nil, color: Color.terminalMutedText.opacity(0.7), lineWidth: 1)
-		.accessibilityLabel("Open vision terminal")
+		.accessibilityLabel(String(localized: "nan_vision_collapsed_a11y"))
 	}
 }

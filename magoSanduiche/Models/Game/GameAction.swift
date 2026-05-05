@@ -5,6 +5,8 @@
 //  Created by Enzo Enrico on 05/12/25.
 //
 
+import Foundation
+
 enum GameAction {
 	case write
 	case roll
@@ -12,9 +14,9 @@ enum GameAction {
 	func buttonTitle(isInputVisible: Bool) -> String {
 		switch self {
 		case .write:
-			isInputVisible ? "> SEND COMMAND" : "> WRITE COMMAND"
+			isInputVisible ? String(localized: "nan_action_send_command") : String(localized: "nan_action_write_command")
 		case .roll:
-			"> ROLL D20"
+			String(localized: "nan_action_roll_d20")
 		}
 	}
 

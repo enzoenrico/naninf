@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct InputBox: View {
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+
 	var textbinding: Binding<String>
 	var isDisabled: Bool
 	var invalidAttempts: Int
@@ -34,7 +36,7 @@ struct InputBox: View {
 				.font(.monocraft(relativeTo: .headline, weight: .semibold))
 				.foregroundStyle(isDisabled ? Color.terminalMutedText : Color.accent)
 
-			TextField("Describe your next action", text: textbinding)
+			TextField("nan_input_placeholder", text: textbinding)
 				.focused($isFocused)
 				.font(.monocraft(relativeTo: .body))
 				.foregroundStyle(Color.accent)
@@ -48,7 +50,7 @@ struct InputBox: View {
 		.padding(.vertical, 12)
 		.background(isFocused ? Color.terminalActiveSurface : Color.terminalSurface)
 		.drawBorder(
-			isFocused ? "> Command" : nil,
+			isFocused ? String(localized: "nan_input_border_focused") : nil,
 			color: isDisabled ? Color.terminalMutedText : Color.accent,
 			lineWidth: isFocused ? 2 : 1
 		)
@@ -59,6 +61,7 @@ struct InputBox: View {
 			isFocused = true
 		}
 		.onChange(of: invalidAttempts) { _, _ in
+			guard !reduceMotion else { return }
 			withAnimation(.linear(duration: 0.06).repeatCount(5, autoreverses: true)) {
 				shakeOffset = 6
 			}
@@ -67,7 +70,11 @@ struct InputBox: View {
 				shakeOffset = 0
 			}
 		}
-		.accessibilityLabel("Command input")
-		.accessibilityHint(isDisabled ? "Wait for the dungeon master" : "Type your next action")
+		.accessibilityLabel(String(localized: "nan_input_a11y_label"))
+		.accessibilityHint(
+			isDisabled
+				? String(localized: "nan_input_a11y_hint_disabled")
+				: String(localized: "nan_input_a11y_hint_enabled")
+		)
 	}
 }

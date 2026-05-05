@@ -10,6 +10,31 @@ import TipKit
 
 struct GameView: View {
 	@Environment(AppCoordinator.self) private var coordinator
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+	@State private var vm = GameViewModel()
+
+	var body: some View {
+		GameSessionView(
+			vm: vm,
+			coordinator: coordinator,
+			showsTips: true,
+			onNavigateBack: {
+				TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
+					coordinator.resetGamePresentation()
+					coordinator.back()
+				}
+			}
+		)
+	}
+}
+
+struct GameSessionView: View {
+	let vm: GameViewModel
+	let coordinator: AppCoordinator
+	let showsTips: Bool
+	let onNavigateBack: (() -> Void)?
+	let onCompletedPlayerAction: (() -> Void)?
+
 	@State private var actionAreaTip = ActionAreaTip()
 	@State private var imageSectionTip = ImageSectionTip()
 	@State private var actionButtonTip = ActionButtonTip()
@@ -17,50 +42,66 @@ struct GameView: View {
 	@State private var tipsConfigured = false
 	@State private var inlineResponseStatus: ResponseStatus?
 	@State private var inlineStatusDismissTask: Task<Void, Never>?
-	@State private var vm = GameViewModel()
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 	@AppStorage("hasSeenGameTips") private var hasSeenGameTips = false
 
+	init(
+		vm: GameViewModel,
+		coordinator: AppCoordinator,
+		showsTips: Bool,
+		onNavigateBack: (() -> Void)? = nil,
+		onCompletedPlayerAction: (() -> Void)? = nil
+	) {
+		self.vm = vm
+		self.coordinator = coordinator
+		self.showsTips = showsTips
+		self.onNavigateBack = onNavigateBack
+		self.onCompletedPlayerAction = onCompletedPlayerAction
+	}
+
 	var body: some View {
-		@Bindable var vm = vm
 		@Bindable var coordinator = coordinator
 
-		let shouldShowTips = !hasSeenGameTips
+		let shouldShowTips = showsTips && !hasSeenGameTips
 
-		VStack(spacing: 12) {
-			GameHeader(
-				health: vm.health,
-				mana: vm.mana,
-				maxHealth: vm.maxHealth,
-				maxMana: vm.maxMana,
-				phase: vm.uiPhase
-			)
-			.popoverTipIf(statBarsTip, arrowEdge: .bottom, when: shouldShowTips)
-			.zIndex(2)
-
+		AppLayout(
+			background: .terminalGrid,
+			contentPadding: EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16)
+		) {
 			VStack(spacing: 12) {
-				sceneImage(coordinator: coordinator, vm: vm, shouldShowTips: shouldShowTips)
-				actionPanel(coordinator: coordinator, vm: vm, shouldShowTips: shouldShowTips)
-				actionButton(coordinator: coordinator, vm: vm, shouldShowTips: shouldShowTips)
+				GameHeader(
+					onBack: onNavigateBack,
+					health: vm.health,
+					mana: vm.mana,
+					maxHealth: vm.maxHealth,
+					maxMana: vm.maxMana,
+					phase: vm.uiPhase
+				)
+				.popoverTipIf(statBarsTip, arrowEdge: .bottom, when: shouldShowTips)
+				.zIndex(2)
+
+				VStack(spacing: 12) {
+					sceneImage(coordinator: coordinator, vm: vm, shouldShowTips: shouldShowTips)
+					actionPanel(coordinator: coordinator, vm: vm, shouldShowTips: shouldShowTips)
+					actionButton(coordinator: coordinator, vm: vm, shouldShowTips: shouldShowTips)
+				}
 			}
 		}
-		.navigationBarBackButtonHidden()
-		.padding()
-		.background {
-			TerminalBackdrop()
-				.ignoresSafeArea()
-		}
-		.animation(.snappy(duration: 0.28), value: inlineResponseStatus?.id)
+		.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: inlineResponseStatus?.id)
+		.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: coordinator.isDicePromptVisible)
+		.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: coordinator.isContextualInputVisible)
+		.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: coordinator.isImageCollapsed)
 		.tipViewStyle(AsciiTipStyle())
 		.task {
 			vm.attachCoordinator(coordinator)
+			vm.onCompletedPlayerAction = onCompletedPlayerAction
 			presentInlineStatus(for: vm.uiPhase)
 			configureTipsIfNeeded(shouldShowTips: shouldShowTips)
 		}
 		.onChange(of: vm.uiPhase) { _, newPhase in
 			presentInlineStatus(for: newPhase)
 		}
-		.enableInjection()
 	}
 
 	#if DEBUG
@@ -75,10 +116,9 @@ struct GameView: View {
 	) -> some View {
 		if coordinator.isImageCollapsed {
 			CollapsedVisionBar {
-				withAnimation(.snappy(duration: 0.35)) {
-					coordinator.toggleImage()
-				}
+				coordinator.toggleImage(reduceMotion: reduceMotion)
 			}
+			.terminalPanelTransition(edge: .top)
 		} else {
 			VisionPanel(
 				isCollapsed: coordinator.isImageCollapsed,
@@ -86,11 +126,9 @@ struct GameView: View {
 				phase: vm.uiPhase
 			)
 			.popoverTipIf(imageSectionTip, arrowEdge: .top, when: shouldShowTips)
-			.transition(.move(edge: .top).combined(with: .opacity))
+			.terminalPanelTransition(edge: .top)
 			.onTapGesture {
-				withAnimation(.snappy(duration: 0.35)) {
-					coordinator.toggleImage()
-				}
+				coordinator.toggleImage(reduceMotion: reduceMotion)
 			}
 		}
 	}
@@ -122,12 +160,12 @@ struct GameView: View {
 				InlineResponseStatusRow(status: inlineResponseStatus) {
 					dismissInlineStatus()
 				}
-				.transition(.move(edge: .top).combined(with: .opacity))
+				.terminalTextTransition(edge: .top)
 			}
 
 			TypeWriterView(vm.narrativeText) {
 				vm.markNarrativeFinished()
-				coordinator.handleTypewriterCompletion()
+				coordinator.handleTypewriterCompletion(reduceMotion: reduceMotion)
 			}
 			.padding(.horizontal, 4)
 
@@ -142,7 +180,7 @@ struct GameView: View {
 				) {
 					submitPrimaryAction(vm: vm, coordinator: coordinator)
 				}
-				.transition(.move(edge: .bottom).combined(with: .opacity))
+				.terminalPanelTransition(edge: .bottom)
 			}
 		}
 		.padding(12)
@@ -164,6 +202,7 @@ struct GameView: View {
 				submitPrimaryAction(vm: vm, coordinator: coordinator)
 			}
 			.popoverTipIf(actionButtonTip, arrowEdge: .bottom, when: shouldShowTips)
+			.terminalPanelTransition(edge: .bottom)
 		}
 	}
 
@@ -172,16 +211,16 @@ struct GameView: View {
 
 		switch vm.contextAction {
 		case .write:
-			withAnimation(.snappy(duration: 0.3)) {
+			TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 				coordinator.handleContextualAction(vm.contextAction) {
 					vm.getResponse(for: vm.contextualInput)
 				}
 			}
 		case .roll:
 			if coordinator.isDicePromptVisible {
-				vm.rollDice()
+				vm.rollDice(reduceMotion: reduceMotion)
 			} else {
-				withAnimation(.snappy(duration: 0.3)) {
+				TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 					coordinator.handleContextualAction(.roll) { false }
 				}
 			}
@@ -205,7 +244,7 @@ struct GameView: View {
 		}
 
 		inlineStatusDismissTask?.cancel()
-		withAnimation(.snappy(duration: 0.28)) {
+		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 			inlineResponseStatus = status
 		}
 
@@ -217,7 +256,7 @@ struct GameView: View {
 
 			await MainActor.run {
 				guard inlineResponseStatus?.id == status.id else { return }
-				withAnimation(.snappy(duration: 0.28)) {
+				TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 					inlineResponseStatus = nil
 				}
 			}
@@ -226,7 +265,7 @@ struct GameView: View {
 
 	private func dismissInlineStatus() {
 		inlineStatusDismissTask?.cancel()
-		withAnimation(.snappy(duration: 0.22)) {
+		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.textAnimation) {
 			inlineResponseStatus = nil
 		}
 	}

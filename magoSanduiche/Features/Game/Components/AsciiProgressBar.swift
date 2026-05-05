@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Foundation
 
 enum BarTypes: String {
 	case health
@@ -14,9 +15,9 @@ enum BarTypes: String {
 	var label: String {
 		switch self {
 		case .health:
-			"HP"
+			String(localized: "nan_progressbar_hp")
 		case .mana:
-			"MP"
+			String(localized: "nan_progressbar_mp")
 		}
 	}
 
@@ -31,6 +32,8 @@ enum BarTypes: String {
 }
 
 struct AsciiProgressBar: View {
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+
 	var barType: BarTypes
 	var progress: Int
 	var maxProgress: Int = 18
@@ -59,8 +62,8 @@ struct AsciiProgressBar: View {
 				.monospacedDigit()
 		}
 		.frame(maxWidth: .infinity, maxHeight: 25)
-		.animation(.snappy(duration: 0.35), value: progress)
-		.accessibilityLabel("\(barType.label) \(clampedProgress) of \(maxProgress)")
+		.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: progress)
+		.accessibilityLabel(String(format: String(localized: "nan_progressbar_a11y"), barType.label, clampedProgress, maxProgress))
 		.enableInjection()
 	}
 

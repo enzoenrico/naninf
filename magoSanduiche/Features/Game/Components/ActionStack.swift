@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import Foundation
 
 struct ActionStack<Content: View>: View {
 	var title: String
 	@ViewBuilder var content: () -> Content
 
-	init(title: String = "> Actions", @ViewBuilder content: @escaping () -> Content) {
+	init(title: String = String(localized: "nan_action_stack_title"), @ViewBuilder content: @escaping () -> Content) {
 		self.title = title
 		self.content = content
 	}

@@ -8,29 +8,31 @@
 import SwiftUI
 
 struct OnboardingCard: View {
-	let page: OnboardingPage
+	let option: OnboardingOption
+	var isSelected = false
 
 	var body: some View {
 		VStack(spacing: 16) {
-			Image(page.image)
+			Image(option.image)
 				.resizable()
 				.interpolation(.none)
 				.scaledToFit()
 				.frame(height: 150)
-				.foregroundStyle(.accent)
+				.foregroundStyle(isSelected ? Color.terminalWarning : Color.accent)
 				.shadow(color: Color.accent.opacity(0.35), radius: 12)
 
-			Text(page.title)
+			Text(option.title)
 				.font(.monocraft(relativeTo: .title2, weight: .semibold))
 				.multilineTextAlignment(.center)
-				.foregroundStyle(Color.accent)
+				.foregroundStyle(isSelected ? Color.terminalWarning : Color.accent)
 
-			Text(page.message)
+			Text(option.subtitle)
 				.font(.monocraft(relativeTo: .body))
 				.multilineTextAlignment(.center)
 				.foregroundStyle(Color.terminalMutedText)
 		}
 		.padding(24)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.drawBorder(nil, color: isSelected ? .terminalWarning : .accent.opacity(0.7), lineWidth: isSelected ? 2 : 1)
 	}
 }

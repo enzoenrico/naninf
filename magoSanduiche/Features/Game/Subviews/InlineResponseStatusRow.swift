@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Foundation
 
 struct ResponseStatus: Identifiable, Equatable {
 	let id = UUID()
@@ -17,10 +18,10 @@ struct ResponseStatus: Identifiable, Equatable {
 		self.phase = phase
 		switch phase {
 		case .awaitingDungeonMaster:
-			text = "> The dungeon master is thinking..."
+			text = String(localized: "nan_phase_status_dm_thinking")
 			isTemporary = false
 		case .result:
-			text = "> Consequence received"
+			text = String(localized: "nan_phase_status_result")
 			isTemporary = true
 		case .reading, .ready, .composing, .rollingDice:
 			return nil
@@ -79,8 +80,16 @@ struct InlineResponseStatusRow: View {
 					}
 				}
 		)
-		.accessibilityLabel(status.text.replacingOccurrences(of: "> ", with: ""))
-		.accessibilityHint(status.isTemporary ? "Swipe to dismiss" : "Waiting for the dungeon master")
+		.accessibilityLabel(
+			status.phase == .awaitingDungeonMaster
+				? String(localized: "nan_inline_status_a11y_dm")
+				: String(localized: "nan_inline_status_a11y_result")
+		)
+		.accessibilityHint(
+			status.isTemporary
+				? String(localized: "nan_inline_status_swipe_hint")
+				: String(localized: "nan_inline_status_wait_hint")
+		)
 	}
 }
 

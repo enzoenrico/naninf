@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct GameHeader: View {
+	var onBack: (() -> Void)?
 	var health: Int
 	var mana: Int
 	var maxHealth: Int
@@ -15,12 +16,14 @@ struct GameHeader: View {
 	var phase: GameUIPhase
 
 	init(
+		onBack: (() -> Void)? = nil,
 		health: Int = 10,
 		mana: Int = 14,
 		maxHealth: Int = 18,
 		maxMana: Int = 18,
 		phase: GameUIPhase = .reading
 	) {
+		self.onBack = onBack
 		self.health = health
 		self.mana = mana
 		self.maxHealth = maxHealth
@@ -29,32 +32,27 @@ struct GameHeader: View {
 	}
 
 	var body: some View {
-		HStack(alignment: .center, spacing: 8) {
-			VStack {
-				Image(.bread)
-					.resizable()
-					.padding()
-					.scaledToFill()
-					.foregroundStyle(.accent)
+		VStack {
+			HStack(alignment: .center, spacing: 8) {
+				if let onBack {
+					Button(action: onBack) {
+						Text("> BACK")
+							.font(.monocraft(relativeTo: .caption, weight: .semibold))
+							.foregroundStyle(statusColor)
+					}
+					.buttonStyle(.plain)
+					.accessibilityLabel("Back to main menu")
+				}
+				VStack(alignment: .leading, spacing: 6) {
+					AsciiProgressBar(.health, progress: health, maxProgress: maxHealth)
+					AsciiProgressBar(.mana, progress: mana, maxProgress: maxMana)
+				}
+				.frame(maxWidth: .infinity, alignment: .leading)
 			}
-			.frame(width: 64, height: 64)
-			.background(Color.terminalSurface)
-			.drawBorder(nil, lineWidth: 1)
-
-			VStack(alignment: .leading, spacing: 6) {
-				Text("> DUNGEON LINK ACTIVE")
-					.font(.monocraft(relativeTo: .caption2, weight: .semibold))
-					.foregroundStyle(statusColor)
-					.lineLimit(1)
-					.minimumScaleFactor(0.75)
-				AsciiProgressBar(.health, progress: health, maxProgress: maxHealth)
-				AsciiProgressBar(.mana, progress: mana, maxProgress: maxMana)
-			}
-			.frame(maxWidth: .infinity, alignment: .leading)
+			.padding(8)
+			.drawBorder(onBack == nil ? "> BACK" : nil, color: statusColor, lineWidth: 2)
+			.accessibilityElement(children: .combine)
 		}
-		.padding(8)
-		.drawBorder(color: statusColor, lineWidth: 2)
-		.accessibilityElement(children: .combine)
 		.enableInjection()
 	}
 

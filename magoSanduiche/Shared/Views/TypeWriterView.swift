@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Foundation
 
 struct TypeWriterView: View {
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -41,7 +42,11 @@ struct TypeWriterView: View {
 			finishImmediately()
 		}
 		.accessibilityLabel(fullText)
-		.accessibilityHint(hasFinishedTyping ? "Narrative complete" : "Tap to reveal the full transmission")
+		.accessibilityHint(
+			hasFinishedTyping
+				? String(localized: "nan_typewriter_a11y_complete")
+				: String(localized: "nan_typewriter_a11y_tap_reveal")
+		)
 		.enableInjection()
 	}
 
@@ -54,7 +59,7 @@ struct TypeWriterView: View {
 	}
 
 	private var renderedText: String {
-		let cursor = cursorVisible ? "▌" : " "
+		let cursor = cursorVisible ? TerminalMotion.cursorSymbol : " "
 		return hasFinishedTyping ? String(temp) : String(temp) + cursor
 	}
 
@@ -65,9 +70,8 @@ struct TypeWriterView: View {
 			return
 		}
 
-		let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ$#@|&*~`.<>/?"
-		temp[index] = letters.randomElement() ?? content[index]
-		try? await Task.sleep(for: .milliseconds(5))
+		temp[index] = TerminalMotion.scrambleGlyphs.randomElement() ?? content[index]
+		try? await Task.sleep(for: TerminalMotion.typewriterStepDelay)
 		await swapLetter(at: index, target: target - 1)
 	}
 
@@ -94,7 +98,7 @@ struct TypeWriterView: View {
 			guard !hasFinishedTyping else { return }
 			temp[index] = content[index]
 			await swapLetter(at: index, target: 2)
-			try? await Task.sleep(for: .milliseconds(5))
+			try? await Task.sleep(for: TerminalMotion.typewriterStepDelay)
 		}
 
 		hasFinishedTyping = true
@@ -110,8 +114,13 @@ struct TypeWriterView: View {
 	}
 
 	private func blinkCursor() async {
+		guard !reduceMotion else {
+			cursorVisible = false
+			return
+		}
+
 		while !Task.isCancelled {
-			try? await Task.sleep(for: .milliseconds(520))
+			try? await Task.sleep(for: TerminalMotion.cursorInterval)
 			guard !hasFinishedTyping else {
 				cursorVisible = false
 				continue

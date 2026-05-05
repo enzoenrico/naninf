@@ -9,26 +9,26 @@ import SwiftUI
 import TipKit
 
 struct ActionAreaTip: Tip {
-	var title: Text { Text("Your actions") }
-	var message: Text? { Text("Everything that happens in the world is shown here") }
+	var title: Text { Text("nan_tip_action_title") }
+	var message: Text? { Text("nan_tip_action_message") }
 	var image: Image? { Image(systemName: "text.justify.left") }
 }
 
 struct ImageSectionTip: Tip {
-	var title: Text { Text("See the world") }
-	var message: Text? { Text("Images are generated to show important characters, actions and events") }
+	var title: Text { Text("nan_tip_image_title") }
+	var message: Text? { Text("nan_tip_image_message") }
 	var image: Image? { Image(systemName: "photo.on.rectangle") }
 }
 
 struct ActionButtonTip: Tip {
-	var title: Text { Text("Take your turn") }
-	var message: Text? { Text("Use the action button whenever you can make a move.") }
+	var title: Text { Text("nan_tip_button_title") }
+	var message: Text? { Text("nan_tip_button_message") }
 	var image: Image? { Image(systemName: "wand.and.stars") }
 }
 
 struct StatBarsTip: Tip {
-	var title: Text { Text("Health and mana") }
-	var message: Text? { Text("Keep track of your health and mana, so the dungeon does not get the best of you") }
+	var title: Text { Text("nan_tip_stats_title") }
+	var message: Text? { Text("nan_tip_stats_message") }
 	var image: Image? { Image(systemName: "heart.text.square") }
 }
 

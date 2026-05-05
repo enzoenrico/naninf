@@ -16,13 +16,13 @@ enum TerminalEntryKind {
 	var prefix: String {
 		switch self {
 		case .dungeonMaster:
-			"> DM"
+			String(localized: "nan_terminal_prefix_dm")
 		case .player:
-			"> YOU"
+			String(localized: "nan_terminal_prefix_you")
 		case .dice:
-			"> D20"
+			String(localized: "nan_terminal_prefix_d20")
 		case .system:
-			"> SYS"
+			String(localized: "nan_terminal_prefix_sys")
 		}
 	}
 }

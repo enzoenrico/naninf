@@ -25,9 +25,10 @@ final class GameViewModel {
 	var maxHealth = 18
 	var maxMana = 18
 	var diceValue = 20
-	var diceResultText = "The die is cold. It waits for your hand."
+	var diceResultText = String(localized: "nan_dice_idle_cold")
 	var invalidInputAttempts = 0
 	var contextualInput = ""
+	var onCompletedPlayerAction: (() -> Void)?
 	var terminalEntries: [TerminalEntry] = [
 		TerminalEntry(kind: .dungeonMaster, text: Introduction.intro)
 	]
@@ -90,17 +91,19 @@ final class GameViewModel {
 		uiPhase = .composing
 	}
 
-	func rollDice() {
+	func rollDice(reduceMotion: Bool = false) {
 		guard !loading else { return }
 
 		loading = true
 		uiPhase = .rollingDice
-		diceResultText = "The die rattles across the dungeon floor..."
+		diceResultText = String(localized: "nan_dice_rolling")
 
 		Task {
-			for _ in 0..<12 {
-				diceValue = Int.random(in: 1...20)
-				try? await Task.sleep(for: .milliseconds(55))
+			if !reduceMotion {
+				for _ in 0..<12 {
+					diceValue = Int.random(in: 1...20)
+					try? await Task.sleep(for: .milliseconds(55))
+				}
 			}
 
 			let finalRoll = Int.random(in: 1...20)
@@ -110,23 +113,27 @@ final class GameViewModel {
 			coordinator?.finishDicePrompt()
 			loading = false
 			uiPhase = .result
+			onCompletedPlayerAction?()
 		}
 	}
 
 	private func fetchNarrative(for prompt: String) async {
 		loading = true
-		defer { loading = false }
+		defer {
+			loading = false
+			onCompletedPlayerAction?()
+		}
 
 		do {
 			guard let result = try await dungeonMaster?.generate(prompt) else {
-				appendSystemMessage("The dungeon master remains silent.")
+				appendSystemMessage(String(localized: "nan_dm_silent"))
 				return
 			}
 
 			terminalEntries.append(TerminalEntry(kind: .dungeonMaster, text: result.narrative))
 			uiPhase = .result
 		} catch {
-			appendSystemMessage("The dungeon master could not respond this time.")
+			appendSystemMessage(String(localized: "nan_dm_error"))
 		}
 	}
 
@@ -140,12 +147,12 @@ final class GameViewModel {
 		switch roll {
 		case 1...6:
 			health = max(0, health - 2)
-			outcome = "A brutal \(roll). The dungeon bites back. HP -2."
+			outcome = String(format: String(localized: "nan_dice_outcome_low"), roll)
 		case 7...14:
-			outcome = "A tense \(roll). You hold your ground, but the dark notices you."
+			outcome = String(format: String(localized: "nan_dice_outcome_mid"), roll)
 		default:
 			mana = min(maxMana, mana + 2)
-			outcome = "A bright \(roll). Arcane luck surges through your staff. MP +2."
+			outcome = String(format: String(localized: "nan_dice_outcome_high"), roll)
 		}
 
 		diceResultText = outcome

@@ -8,17 +8,18 @@
 import SwiftUI
 
 struct OnboardingPrimaryButtonStyle: ButtonStyle {
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+
 	func makeBody(configuration: Configuration) -> some View {
 		configuration.label
 			.foregroundStyle(Color.accent)
-//            .background(Color.backgroundColor)
-            .drawBorder(
-                nil,
-                color: .accent,
-                lineWidth: configuration.isPressed ? 3 : 2
-            )
+			.drawBorder(
+				nil,
+				color: .accent,
+				lineWidth: configuration.isPressed ? 3 : 2
+			)
 			.scaleEffect(configuration.isPressed ? 0.985 : 1)
 			.shadow(color: Color.accent.opacity(0.28), radius: 10)
-			.animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+			.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.quickPressAnimation), value: configuration.isPressed)
 	}
 }

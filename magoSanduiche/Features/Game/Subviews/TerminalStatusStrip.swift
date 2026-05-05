@@ -20,7 +20,12 @@ struct TerminalStatusStrip: View {
 				.minimumScaleFactor(0.75)
 
 			if isLoading {
-				InlineTerminalDots()
+				TerminalGlyphLoader(
+					style: .spinner,
+					textStyle: .caption,
+					weight: .bold,
+					color: .terminalWarning
+				)
 			}
 
 			Spacer(minLength: 0)
@@ -44,18 +49,12 @@ struct TerminalStatusStrip: View {
 }
 
 struct InlineTerminalDots: View {
-	@State private var dotCount = 1
-
 	var body: some View {
-		Text(String(repeating: ".", count: dotCount))
-			.font(.monocraft(relativeTo: .caption, weight: .bold))
-			.foregroundStyle(Color.terminalWarning)
-			.frame(width: 24, alignment: .leading)
-			.task {
-				while !Task.isCancelled {
-					try? await Task.sleep(for: .milliseconds(220))
-					dotCount = dotCount == 3 ? 1 : dotCount + 1
-				}
-			}
+		TerminalGlyphLoader(
+			style: .dots,
+			textStyle: .caption,
+			weight: .bold,
+			color: .terminalWarning
+		)
 	}
 }

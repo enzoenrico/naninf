@@ -78,17 +78,27 @@ final class AppCoordinator {
 		}
 	}
 
-	func handleTypewriterCompletion() {
-		withAnimation(.easeInOut) {
+	func resetGamePresentation() {
+		updatePresentationState {
+			isContextualInputVisible = false
+			isDicePromptVisible = false
+			isImageCollapsed = true
+			hasCompletedInitialText = false
+			showActionButton = false
+		}
+	}
+
+	func handleTypewriterCompletion(reduceMotion: Bool = false) {
+		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 			hasCompletedInitialText = true
 			isImageCollapsed = false
 			showActionButton = true
 		}
 	}
 
-	func toggleImage() {
+	func toggleImage(reduceMotion: Bool = false) {
 		guard hasCompletedInitialText else { return }
-		withAnimation(.easeInOut) {
+		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 			isImageCollapsed.toggle()
 		}
 	}
