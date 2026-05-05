@@ -1,0 +1,4144 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    " " : {
+
+    },
+    "  " : {
+
+    },
+    "[" : {
+
+    },
+    "[x]" : {
+
+    },
+    "]" : {
+
+    },
+    "*****" : {
+
+    },
+    "//" : {
+
+    },
+    "// scanning C:\\NAN\\SAVES" : {
+
+    },
+    "%@, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@"
+          }
+        }
+      }
+    },
+    "%@: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "%lld" : {
+
+    },
+    "%lld/%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld/%2$lld"
+          }
+        }
+      }
+    },
+    ">" : {
+
+    },
+    "> " : {
+
+    },
+    "> %@" : {
+
+    },
+    "> BACK" : {
+
+    },
+    "$" : {
+
+    },
+    "Back to main menu" : {
+
+    },
+    "MAGO-DOS" : {
+
+    },
+    "nan_a11y_action_roll_d20" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ROLL D20"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ROLAR D20"
+          }
+        }
+      }
+    },
+    "nan_a11y_action_send_command" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SEND COMMAND"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ENVIAR COMANDO"
+          }
+        }
+      }
+    },
+    "nan_a11y_action_write_command" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WRITE COMMAND"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ESCREVER COMANDO"
+          }
+        }
+      }
+    },
+    "nan_a11y_button_fate_rolling" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FATE IS ROLLING"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O DESTINO ESTÁ GIRANDO"
+          }
+        }
+      }
+    },
+    "nan_a11y_button_processing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PROCESSING"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PROCESSANDO"
+          }
+        }
+      }
+    },
+    "nan_a11y_button_writing_story" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WRITING THE STORY"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ESCREVENDO A HISTÓRIA"
+          }
+        }
+      }
+    },
+    "nan_about_back" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "< BACK TO HUB"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "< VOLTAR AO HUB"
+          }
+        }
+      }
+    },
+    "nan_about_back_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Returns to the home hub."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volta ao hub principal."
+          }
+        }
+      }
+    },
+    "nan_about_credits_border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> CREDITS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> CRÉDITOS"
+          }
+        }
+      }
+    },
+    "nan_about_engine_value" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAN-DOS / SwiftUI"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAN-DOS / SwiftUI"
+          }
+        }
+      }
+    },
+    "nan_about_key_app" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APP"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APP"
+          }
+        }
+      }
+    },
+    "nan_about_key_code" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CODE"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CÓDIGO"
+          }
+        }
+      }
+    },
+    "nan_about_key_design" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DESIGN"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DESIGN"
+          }
+        }
+      }
+    },
+    "nan_about_key_dungeon_master" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DUNGEON.MASTER"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MASMORRA.MASTER"
+          }
+        }
+      }
+    },
+    "nan_about_key_engine" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ENGINE"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MOTOR"
+          }
+        }
+      }
+    },
+    "nan_about_key_font" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FONT"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FONTE"
+          }
+        }
+      }
+    },
+    "nan_about_key_platform" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PLATFORM"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PLATAFORMA"
+          }
+        }
+      }
+    },
+    "nan_about_key_version" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VERSION"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VERSÃO"
+          }
+        }
+      }
+    },
+    "nan_about_platform_value" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS"
+          }
+        }
+      }
+    },
+    "nan_about_readme_kicker" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> README.MD"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> README.MD"
+          }
+        }
+      }
+    },
+    "nan_about_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A pocket dungeon ran by an AI Dungeon Master, powered by sandwiches and questionable d20s."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uma masmorra de bolso comandada por um Mestre da Masmorra de IA, movida a sanduíches e d20s duvidosos."
+          }
+        }
+      }
+    },
+    "nan_about_sys_info_border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> SYS.INFO"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> SYS.INFO"
+          }
+        }
+      }
+    },
+    "nan_about_thanks" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ">_ thanks for playing"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ">_ obrigado por jogar"
+          }
+        }
+      }
+    },
+    "nan_about_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About Mago Sanduiche"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre o Mago Sanduíche"
+          }
+        }
+      }
+    },
+    "nan_about_value_dungeon_master" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI familiar in residence"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Familiar de IA em residência"
+          }
+        }
+      }
+    },
+    "nan_about_version_value" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "v%1$@ (build %2$@)"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "v%1$@ (build %2$@)"
+          }
+        }
+      }
+    },
+    "nan_action_roll_d20" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ROLL D20"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ROLAR D20"
+          }
+        }
+      }
+    },
+    "nan_action_send_command" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> SEND COMMAND"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ENVIAR COMANDO"
+          }
+        }
+      }
+    },
+    "nan_action_stack_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Actions"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Ações"
+          }
+        }
+      }
+    },
+    "nan_action_write_command" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> WRITE COMMAND"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ESCREVER COMANDO"
+          }
+        }
+      }
+    },
+    "nan_boot_loading_memory" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading arcane memory..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carregando memória arcana..."
+          }
+        }
+      }
+    },
+    "nan_boot_ok_d20_driver" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[OK] D20 driver loaded..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[OK] Driver D20 carregado..."
+          }
+        }
+      }
+    },
+    "nan_boot_ok_dungeon_master" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[OK] Dungeon Master resident..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[OK] Mestre da Masmorra residente..."
+          }
+        }
+      }
+    },
+    "nan_boot_ok_hp_mp" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[OK] HP/MP registers mapped..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[OK] Registradores HP/PM mapeados..."
+          }
+        }
+      }
+    },
+    "nan_boot_ok_sandwich" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[OK] Sandwich of Power mounted..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[OK] Sanduíche do Poder montado..."
+          }
+        }
+      }
+    },
+    "nan_button_loading_fate_rolling" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> FATE IS ROLLING"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> O DESTINO ESTÁ GIRANDO"
+          }
+        }
+      }
+    },
+    "nan_button_loading_processing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> PROCESSING"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> PROCESSANDO"
+          }
+        }
+      }
+    },
+    "nan_button_loading_story" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> WRITING THE STORY"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ESCREVENDO A HISTÓRIA"
+          }
+        }
+      }
+    },
+    "nan_debug_onboarding_a11y" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug show onboarding"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug: mostrar onboarding"
+          }
+        }
+      }
+    },
+    "nan_debug_onboarding_button" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> DEBUG ONBOARDING"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> DEBUG ONBOARDING"
+          }
+        }
+      }
+    },
+    "nan_dice_flavor_idle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Roll the dice, little wizard."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Role o dado, maginho."
+          }
+        }
+      }
+    },
+    "nan_dice_flavor_rolling" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fate is moving."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O destino se move."
+          }
+        }
+      }
+    },
+    "nan_dice_idle_cold" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The die is cold. It waits for your hand."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O dado está frio. Espera pela sua mão."
+          }
+        }
+      }
+    },
+    "nan_dice_outcome_high" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A bright %lld. Arcane luck surges through your staff. MP +2."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um %lld brilhante. Sorte arcana percorre seu cajado. PM +2."
+          }
+        }
+      }
+    },
+    "nan_dice_outcome_low" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A brutal %lld. The dungeon bites back. HP -2."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um %lld brutal. A masmorra revida. HP -2."
+          }
+        }
+      }
+    },
+    "nan_dice_outcome_mid" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A tense %lld. You hold your ground, but the dark notices you."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um %lld tenso. Você segura o terreno, mas as trevas percebem você."
+          }
+        }
+      }
+    },
+    "nan_dice_panel_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> D20"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> D20"
+          }
+        }
+      }
+    },
+    "nan_dice_rolling" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The die rattles across the dungeon floor..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O dado chocalha pelo chão da masmorra..."
+          }
+        }
+      }
+    },
+    "nan_dm_error" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The dungeon master could not respond this time."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O mestre da masmorra não pôde responder desta vez."
+          }
+        }
+      }
+    },
+    "nan_dm_silent" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The dungeon master remains silent."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O mestre da masmorra permanece em silêncio."
+          }
+        }
+      }
+    },
+    "nan_home_crest_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mago Sanduiche logo. A small wizard above a stacked sandwich."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logotipo Mago Sanduíche. Um mago pequeno sobre um sanduíche empilhado."
+          }
+        }
+      }
+    },
+    "nan_home_footer_selected" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[%@] SELECTED"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[%@] SELECIONADO"
+          }
+        }
+      }
+    },
+    "nan_home_footer_version" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "v%@ // C:\\NAN>"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "v%@ // C:\\NAN>"
+          }
+        }
+      }
+    },
+    "nan_home_hero_border_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> NAN.SYS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> NAN.SYS"
+          }
+        }
+      }
+    },
+    "nan_home_menu_voiceover_hint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Double tap to open %@: %@."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toque duas vezes para abrir %@: %@."
+          }
+        }
+      }
+    },
+    "nan_home_session_ready" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SESSION READY"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SESSÃO PRONTA"
+          }
+        }
+      }
+    },
+    "nan_home_shell_ready" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> NAN.SYS / SHELL READY"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> NAN.SYS / SHELL PRONTO"
+          }
+        }
+      }
+    },
+    "nan_home_tagline" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> A DUNGEON OF QUESTIONABLE SANDWICHES_"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> UMA MASMORRA DE SANDUÍCHES DUVIDOSOS_"
+          }
+        }
+      }
+    },
+    "nan_inline_status_a11y_dm" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The dungeon master is thinking..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O mestre da masmorra está pensando..."
+          }
+        }
+      }
+    },
+    "nan_inline_status_a11y_result" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consequence received"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consequência recebida"
+          }
+        }
+      }
+    },
+    "nan_inline_status_swipe_hint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swipe to dismiss"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deslize para dispensar"
+          }
+        }
+      }
+    },
+    "nan_inline_status_wait_hint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for the dungeon master"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aguardando o mestre da masmorra"
+          }
+        }
+      }
+    },
+    "nan_input_a11y_hint_disabled" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wait for the dungeon master"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aguarde o mestre da masmorra"
+          }
+        }
+      }
+    },
+    "nan_input_a11y_hint_enabled" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type your next action"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digite sua próxima ação"
+          }
+        }
+      }
+    },
+    "nan_input_a11y_label" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command input"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrada de comando"
+          }
+        }
+      }
+    },
+    "nan_input_border_focused" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Command"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Comando"
+          }
+        }
+      }
+    },
+    "nan_input_placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Describe your next action"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descreva sua próxima ação"
+          }
+        }
+      }
+    },
+    "nan_intro_full" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Breathe, traveler. The way back is sealed. There is only the path forward.\n\nWelcome to the heart of the forgotten. This place you see... it is more than mere stone and shadow. It is a living puzzle, a labyrinth of secrets designed to guard a prize of immense power: the Sandwich of Power.\n\nOur journey will not be a simple one. The main corridors may lead only to ruin and despair. You must look deeper. Examine the walls for hidden switches, listen for the echo in hollow floors, and understand that the dungeon itself will try to deceive you. New paths will reveal themselves only to a keen eye and a clever mind.\n\nDanger lurks in every shadow, but do not let fear master you. Your courage is a light as potent as the one from my staff. Together, we will navigate its depths, uncover its long-lost ways, and claim the power that lies waiting.\n\nNow... take the first step. Our true journey begins.\n\n> Type your commands to interact with the world."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respira, viajante. O caminho de volta está selado. Só resta seguir em frente.\n\nBem-vindo ao coração do esquecimento. O que você vê... é muito mais que pedra e sombra. É um quebra-cabeça vivo, um labirinto de segredos feito para guardar um prêmio de imenso poder: o Sanduíche do Poder.\n\nNossa jornada não será simples. Os corredores principais podem levar só à ruína e ao desespero. Você precisa olhar além. Examine as paredes em busca de alavancas ocultas, ouça o eco em pisos ocos e entenda que a masmorra vai tentar enganar você. Novos caminhos só se revelam para quem tem olhar afiado e mente sagaz.\n\nO perigo espreita em cada sombra, mas não deixe o medo te dominar. Sua coragem é uma luz tão potente quanto a do meu cajado. Juntos, vamos navegar suas profundezas, redescobrir atalhos perdidos e reivindicar o poder que aguarda.\n\nAgora... dê o primeiro passo. Nossa verdadeira jornada começa.\n\n> Digite seus comandos para interagir com o mundo."
+          }
+        }
+      }
+    },
+    "nan_load_back" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "< BACK TO HUB"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "< VOLTAR AO HUB"
+          }
+        }
+      }
+    },
+    "nan_load_back_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Returns to the home hub."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volta ao hub principal."
+          }
+        }
+      }
+    },
+    "nan_load_empty_body" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start a new run from the hub. Your progress is saved between sessions in the next patch."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comece uma nova run no hub. Seu progresso será salvo entre sessões no próximo patch."
+          }
+        }
+      }
+    },
+    "nan_load_empty_headline" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[ NO SAVES FOUND ]"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[ NENHUM SAVE ENCONTRADO ]"
+          }
+        }
+      }
+    },
+    "nan_load_header_kicker" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> SAV.SLOT"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> SAV.SLOT"
+          }
+        }
+      }
+    },
+    "nan_load_panel_border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> SAV.SLOT"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> SAV.SLOT"
+          }
+        }
+      }
+    },
+    "nan_load_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-save will land here once the dungeon writes its first checkpoint."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O salvamento automático aparecerá aqui quando a masmorra gravar o primeiro checkpoint."
+          }
+        }
+      }
+    },
+    "nan_load_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load a previous run"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carregar uma run anterior"
+          }
+        }
+      }
+    },
+    "nan_menu_about_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CREDITS / VERSION"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CRÉDITOS / VERSÃO"
+          }
+        }
+      }
+    },
+    "nan_menu_about_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ABOUT"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SOBRE"
+          }
+        }
+      }
+    },
+    "nan_menu_load_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RESUME RUN"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RETOMAR RUN"
+          }
+        }
+      }
+    },
+    "nan_menu_load_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LOAD"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CARREGAR"
+          }
+        }
+      }
+    },
+    "nan_menu_play_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NEW RUN"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NOVA RUN"
+          }
+        }
+      }
+    },
+    "nan_menu_play_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PLAY"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JOGAR"
+          }
+        }
+      }
+    },
+    "nan_menu_stats_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PROFILE / TRAITS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PERFIL / TRAÇOS"
+          }
+        }
+      }
+    },
+    "nan_menu_stats_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "STATS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "STATS"
+          }
+        }
+      }
+    },
+    "nan_onboarding_button_bind" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> BIND MY DUNGEON"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> VINCULAR MINHA MASMORRA"
+          }
+        }
+      }
+    },
+    "nan_onboarding_button_binding" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> BINDING"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> VINCULANDO"
+          }
+        }
+      }
+    },
+    "nan_onboarding_button_continue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> CONTINUE"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> CONTINUAR"
+          }
+        }
+      }
+    },
+    "nan_onboarding_button_open_gate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> OPEN THE GATE"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ABRIR O PORTAL"
+          }
+        }
+      }
+    },
+    "nan_onboarding_button_play_demo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> PLAY THE DEMO"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> JOGAR A DEMO"
+          }
+        }
+      }
+    },
+    "nan_onboarding_button_show_how" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> SHOW ME HOW"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ME MOSTRE"
+          }
+        }
+      }
+    },
+    "nan_onboarding_button_start_trial" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> START FREE TRIAL"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> COMEÇAR TESTE GRÁTIS"
+          }
+        }
+      }
+    },
+    "nan_onboarding_demo_actions_chip_format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> DEMO ACTIONS %@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> AÇÕES DA DEMO %@"
+          }
+        }
+      }
+    },
+    "nan_onboarding_demo_bullet_fullscreen" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> The demo opens as a full-screen dungeon session."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> A demo abre em uma sessão de masmorra em tela cheia."
+          }
+        }
+      }
+    },
+    "nan_onboarding_demo_bullet_resume" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Leave and resume anytime before the paywall appears."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Saia e retome a qualquer momento antes do paywall aparecer."
+          }
+        }
+      }
+    },
+    "nan_onboarding_demo_cta_format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> %@ LIVE DEMO"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> %@ DEMO AO VIVO"
+          }
+        }
+      }
+    },
+    "nan_onboarding_demo_cta_resume" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RESUME"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RETOMAR"
+          }
+        }
+      }
+    },
+    "nan_onboarding_demo_cta_start" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "START"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "INICIAR"
+          }
+        }
+      }
+    },
+    "nan_onboarding_demo_exit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> EXIT"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> SAIR"
+          }
+        }
+      }
+    },
+    "nan_onboarding_demo_mode_border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Demo Mode"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Modo demo"
+          }
+        }
+      }
+    },
+    "nan_onboarding_demo_subtitle_format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is the same Dungeon Master interaction used in the full game. Complete %lld actions to keep the adventure."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "É a mesma interação com o Mestre da Masmorra do jogo completo. Complete %lld ações para manter a aventura."
+          }
+        }
+      }
+    },
+    "nan_onboarding_demo_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play your first turns."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jogue suas primeiras jogadas."
+          }
+        }
+      }
+    },
+    "nan_onboarding_goal_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick the fantasy mood that makes you want to open the gate."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha o clima de fantasia que te faz querer abrir o portal."
+          }
+        }
+      }
+    },
+    "nan_onboarding_goal_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What kind of adventure do you want tonight?"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Que tipo de aventura você quer hoje à noite?"
+          }
+        }
+      }
+    },
+    "nan_onboarding_kicker_compiler" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ARCANE COMPILER"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> COMPILADOR ARCANO"
+          }
+        }
+      }
+    },
+    "nan_onboarding_kicker_curses" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> COMMON CURSES"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> MALDIÇÕES COMUNS"
+          }
+        }
+      }
+    },
+    "nan_onboarding_kicker_demo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> LIVE DUNGEON DEMO"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> DEMO AO VIVO DA MASMORRA"
+          }
+        }
+      }
+    },
+    "nan_onboarding_kicker_flavor" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> DUNGEON FLAVOR"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> SABOR DA MASMORRA"
+          }
+        }
+      }
+    },
+    "nan_onboarding_kicker_paywall" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> FULL GAME ACCESS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ACESSO AO JOGO COMPLETO"
+          }
+        }
+      }
+    },
+    "nan_onboarding_kicker_player_intent" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> PLAYER INTENT"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> INTENÇÃO DO JOGADOR"
+          }
+        }
+      }
+    },
+    "nan_onboarding_kicker_reports" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> FIELD REPORTS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> RELATÓRIOS DE CAMPO"
+          }
+        }
+      }
+    },
+    "nan_onboarding_kicker_spell" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> PERSONAL SPELL"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> FEITIÇO PESSOAL"
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_boring_choices_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap-to-win quests get old fast."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Missões de toque fácil enjoam rápido."
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_boring_choices_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boring choices"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolhas chatas"
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_chaotic_sandbox_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try odd ideas and see how the dungeon reacts."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teste ideias estranhas e veja como a masmorra reage."
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_chaotic_sandbox_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A chaotic sandbox"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um sandbox caótico"
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_clever_puzzle_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find hidden paths, traps, and strange clues."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encontre caminhos ocultos, armadilhas e pistas estranhas."
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_clever_puzzle_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clever puzzles"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enigmas espertos"
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_dangerous_combat_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Risk HP, spend MP, and roll when fate turns."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrisque PV, gaste PM e role quando o destino virar."
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_dangerous_combat_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dangerous combat"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Combate perigoso"
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_funny_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Strange monsters and sandwich-level chaos."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monstros estranhos e caos nível sanduíche."
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_funny_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funny"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Engraçado"
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_generic_stories_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Most games do not react to my weird choices."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A maioria dos jogos não reage às minhas escolhas malucas."
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_generic_stories_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generic stories"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Histórias genéricas"
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_heroic_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Big spells, brave calls, and close saves."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Magias grandes, decisões corajosas e salvamentos por um triz."
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_heroic_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heroic"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heroico"
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_magic_roleplay_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cast spells and talk your way through trouble."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lance magias e negocie seu caminho pelo perigo."
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_magic_roleplay_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Magical roleplay"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interpretação mágica"
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_mysterious_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Runes, locked doors, and secrets under stone."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Runas, portas trancadas e segredos sob a pedra."
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_mysterious_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mysterious"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Misterioso"
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_no_group_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I want a solo adventure anytime."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quero uma aventura solo a qualquer hora."
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_no_group_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No one to play with"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem ninguém para jogar"
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_quick_escape_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop into a dungeon in under a minute."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entre numa masmorra em menos de um minuto."
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_quick_escape_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A quick fantasy escape"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uma fuga rápida para a fantasia"
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_risky_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hard rolls, sharp traps, and real consequences."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rolagens difíceis, armadilhas cruéis e consequências reais."
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_risky_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Risky"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arriscado"
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_slow_setup_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Character sheets and prep kill the mood."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fichas e preparação matam o clima."
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_slow_setup_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slow setup"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparação demorada"
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_spooky_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damp halls, whispers, and old curses."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salas úmidas, sussurros e maldições antigas."
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_spooky_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spooky"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assombrado"
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_too_many_rules_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I want adventure, not a manual."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quero aventura, não manual."
+          }
+        }
+      }
+    },
+    "nan_onboarding_option_too_many_rules_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Too many rules"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regras demais"
+          }
+        }
+      }
+    },
+    "nan_onboarding_pain_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose every answer that feels familiar."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marque tudo que parecer familiar."
+          }
+        }
+      }
+    },
+    "nan_onboarding_pain_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What usually keeps you from playing?"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O que costuma te impedir de jogar?"
+          }
+        }
+      }
+    },
+    "nan_onboarding_paywall_bullet_content" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New rooms, traps, monsters, and sandwich omens"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Novas salas, armadilhas, monstros e presságios de sanduíche"
+          }
+        }
+      }
+    },
+    "nan_onboarding_paywall_bullet_reactive" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reactive story, HP, MP, and d20 outcomes"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "História reativa, PV, PM e resultados de d20"
+          }
+        }
+      }
+    },
+    "nan_onboarding_paywall_bullet_turns" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlimited command-driven dungeon turns"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turnos ilimitados da masmorra guiados por comando"
+          }
+        }
+      }
+    },
+    "nan_onboarding_paywall_disclaimer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Placeholder pricing. Connect StoreKit products before release."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preço de exemplo. Conecte produtos do StoreKit antes do lançamento."
+          }
+        }
+      }
+    },
+    "nan_onboarding_paywall_included_border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Included"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Incluso"
+          }
+        }
+      }
+    },
+    "nan_onboarding_paywall_price" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 days free, then $4.99/week"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 dias grátis, depois US$ 4,99/semana"
+          }
+        }
+      }
+    },
+    "nan_onboarding_paywall_restore" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Purchases"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurar compras"
+          }
+        }
+      }
+    },
+    "nan_onboarding_paywall_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep your adventure going with unlimited AI Dungeon Master turns, dice checks, and evolving consequences."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue sua aventura com turnos ilimitados do Mestre de IA, testes de dado e consequências em evolução."
+          }
+        }
+      }
+    },
+    "nan_onboarding_paywall_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock the full dungeon."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloqueie a masmorra completa."
+          }
+        }
+      }
+    },
+    "nan_onboarding_paywall_trial_border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Trial"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Teste"
+          }
+        }
+      }
+    },
+    "nan_onboarding_pref_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These choices shape the demo omen you will see next."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essas escolhas moldam o presságio da demo que você verá em seguida."
+          }
+        }
+      }
+    },
+    "nan_onboarding_pref_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What should your first dungeon feel like?"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como deve ser a sensação da sua primeira masmorra?"
+          }
+        }
+      }
+    },
+    "nan_onboarding_processing_flavor" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> rolling moss, traps, bread crumbs"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> musgo rolando, armadilhas, migalhas de pão"
+          }
+        }
+      }
+    },
+    "nan_onboarding_processing_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparing a tiny playable omen from your choices."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando um presságio jogável minúsculo a partir das suas escolhas."
+          }
+        }
+      }
+    },
+    "nan_onboarding_processing_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Binding your first dungeon..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinculando sua primeira masmorra..."
+          }
+        }
+      }
+    },
+    "nan_onboarding_progress_format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d/%2$d"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d/%2$d"
+          }
+        }
+      }
+    },
+    "nan_onboarding_progress_label" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ONBOARDING SEQUENCE"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> SEQUÊNCIA DO ONBOARDING"
+          }
+        }
+      }
+    },
+    "nan_onboarding_promise_boring_choices" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Risky commands, dice rolls, and resource changes keep each turn alive."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comandos arriscados, rolagens e mudanças de recursos mantêm cada turno vivo."
+          }
+        }
+      }
+    },
+    "nan_onboarding_promise_default" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your answers shape a cleaner first adventure."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suas respostas moldam uma primeira aventura mais redonda."
+          }
+        }
+      }
+    },
+    "nan_onboarding_promise_generic_stories" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The AI Dungeon Master reacts to odd choices instead of forcing one path."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Mestre de IA reage a escolhas estranhas em vez de forçar um único caminho."
+          }
+        }
+      }
+    },
+    "nan_onboarding_promise_no_group" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play a solo fantasy session whenever you have a spare minute."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jogue uma sessão solo de fantasia sempre que tiver um minuto livre."
+          }
+        }
+      }
+    },
+    "nan_onboarding_promise_slow_setup" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the app and begin with a ready-made mage, HP, MP, and a waiting dungeon."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abra o app e comece com um mago pronto, PV, PM e uma masmorra esperando."
+          }
+        }
+      }
+    },
+    "nan_onboarding_promise_too_many_rules" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type natural commands. The app turns them into a playable RPG moment."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digite comandos naturais. O app os transforma em um momento jogável de RPG."
+          }
+        }
+      }
+    },
+    "nan_onboarding_social_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Placeholder reviews below. Replace them with real App Store feedback when you have it."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avaliações de exemplo abaixo. Troque por feedback real da App Store quando tiver."
+          }
+        }
+      }
+    },
+    "nan_onboarding_social_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Built for quick fantasy sessions."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feita para sessões rápidas de fantasia."
+          }
+        }
+      }
+    },
+    "nan_onboarding_solution_default_rules_pain" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No rulebook required"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem livro de regras"
+          }
+        }
+      }
+    },
+    "nan_onboarding_solution_default_rules_promise" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type one simple command and the Dungeon Master handles the world."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digite um comando simples e o Mestre da Masmorra cuida do mundo."
+          }
+        }
+      }
+    },
+    "nan_onboarding_solution_default_solo_pain" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo play anytime"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jogo solo a qualquer hora"
+          }
+        }
+      }
+    },
+    "nan_onboarding_solution_default_solo_promise" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start a living fantasy session without finding a group."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comece uma sessão viva de fantasia sem precisar de grupo."
+          }
+        }
+      }
+    },
+    "nan_onboarding_solution_default_teeth_pain" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choices with teeth"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolhas com mordida"
+          }
+        }
+      }
+    },
+    "nan_onboarding_solution_default_teeth_promise" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HP, MP, and d20 rolls turn risky ideas into real consequences."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PV, PM e rolagens de d20 transformam ideias arriscadas em consequências reais."
+          }
+        }
+      }
+    },
+    "nan_onboarding_solution_fallback_goal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "your next escape"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sua próxima fuga"
+          }
+        }
+      }
+    },
+    "nan_onboarding_solution_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You bring the idea. The Dungeon Master handles the rules, consequences, and surprises."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Você traz a ideia. O Mestre da Masmorra cuida das regras, consequências e surpresas."
+          }
+        }
+      }
+    },
+    "nan_onboarding_solution_title_format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A dungeon tuned for %@."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uma masmorra afinada para %@."
+          }
+        }
+      }
+    },
+    "nan_onboarding_testimonial_attribution_format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ / %@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ / %@"
+          }
+        }
+      }
+    },
+    "nan_onboarding_testimonial_l_persona" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fantasy fan"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fã de fantasia"
+          }
+        }
+      }
+    },
+    "nan_onboarding_testimonial_l_quote" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The d20 moments made tiny choices feel dramatic."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os momentos de d20 fizeram escolhas miúdas parecerem dramáticas."
+          }
+        }
+      }
+    },
+    "nan_onboarding_testimonial_m_persona" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casual adventurer"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aventureiro casual"
+          }
+        }
+      }
+    },
+    "nan_onboarding_testimonial_m_quote" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I got a full dungeon scene during a coffee break. No rules homework needed."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tive uma cena inteira de masmorra no intervalo do café. Sem lição de regras."
+          }
+        }
+      }
+    },
+    "nan_onboarding_testimonial_quote_format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\""
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\""
+          }
+        }
+      }
+    },
+    "nan_onboarding_testimonial_r_persona" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo player"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jogador solo"
+          }
+        }
+      }
+    },
+    "nan_onboarding_testimonial_r_quote" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It feels like texting a Dungeon Master who says yes to my weird plans."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parece mandar mensagem para um Mestre que diz sim aos meus planos malucos."
+          }
+        }
+      }
+    },
+    "nan_onboarding_welcome_body" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No character sheet. No group chat. Just type what your mage does, roll when fate asks, and watch the dungeon answer."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem ficha de personagem. Sem grupo no chat. É só digitar o que seu mago faz, rolar quando o destino pedir e ver a masmorra responder."
+          }
+        }
+      }
+    },
+    "nan_onboarding_welcome_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your pocket dungeon is waiting."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sua masmorra de bolso está esperando."
+          }
+        }
+      }
+    },
+    "nan_phase_action_composing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Write Command"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Escrever comando"
+          }
+        }
+      }
+    },
+    "nan_phase_action_processing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Processing"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Processando"
+          }
+        }
+      }
+    },
+    "nan_phase_action_reading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Transmission"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Transmissão"
+          }
+        }
+      }
+    },
+    "nan_phase_action_ready" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Command Line"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Linha de comando"
+          }
+        }
+      }
+    },
+    "nan_phase_action_result" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Dungeon Log"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Registro da masmorra"
+          }
+        }
+      }
+    },
+    "nan_phase_action_roll_check" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Roll Check"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Teste de rolagem"
+          }
+        }
+      }
+    },
+    "nan_phase_status_composing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> COMPOSE YOUR NEXT COMMAND"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ESCREVA SEU PRÓXIMO COMANDO"
+          }
+        }
+      }
+    },
+    "nan_phase_status_dm_thinking" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> The dungeon master is thinking..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> O mestre da masmorra está pensando..."
+          }
+        }
+      }
+    },
+    "nan_phase_status_reading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> BOOTING DUNGEON SESSION"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> INICIANDO SESSÃO DA MASMORRA"
+          }
+        }
+      }
+    },
+    "nan_phase_status_ready" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> AWAITING PLAYER INPUT"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> AGUARDANDO ENTRADA DO JOGADOR"
+          }
+        }
+      }
+    },
+    "nan_phase_status_result" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Consequence received"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Consequência recebida"
+          }
+        }
+      }
+    },
+    "nan_phase_status_rolling" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> FATE ENGINE SPINNING"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> MOTOR DO DESTINO GIRANDO"
+          }
+        }
+      }
+    },
+    "nan_profile_back" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "< BACK TO HUB"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "< VOLTAR AO HUB"
+          }
+        }
+      }
+    },
+    "nan_profile_back_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Returns to the home hub."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volta ao hub principal."
+          }
+        }
+      }
+    },
+    "nan_profile_counter_loading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "loading"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "carregando"
+          }
+        }
+      }
+    },
+    "nan_profile_counters_footnote" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "// counters online next patch"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "// contadores online no próximo patch"
+          }
+        }
+      }
+    },
+    "nan_profile_header_kicker" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> PROFILE.SYS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> PROFILE.SYS"
+          }
+        }
+      }
+    },
+    "nan_profile_key_best_streak" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEST STREAK"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MELHOR SEQUÊNCIA"
+          }
+        }
+      }
+    },
+    "nan_profile_key_callsign" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CALL SIGN"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NOME DE GUERRA"
+          }
+        }
+      }
+    },
+    "nan_profile_key_curses" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CURSES"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MALDIÇÕES"
+          }
+        }
+      }
+    },
+    "nan_profile_key_defeats" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DEFEATS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DERROTAS"
+          }
+        }
+      }
+    },
+    "nan_profile_key_flavor" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FLAVOR"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SABOR"
+          }
+        }
+      }
+    },
+    "nan_profile_key_goal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GOAL"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "META"
+          }
+        }
+      }
+    },
+    "nan_profile_key_runs_started" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RUNS STARTED"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RUNS INICIADAS"
+          }
+        }
+      }
+    },
+    "nan_profile_key_status" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "STATUS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "STATUS"
+          }
+        }
+      }
+    },
+    "nan_profile_key_unlocked" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UNLOCKED"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DESBLOQUEADO"
+          }
+        }
+      }
+    },
+    "nan_profile_key_victories" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VICTORIES"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VITÓRIAS"
+          }
+        }
+      }
+    },
+    "nan_profile_section_counters" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "COUNTERS.DAT"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "COUNTERS.DAT"
+          }
+        }
+      }
+    },
+    "nan_profile_section_identity" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IDENT.SYS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IDENT.SYS"
+          }
+        }
+      }
+    },
+    "nan_profile_section_traits" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TRAITS.LOG"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TRAITS.LOG"
+          }
+        }
+      }
+    },
+    "nan_profile_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stats, traits, and the choices that shaped your dungeon."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estatísticas, traços e escolhas que moldaram sua masmorra."
+          }
+        }
+      }
+    },
+    "nan_profile_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Player profile"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perfil do jogador"
+          }
+        }
+      }
+    },
+    "nan_profile_traits_empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "// no traits recorded yet"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "// ainda sem traços registrados"
+          }
+        }
+      }
+    },
+    "nan_profile_value_active" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ACTIVE"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ATIVO"
+          }
+        }
+      }
+    },
+    "nan_profile_value_wizard" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WIZARD"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MAGO"
+          }
+        }
+      }
+    },
+    "nan_progressbar_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$d of %3$d"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$d de %3$d"
+          }
+        }
+      }
+    },
+    "nan_progressbar_hp" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HP"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PV"
+          }
+        }
+      }
+    },
+    "nan_progressbar_mp" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MP"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PM"
+          }
+        }
+      }
+    },
+    "nan_prologue_footer_final" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The dungeon is listening."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A masmorra está ouvindo."
+          }
+        }
+      }
+    },
+    "nan_prologue_footer_learning" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learn the language of the dungeon."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aprenda a língua da masmorra."
+          }
+        }
+      }
+    },
+    "nan_prologue_terminal_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> PROLOGUE TERMINAL"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> TERMINAL DO PRÓLOGO"
+          }
+        }
+      }
+    },
+    "nan_startup_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DUNGEON TERMINAL / CRT MODE"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TERMINAL DA MASMORRA / MODO CRT"
+          }
+        }
+      }
+    },
+    "nan_terminal_prefix_d20" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> D20"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> D20"
+          }
+        }
+      }
+    },
+    "nan_terminal_prefix_dm" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> DM"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> DM"
+          }
+        }
+      }
+    },
+    "nan_terminal_prefix_sys" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> SYS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> SYS"
+          }
+        }
+      }
+    },
+    "nan_terminal_prefix_you" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> YOU"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> VOCÊ"
+          }
+        }
+      }
+    },
+    "nan_tip_action_message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything that happens in the world is shown here"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tudo que acontece no mundo aparece aqui"
+          }
+        }
+      }
+    },
+    "nan_tip_action_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your actions"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suas ações"
+          }
+        }
+      }
+    },
+    "nan_tip_button_message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use the action button whenever you can make a move."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use o botão de ação sempre que puder fazer uma jogada."
+          }
+        }
+      }
+    },
+    "nan_tip_button_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Take your turn"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faça sua jogada"
+          }
+        }
+      }
+    },
+    "nan_tip_image_message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Images are generated to show important characters, actions and events"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imagens são geradas para mostrar personagens, ações e eventos importantes"
+          }
+        }
+      }
+    },
+    "nan_tip_image_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See the world"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veja o mundo"
+          }
+        }
+      }
+    },
+    "nan_tip_stats_message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep track of your health and mana, so the dungeon does not get the best of you"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monitore vida e mana para a masmorra não levar a melhor"
+          }
+        }
+      }
+    },
+    "nan_tip_stats_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Health and mana"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vida e mana"
+          }
+        }
+      }
+    },
+    "nan_typewriter_a11y_complete" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Narrative complete"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Narrativa completa"
+          }
+        }
+      }
+    },
+    "nan_typewriter_a11y_tap_reveal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to reveal the full transmission"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toque para revelar a transmissão completa"
+          }
+        }
+      }
+    },
+    "nan_vision_a11y_hint_collapse" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to collapse the scene panel"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toque para recolher o painel da cena"
+          }
+        }
+      }
+    },
+    "nan_vision_a11y_loading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vision terminal, rendering next omen"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminal de visão, renderizando próximo presságio"
+          }
+        }
+      }
+    },
+    "nan_vision_a11y_ready" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vision terminal"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminal de visão"
+          }
+        }
+      }
+    },
+    "nan_vision_collapsed_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open vision terminal"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir terminal de visão"
+          }
+        }
+      }
+    },
+    "nan_vision_collapsed_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> VISION TERMINAL COLLAPSED"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> TERMINAL DE VISÃO RECOLHIDO"
+          }
+        }
+      }
+    },
+    "nan_vision_loading_ram" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[░░▒▒▓▓] VIDEO RAM"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[░░▒▒▓▓] RAM DE VÍDEO"
+          }
+        }
+      }
+    },
+    "nan_vision_loading_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> RENDERING OMEN"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> RENDERIZANDO PRESSÁGIO"
+          }
+        }
+      }
+    },
+    "nan_vision_overlay_idle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tap to collapse"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "toque para recolher"
+          }
+        }
+      }
+    },
+    "nan_vision_overlay_loading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "rendering next omen"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "renderizando próximo presságio"
+          }
+        }
+      }
+    },
+    "nan_vision_panel_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Scene Feed"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Feed da cena"
+          }
+        }
+      }
+    },
+    "OK" : {
+
+    },
+    "OPEN" : {
+
+    }
+  },
+  "version" : "1.0"
+}

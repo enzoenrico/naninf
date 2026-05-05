@@ -5,8 +5,12 @@
 //  Created by Enzo Enrico on 01/12/25.
 //
 
-import SwiftUI
 import Foundation
+import SwiftUI
+
+#if canImport(UIKit)
+	import UIKit
+#endif
 
 struct VisionPanel: View {
 	let isCollapsed: Bool
@@ -15,18 +19,19 @@ struct VisionPanel: View {
 
 	var body: some View {
 		ZStack(alignment: .topLeading) {
-			Image(.bread)
-				.resizable()
-				.interpolation(.none)
-				.scaledToFit()
+			AsciiMediaView(catalogVideoNamed: "mageIntro")
+				.asciiScaleMode(.fill)
+				.asciiCharacters(String(" ..:-=+#"))
 				.padding(24)
 				.frame(maxWidth: .infinity)
 				.frame(height: isCollapsed ? 0 : 220)
-				.foregroundStyle(.accent)
 				.opacity(isLoading ? 0.55 : 1)
 
-				Text(phase == .awaitingDungeonMaster ? String(localized: "nan_vision_overlay_loading") : String(localized: "nan_vision_overlay_idle"))
-					.font(.monocraft(relativeTo: .caption2))
+			Text(
+				phase == .awaitingDungeonMaster
+					? String(localized: "nan_vision_overlay_loading") : String(localized: "nan_vision_overlay_idle")
+			)
+			.font(.monocraft(relativeTo: .caption2))
 			.foregroundStyle(Color.accent)
 			.padding(10)
 
