@@ -37,6 +37,12 @@ final class AppCoordinator {
 	}
 
 	func handleContextualAction(_ action: GameAction, onSubmit: () -> Bool) {
+		AppAnalytics.capture("game_contextual_action_tapped", properties: [
+			"action": String(describing: action),
+			"is_contextual_input_visible": isContextualInputVisible,
+			"is_dice_prompt_visible": isDicePromptVisible
+		])
+
 		switch action {
 		case .write:
 			handleWriteAction(onSubmit: onSubmit)
@@ -46,6 +52,7 @@ final class AppCoordinator {
 	}
 
 	func finishDicePrompt() {
+		AppAnalytics.capture("game_dice_prompt_finished")
 		updatePresentationState {
 			isContextualInputVisible = false
 			isDicePromptVisible = false
@@ -55,6 +62,7 @@ final class AppCoordinator {
 	}
 
 	func prepareForTextInput() {
+		AppAnalytics.capture("game_text_input_opened")
 		updatePresentationState {
 			isContextualInputVisible = true
 			isDicePromptVisible = false
@@ -63,6 +71,7 @@ final class AppCoordinator {
 	}
 
 	func showDicePrompt() {
+		AppAnalytics.capture("game_dice_prompt_opened")
 		updatePresentationState {
 			isContextualInputVisible = false
 			isDicePromptVisible = true
@@ -79,6 +88,7 @@ final class AppCoordinator {
 	}
 
 	func resetGamePresentation() {
+		AppAnalytics.capture("game_presentation_reset")
 		updatePresentationState {
 			isContextualInputVisible = false
 			isDicePromptVisible = false
@@ -100,19 +110,32 @@ final class AppCoordinator {
 		guard hasCompletedInitialText else { return }
 		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 			isImageCollapsed.toggle()
+			AppAnalytics.capture("game_image_toggled", properties: [
+				"is_collapsed": isImageCollapsed
+			])
 		}
 	}
 
 	func navigate(to route: AppRoute) {
+		AppAnalytics.capture("navigation_route_opened", properties: [
+			"route": String(describing: route),
+			"path_depth_before": path.count
+		])
 		path.append(route)
 	}
 
 	func back() {
 		guard !path.isEmpty else { return }
+		AppAnalytics.capture("navigation_back_tapped", properties: [
+			"path_depth_before": path.count
+		])
 		path.removeLast()
 	}
 
 	func popToRoot() {
+		AppAnalytics.capture("navigation_pop_to_root", properties: [
+			"path_depth_before": path.count
+		])
 		path.removeLast(path.count)
 	}
 

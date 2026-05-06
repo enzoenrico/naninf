@@ -38,12 +38,13 @@ final class DungeonMasterService {
 		)
 	}
 
-	func generate(_ scenario: String) async throws -> PromptOutput {
+	func generate(_ scenario: String, analyticsContext: AIAnalyticsContext? = nil) async throws -> PromptOutput {
 		try await service.generate(
 			scenario,
 			returning: PromptOutput.self,
 			tools: [RollDiceTool.self, DecideActionTool.self, ChangeHealthTool.self],
-			model: .gpt4_o_mini
+			model: .gpt4_o_mini,
+			analyticsContext: analyticsContext
 		)
 	}
 

@@ -8,5 +8,9 @@
 	</array>
 	<key>OPENAI_API_KEY</key>
 	<string>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</string>
+	<key>POSTHOG_PROJECT_TOKEN</key>
+	<string>phc_t6kHzZzyorXtiXxLEX26gXazbEtfcbdBwE5hBEts8JPH</string>
+	<key>POSTHOG_HOST</key>
+	<string>https://us.i.posthog.com</string>
 </dict>
 </plist>

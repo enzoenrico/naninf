@@ -9,6 +9,10 @@ import SwiftUI
 
 @main
 struct magoSanduicheApp: App {
+	init() {
+		AppAnalytics.configure()
+	}
+
 	var body: some Scene {
 		WindowGroup {
 			AppStartupGate()

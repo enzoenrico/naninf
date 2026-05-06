@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B0D71A42F1A000100A6C001 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 5B0D71A32F1A000100A6C001 /* PostHog */; };
 		5B51D8822EFAA23000EB5908 /* OpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B51D8812EFAA23000EB5908 /* OpenAI */; };
 /* End PBXBuildFile section */
 
@@ -70,6 +71,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B51D8822EFAA23000EB5908 /* OpenAI in Frameworks */,
+				5B0D71A42F1A000100A6C001 /* PostHog in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,6 +133,7 @@
 			name = magoSanduiche;
 			packageProductDependencies = (
 				5B51D8812EFAA23000EB5908 /* OpenAI */,
+				5B0D71A32F1A000100A6C001 /* PostHog */,
 			);
 			productName = magoSanduiche;
 			productReference = 5BE1F3002EDE1B62004ACDF5 /* magoSanduiche.app */;
@@ -216,6 +219,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				5B51D8802EFAA23000EB5908 /* XCRemoteSwiftPackageReference "OpenAI" */,
+				5B0D71A22F1A000100A6C001 /* XCRemoteSwiftPackageReference "posthog-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5BE1F3012EDE1B62004ACDF5 /* Products */;
@@ -634,6 +638,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		5B0D71A22F1A000100A6C001 /* XCRemoteSwiftPackageReference "posthog-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/PostHog/posthog-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
 		5B51D8802EFAA23000EB5908 /* XCRemoteSwiftPackageReference "OpenAI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/MacPaw/OpenAI";
@@ -645,6 +657,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5B0D71A32F1A000100A6C001 /* PostHog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B0D71A22F1A000100A6C001 /* XCRemoteSwiftPackageReference "posthog-ios" */;
+			productName = PostHog;
+		};
 		5B51D8812EFAA23000EB5908 /* OpenAI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5B51D8802EFAA23000EB5908 /* XCRemoteSwiftPackageReference "OpenAI" */;

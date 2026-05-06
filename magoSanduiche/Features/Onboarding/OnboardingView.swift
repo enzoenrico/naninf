@@ -51,6 +51,7 @@ struct OnboardingView: View {
 			}
 		}
 		.task(id: vm.currentStep) {
+			AppAnalytics.capture("onboarding_step_viewed", properties: onboardingProperties)
 			await advanceAfterProcessingIfNeeded()
 		}
 	}
@@ -60,8 +61,14 @@ struct OnboardingView: View {
 	#endif
 
 	private func handlePrimaryAction() {
+		AppAnalytics.capture("onboarding_primary_tapped", properties: onboardingProperties.merging([
+			"can_continue": vm.canContinue,
+			"is_final_page": vm.isOnFinalPage
+		]) { _, new in new })
+
 		if vm.isOnFinalPage {
 			vm.persistResponsesOnUnlock()
+			AppAnalytics.capture("onboarding_unlocked", properties: onboardingProperties)
 			TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 				hasUnlockedFullGame = true
 				coordinator.popToRoot()
@@ -71,6 +78,22 @@ struct OnboardingView: View {
 				vm.advance()
 			}
 		}
+	}
+
+	private var onboardingProperties: [String: Any] {
+		var properties: [String: Any] = [
+			"step": String(describing: vm.currentStep),
+			"step_index": vm.currentIndex,
+			"progress": vm.progress,
+			"selected_pain_point_ids": Array(vm.responses.selectedPainPointIDs),
+			"selected_preference_ids": Array(vm.responses.selectedPreferenceIDs),
+			"completed_demo_actions": vm.completedDemoActions,
+			"demo_action_target": vm.demoActionTarget
+		]
+		if let selectedGoalID = vm.responses.selectedGoalID {
+			properties["selected_goal_id"] = selectedGoalID
+		}
+		return properties
 	}
 
 	@ViewBuilder
@@ -218,6 +241,13 @@ private struct QuestionScreen: View {
 						isSelected: vm.isSelected(option, for: kind),
 						allowsMultipleSelection: allowsMultipleSelection
 					) {
+						AppAnalytics.capture("onboarding_option_selected", properties: [
+							"step": String(describing: vm.currentStep),
+							"option_kind": String(describing: kind),
+							"option_id": option.id,
+							"allows_multiple_selection": allowsMultipleSelection,
+							"was_selected": vm.isSelected(option, for: kind)
+						])
 						TerminalMotion.perform(reduceMotion: reduceMotion, animation: .snappy(duration: 0.22)) {
 							allowsMultipleSelection ? vm.toggle(option, for: kind) : vm.selectSingle(option, for: kind)
 						}
@@ -466,6 +496,11 @@ private struct DemoOnboardingScreen: View {
 			.drawBorder(String(localized: "nan_onboarding_demo_mode_border"), color: .terminalMana, lineWidth: 1)
 
 			Button {
+				AppAnalytics.capture("onboarding_demo_opened", properties: [
+					"completed_demo_actions": vm.completedDemoActions,
+					"demo_action_target": vm.demoActionTarget,
+					"is_resume": vm.completedDemoActions > 0
+				])
 				isDemoPresented = true
 			} label: {
 				Text(
@@ -486,6 +521,10 @@ private struct DemoOnboardingScreen: View {
 			guard vm.completedDemoActions < vm.demoActionTarget else { return }
 			guard !hasAutoPresentedDemo else { return }
 			hasAutoPresentedDemo = true
+			AppAnalytics.capture("onboarding_demo_auto_presented", properties: [
+				"completed_demo_actions": vm.completedDemoActions,
+				"demo_action_target": vm.demoActionTarget
+			])
 			isDemoPresented = true
 		}
 		.fullScreenCover(isPresented: $isDemoPresented) {
@@ -495,6 +534,10 @@ private struct DemoOnboardingScreen: View {
 				demoCoordinator: demoCoordinator,
 				onCompletedPlayerAction: handleCompletedPlayerAction
 			) {
+				AppAnalytics.capture("onboarding_demo_closed", properties: [
+					"completed_demo_actions": vm.completedDemoActions,
+					"demo_action_target": vm.demoActionTarget
+				])
 				isDemoPresented = false
 			}
 		}
@@ -502,8 +545,17 @@ private struct DemoOnboardingScreen: View {
 
 	private func handleCompletedPlayerAction() {
 		let shouldShowPaywall = vm.recordCompletedDemoAction()
+		AppAnalytics.capture("onboarding_demo_action_completed", properties: [
+			"completed_demo_actions": vm.completedDemoActions,
+			"demo_action_target": vm.demoActionTarget,
+			"did_complete_demo": shouldShowPaywall
+		])
 		guard shouldShowPaywall else { return }
 
+		AppAnalytics.capture("onboarding_demo_completed", properties: [
+			"completed_demo_actions": vm.completedDemoActions,
+			"demo_action_target": vm.demoActionTarget
+		])
 		isDemoPresented = false
 		Task { @MainActor in
 			try? await Task.sleep(for: .milliseconds(250))
@@ -593,7 +645,9 @@ private struct PaywallOnboardingScreen: View {
 					.font(.monocraft(relativeTo: .caption))
 					.multilineTextAlignment(.center)
 					.foregroundStyle(Color.terminalMutedText)
-				Button(String(localized: "nan_onboarding_paywall_restore")) {}
+				Button(String(localized: "nan_onboarding_paywall_restore")) {
+					AppAnalytics.capture("onboarding_paywall_restore_tapped")
+				}
 					.font(.monocraft(relativeTo: .caption, weight: .semibold))
 					.foregroundStyle(Color.terminalMana)
 			}

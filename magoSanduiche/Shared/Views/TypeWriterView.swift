@@ -10,6 +10,7 @@ import Foundation
 
 struct TypeWriterView: View {
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+	var embedsScrollView: Bool
 	var content: [Character]
 	var onFinished: (() -> Void)?
 
@@ -17,24 +18,30 @@ struct TypeWriterView: View {
 	@State private var hasFinishedTyping = false
 	@State private var cursorVisible = true
 
-	init(_ content: String, onFinished: (() -> Void)? = nil) {
+	init(
+		_ content: String,
+		embedsScrollView: Bool = false,
+		onFinished: (() -> Void)? = nil
+	) {
+		self.embedsScrollView = embedsScrollView
 		self.content = content.map { $0 }
 		self.onFinished = onFinished
 		_temp = State(initialValue: Array(repeating: " ", count: self.content.count))
 	}
 
 	var body: some View {
-		ScrollView {
-			VStack {
-				Text(renderedText)
-					.font(.monocraft())
-					.foregroundStyle(Color.accent)
-					.frame(maxWidth: .infinity, alignment: .leading)
-					.task(id: fullText) { await buildContent() }
-					.task { await blinkCursor() }
+		Group {
+			if embedsScrollView {
+				ScrollView {
+					VStack {
+						typewriterText
+					}
+				}
+				.defaultScrollAnchor(.bottom)
+			} else {
+				typewriterText
 			}
 		}
-		.defaultScrollAnchor(.bottom)
 		.frame(maxWidth: .infinity)
 		.clipped()
 		.contentShape(Rectangle())
@@ -48,6 +55,15 @@ struct TypeWriterView: View {
 				: String(localized: "nan_typewriter_a11y_tap_reveal")
 		)
 		.enableInjection()
+	}
+
+	private var typewriterText: some View {
+		Text(renderedText)
+			.font(.monocraft())
+			.foregroundStyle(Color.accent)
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.task(id: fullText) { await buildContent() }
+			.task { await blinkCursor() }
 	}
 
 	#if DEBUG

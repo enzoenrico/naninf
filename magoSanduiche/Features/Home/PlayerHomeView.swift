@@ -119,6 +119,10 @@ struct PlayerHomeView: View {
 	private func handleSelect(_ item: HomeMenuItem) {
 		focus(item)
 		triggerImpactHaptic()
+		AppAnalytics.capture("home_menu_item_selected", properties: [
+			"item_id": item.id,
+			"route": String(describing: item.route)
+		])
 		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 			coordinator.navigate(to: item.route)
 		}

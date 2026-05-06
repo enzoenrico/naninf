@@ -1157,6 +1157,38 @@
         }
       }
     },
+    "nan_suggested_action_tap_again" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap again to choose"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toque de novo para escolher"
+          }
+        }
+      }
+    },
+    "nan_suggested_action_expand_a11y_hint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expands to show the full action. Then confirm below."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expande para mostrar a ação completa. Depois confirme abaixo."
+          }
+        }
+      }
+    },
     "nan_intro_full" : {
       "localizations" : {
         "en" : {

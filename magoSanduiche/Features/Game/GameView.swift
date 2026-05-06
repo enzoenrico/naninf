@@ -19,6 +19,7 @@ struct GameView: View {
 			coordinator: coordinator,
 			showsTips: true,
 			onNavigateBack: {
+				AppAnalytics.capture("game_back_tapped")
 				TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 					coordinator.resetGamePresentation()
 					coordinator.back()
@@ -163,13 +164,20 @@ struct GameSessionView: View {
 				.terminalTextTransition(edge: .top)
 			}
 
-			TypeWriterView(vm.narrativeText) {
-				vm.markNarrativeFinished()
-				coordinator.handleTypewriterCompletion(reduceMotion: reduceMotion)
-			}
-			.padding(.horizontal, 4)
+			terminalTranscript(vm: vm, coordinator: coordinator)
 
 			if coordinator.isContextualInputVisible {
+				if vm.contextAction == .write, !vm.suggestedOptions.isEmpty {
+					SuggestedOptionsList(
+						options: vm.suggestedOptions,
+						isDisabled: vm.loading,
+						onSelect: { choice in
+							submitSuggestedAction(choice, vm: vm, coordinator: coordinator)
+						}
+					)
+					.terminalPanelTransition(edge: .bottom)
+				}
+
 				InputBox(
 					with: Binding(
 						get: { vm.contextualInput },
@@ -184,6 +192,42 @@ struct GameSessionView: View {
 			}
 		}
 		.padding(12)
+	}
+
+	@ViewBuilder
+	private func terminalTranscript(vm: GameViewModel, coordinator: AppCoordinator) -> some View {
+		ScrollView {
+			VStack(alignment: .leading, spacing: 16) {
+				ForEach(vm.terminalEntries) { entry in
+					terminalEntryView(entry: entry, vm: vm, coordinator: coordinator)
+				}
+			}
+			.frame(maxWidth: .infinity, alignment: .leading)
+		}
+		.defaultScrollAnchor(.bottom)
+		.frame(maxWidth: .infinity)
+		.clipped()
+		.padding(.horizontal, 4)
+	}
+
+	@ViewBuilder
+	private func terminalEntryView(entry: TerminalEntry, vm: GameViewModel, coordinator: AppCoordinator) -> some View {
+		let isLatest = entry.id == vm.terminalEntries.last?.id
+		let useTypewriter = isLatest && (entry.kind == .dungeonMaster || entry.kind == .system)
+
+		if useTypewriter {
+			TypeWriterView(entry.renderedText, embedsScrollView: false) {
+				vm.markNarrativeFinished()
+				if !coordinator.hasCompletedInitialText {
+					coordinator.handleTypewriterCompletion(reduceMotion: reduceMotion)
+				}
+			}
+		} else {
+			Text(entry.renderedText)
+				.font(.monocraft())
+				.foregroundStyle(Color.accent)
+				.frame(maxWidth: .infinity, alignment: .leading)
+		}
 	}
 
 	@ViewBuilder
@@ -227,12 +271,24 @@ struct GameSessionView: View {
 		}
 	}
 
+	private func submitSuggestedAction(_ choice: String, vm: GameViewModel, coordinator: AppCoordinator) {
+		guard !vm.loading else { return }
+		guard vm.contextAction == .write else { return }
+
+		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
+			coordinator.handleContextualAction(vm.contextAction) {
+				vm.getResponse(for: choice)
+			}
+		}
+	}
+
 	private func configureTipsIfNeeded(shouldShowTips: Bool) {
 		guard !tipsConfigured else { return }
 		guard shouldShowTips else { return }
 		try? Tips.configure([.displayFrequency(.immediate)])
 		hasSeenGameTips = true
 		tipsConfigured = true
+		AppAnalytics.capture("game_tips_shown")
 	}
 
 	private func presentInlineStatus(for phase: GameUIPhase) {

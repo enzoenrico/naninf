@@ -74,6 +74,18 @@
             ReferencedContainer = "container:magoSanduiche.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "POSTHOG_PROJECT_TOKEN"
+            value = "phc_t6kHzZzyorXtiXxLEX26gXazbEtfcbdBwE5hBEts8JPH"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "POSTHOG_HOST"
+            value = "https://us.i.posthog.com"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
