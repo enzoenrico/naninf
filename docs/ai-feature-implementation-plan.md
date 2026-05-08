@@ -55,8 +55,8 @@ Important current app files:
 | Old `ActionModal` rendered multiple AI suggestions as buttons | Current `ContextualButton` renders one primary action: `.write` or `.roll`; `ActionStack` hosts the game action area | Keep `ContextualButton` for primary write/roll action. Add secondary suggested-action buttons in `GameView.terminalPanel` or `ActionStack` using `GameViewModel.suggestedActions`. |
 | Old image-prompt generator transformed story plus user input into image JSON text | Current model output has no image prompt field; current `ImageGenerator` has a fixed concept string | Add `visualPrompt` to the structured turn result, or introduce `ImagePromptService` if image prompting should remain a second AI call. Start with one structured `visualPrompt` field to minimize latency and complexity. |
 | Old Gemini image generation returned inline image data | `ImageGenerator` wraps Apple `ImagePlayground` and returns `[CGImage]?`, but is not connected to the visible UI | Add `ImageGenerator.generateImage(for prompt: VisualPrompt)` or recreate `ImageGenerator(concept:)` per request in `GameViewModel`. Store result in `GameViewModel.currentMedia`/`selectedImage`. |
-| Old generated media was converted to ASCII | `AsciiMediaView` already supports `CGImage`, `UIImage`, local/remote image URLs, and videos | Change `VisionPanel` to accept an optional generated image/media source and render `AsciiMediaView(image:)` when present, falling back to `AsciiMediaView(catalogVideoNamed: "mageIntro")`. |
-| Old app used a hardcoded remote MP4 fallback if image generation failed | Current `VisionPanel` always shows bundled `mageIntro`; `ImageGenerator` returns `nil` on failure | Use bundled `mageIntro` as the visual fallback. Surface a non-blocking "vision unavailable" status instead of inserting broken remote URLs. |
+| Old generated media was converted to ASCII | `AsciiMediaView` already supports `CGImage`, `UIImage`, local/remote image URLs, and videos | Change `VisionPanel` to accept an optional generated image/media source and render `AsciiMediaView(image:)` when present, falling back to `AsciiMediaView(catalogVideoNamed: "mageOpening")`. |
+| Old app used a hardcoded remote MP4 fallback if image generation failed | Current `VisionPanel` always shows bundled `mageOpening`; `ImageGenerator` returns `nil` on failure | Use bundled `mageOpening` as the visual fallback. Surface a non-blocking "vision unavailable" status instead of inserting broken remote URLs. |
 | Old AI selected next action by text options; current AI can call `decideAction` | `DecideActionTool` updates `GameViewModel.handleAction(_:)` through a static callback | Prefer structured `nextInput` in the turn result. Keep `DecideActionTool` only as a transitional compatibility tool or convert it to return data without mutating global state. |
 | Old app had unused video/Fal remnants and negative prompt | Current app has no Fal dependency and no video generation provider | Do not port unused Fal/video code. If negative prompting is needed later, attach it to a provider-specific image request type, not the game model contract. |
 | Old health/mana mechanics were prompt-level expectations | `ChangeHealthTool` exists but is not wired; `GameViewModel` has `health` and `mana`; no mana tool exists | Wire `ChangeHealthTool` or replace side effects with structured `stateDelta.health`. Add `ChangeManaTool` or `stateDelta.mana`. Clamp in `GameViewModel`. |
@@ -122,7 +122,7 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     A[DungeonTurnOutput.visualPrompt] --> B{Prompt exists?}
-    B -- no --> C[Keep existing media or mageIntro]
+    B -- no --> C[Keep existing media or mageOpening]
     B -- yes --> D[GameViewModel starts image task]
     D --> E[Set imageLoading state]
     E --> F[ImageGenerationService generates CGImage]
@@ -338,7 +338,7 @@ Recommended minimal path:
   - a new `ImageGenerationService` wrapper that constructs `ImageGenerator(concept:reference:)` per request.
 - In `GameViewModel.fetchNarrative(for:)`, append the narrative first, then start image generation if `visualPrompt` exists. The turn should not fail if image generation fails.
 - Pass `vm.currentMedia` or `vm.selectedImage` into `VisionPanel`.
-- In `VisionPanel`, render generated images with `AsciiMediaView(image:)` and use `AsciiMediaView(catalogVideoNamed: "mageIntro")` as fallback.
+- In `VisionPanel`, render generated images with `AsciiMediaView(image:)` and use `AsciiMediaView(catalogVideoNamed: "mageOpening")` as fallback.
 
 Recommended `GameViewModel` flow example:
 
@@ -462,7 +462,7 @@ Fallback behavior:
 - If structured decode fails, append `nan_dm_error` and keep the previous suggested actions disabled or cleared.
 - If the model returns fewer than three actions, fill with safe generic actions only after logging the validation issue.
 - If `visualPrompt` fails validation, skip image generation and keep the previous/fallback media.
-- If `ImagePlayground` is unavailable, display `mageIntro` and a localized "vision offline" status.
+- If `ImagePlayground` is unavailable, display `mageOpening` and a localized "vision offline" status.
 
 ### Phase 8: Analytics And Logging
 
@@ -582,7 +582,7 @@ Adjust the simulator destination to an installed runtime on the development mach
 13. `magoSanduiche/Features/Game/Subviews/VisionPanel.swift`
     - Add a media parameter.
     - Render generated image through `AsciiMediaView(image:)`.
-    - Keep `mageIntro` as default/fallback.
+    - Keep `mageOpening` as default/fallback.
     - Surface image-specific loading/failure independent of story loading.
 
 14. `magoSanduiche/Services/ImageGeneration/ImageGenerator.swift`
@@ -611,7 +611,7 @@ Adjust the simulator destination to an installed runtime on the development mach
 | Static tool callbacks can leak between sessions or tests | Prefer final structured `stateDelta`; if callbacks remain, set and clear them per service lifecycle and avoid overlapping sessions. |
 | Dice can be rolled twice by AI tools and UI | Choose one source of truth per turn. Use `nextInput == .diceRoll` for player-facing rolls; use `RollDiceTool` only for model-internal randomness. |
 | Client-bundled provider key can be extracted | Keep direct key only for local/dev. For production, proxy model calls through a backend or provider gateway with rate limits and entitlement checks. |
-| ImagePlayground may be unavailable or return no image | Treat image generation as optional. Keep `mageIntro` fallback, add non-blocking status, and allow retry. |
+| ImagePlayground may be unavailable or return no image | Treat image generation as optional. Keep `mageOpening` fallback, add non-blocking status, and allow retry. |
 | Generated media can bloat storage | Store one image per turn at most, compress PNG/JPEG intentionally, and add a cleanup policy for old runs. |
 | Persisted AI history can become provider-specific | Start by rebuilding history from transcript. Add provider-neutral chat DTOs only if continuity needs better fidelity. |
 | Logging transcripts can create privacy issues | Log event names and coarse metadata only. Never log full prompts, full narratives, raw image prompts, or API keys. |
@@ -626,7 +626,7 @@ Adjust the simulator destination to an installed runtime on the development mach
 - Dice prompt presentation follows structured `nextInput` or a clearly retained tool path, with no duplicate dice resolution.
 - Health and mana changes are applied to `GameViewModel` with clamping.
 - `VisionPanel` renders a generated `CGImage` through `AsciiMediaView` when image generation succeeds.
-- If image generation fails or is unavailable, the story remains playable and `mageIntro` remains available as fallback.
+- If image generation fails or is unavailable, the story remains playable and `mageOpening` remains available as fallback.
 - Story loading and image loading are separately visible and always clear after success, failure, or cancellation.
 - Starting/resetting a run clears visible state and AI conversation history.
 - No full transcripts, prompts, narratives, image prompts, or provider keys are logged.

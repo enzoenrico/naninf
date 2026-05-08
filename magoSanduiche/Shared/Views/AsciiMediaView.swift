@@ -15,7 +15,7 @@ import SwiftUI
 	import UIKit
 #endif
 
-private let asciiMediaDefaultCharacters = " .:-=+*#%@"
+private let asciiMediaDefaultCharacters = "  .*░▒▓█"
 
 enum AsciiMediaScaleMode: String {
 	case fit
@@ -57,10 +57,10 @@ struct AsciiMediaView: View {
 			case .remoteVideo(let url):
 				"remote-video:\(url.absoluteString)"
 			#if canImport(UIKit)
-			case .catalogVideo(let name):
-				"catalog-video:\(name)"
-			case .uiImage(let image):
-				"ui-image:\(ObjectIdentifier(image).hashValue)"
+				case .catalogVideo(let name):
+					"catalog-video:\(name)"
+				case .uiImage(let image):
+					"ui-image:\(ObjectIdentifier(image).hashValue)"
 			#endif
 			}
 		}
@@ -72,10 +72,10 @@ struct AsciiMediaView: View {
 			case .image, .imageFile, .remoteImage:
 				false
 			#if canImport(UIKit)
-			case .catalogVideo:
-				true
-			case .uiImage:
-				false
+				case .catalogVideo:
+					true
+				case .uiImage:
+					false
 			#endif
 			}
 		}
@@ -194,7 +194,7 @@ struct AsciiMediaView: View {
 			configuration.sanitizedCharacters,
 			"\(configuration.frameRate)",
 			"\(configuration.maxVideoFrames)",
-			"\(configuration.fontSize)"
+			"\(configuration.fontSize)",
 		].joined(separator: "|")
 	}
 
@@ -332,9 +332,9 @@ private enum AsciiMediaPhase {
 }
 
 private struct AsciiMediaConfiguration {
-	var columns = 96
+	var columns = 198
 	var maxRows: Int?
-	var scaleMode: AsciiMediaScaleMode = .fit
+	var scaleMode: AsciiMediaScaleMode = .fill
 	var preservesAspectRatio = true
 	var characters = AsciiMediaView.defaultCharacters
 	var frameRate = 8.0
@@ -342,7 +342,7 @@ private struct AsciiMediaConfiguration {
 	var foreground = Color.accent
 	var background = Color.clear
 	var fontSize: CGFloat = 8
-	var placeholderHeight: CGFloat = 160
+	var placeholderHeight: CGFloat = 360
 
 	var sanitizedCharacters: String {
 		let characters = characters.filter { character in
@@ -487,14 +487,14 @@ private enum AsciiMediaLoader {
 		case .videoFile(let url), .remoteVideo(let url):
 			images = try await loadVideoFrames(from: url, configuration: configuration)
 		#if canImport(UIKit)
-		case .catalogVideo(let name):
-			let url = try catalogVideoFileURL(named: name)
-			images = try await loadVideoFrames(from: url, configuration: configuration)
-		case .uiImage(let image):
-			guard let cgImage = image.asciiNormalizedCGImage else {
-				throw AsciiMediaError.imageDecodeFailed
-			}
-			images = [cgImage]
+			case .catalogVideo(let name):
+				let url = try catalogVideoFileURL(named: name)
+				images = try await loadVideoFrames(from: url, configuration: configuration)
+			case .uiImage(let image):
+				guard let cgImage = image.asciiNormalizedCGImage else {
+					throw AsciiMediaError.imageDecodeFailed
+				}
+				images = [cgImage]
 		#endif
 		}
 
@@ -611,10 +611,11 @@ private enum AsciiMediaLoader {
 				)
 				let lock = NSLock()
 				var remaining = times.count
-				var frames = Array<CGImage?>(repeating: nil, count: times.count)
+				var frames = [CGImage?](repeating: nil, count: times.count)
 				var firstError: Error?
 
-				generator.generateCGImagesAsynchronously(forTimes: requestedTimes) { requestedTime, image, _, result, error in
+				generator.generateCGImagesAsynchronously(forTimes: requestedTimes) {
+					requestedTime, image, _, result, error in
 					lock.lock()
 					defer { lock.unlock() }
 
@@ -794,8 +795,8 @@ private enum AsciiMediaError: LocalizedError {
 			}.cgImage
 		}
 	}
-#Preview {
-	AsciiMediaView(catalogVideoNamed: "mageIntro")
-		.asciiColumns(48)
-}
+	#Preview {
+		AsciiMediaView(catalogVideoNamed: "mageOpening")
+			.asciiColumns(48)
+	}
 #endif

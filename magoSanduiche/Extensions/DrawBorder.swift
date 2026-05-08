@@ -113,7 +113,7 @@ private struct DrawBorderModifierContent<Content: View>: View {
 										)
 									}
 								)
-								.offset(x: -geo.size.width / 3, y: -geo.size.height / 2)
+								.offset(x: -geo.size.width / 3.3, y: -geo.size.height / 2)
 								.zIndex(1)
 						}
 					}

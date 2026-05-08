@@ -19,9 +19,8 @@ struct VisionPanel: View {
 
 	var body: some View {
 		ZStack(alignment: .topLeading) {
-			AsciiMediaView(catalogVideoNamed: "mageIntro")
+			AsciiMediaView(catalogVideoNamed: "mageOpening")
 				.asciiScaleMode(.fill)
-				.asciiCharacters(String(" ..:-=+#"))
 				.padding(24)
 				.frame(maxWidth: .infinity)
 				.frame(height: isCollapsed ? 0 : 220)

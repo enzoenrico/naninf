@@ -117,8 +117,8 @@ Generated image surface:
 
 Media rendering surface:
 
-- `VisionPanel` in `magoSanduiche/Features/Game/Subviews/VisionPanel.swift` currently renders `AsciiMediaView(catalogVideoNamed: "mageIntro")`, not the generated `selectedImage`.
-- `HomeHeroBanner` also renders `AsciiMediaView(catalogVideoNamed: "mageIntro")`.
+- `VisionPanel` in `magoSanduiche/Features/Game/Subviews/VisionPanel.swift` currently renders `AsciiMediaView(catalogVideoNamed: "mageOpening")`, not the generated `selectedImage`.
+- `HomeHeroBanner` also renders `AsciiMediaView(catalogVideoNamed: "mageOpening")`.
 - `AsciiMediaView` in `magoSanduiche/Shared/Views/AsciiMediaView.swift` supports local images, remote images, local videos, remote videos, asset-catalog videos, and `UIImage`/`CGImage` sources. It rasterizes media to ASCII frames and plays videos unless reduce motion is enabled.
 - `AsciiMediaView` caches catalog video bytes into the caches directory with `FileManager` before decoding frames.
 
@@ -245,8 +245,8 @@ flowchart TD
 ```mermaid
 flowchart TD
   Vision[VisionPanel]
-  StaticMedia[AsciiMediaView catalogVideo mageIntro]
-  Asset[Assets.xcassets Videos mageIntro.dataset]
+  StaticMedia[AsciiMediaView catalogVideo mageOpening]
+  Asset[Assets.xcassets Videos mageOpening.dataset]
   Cache[(Caches directory)]
   Frames[AsciiMediaLoader loads frames]
   Raster[AsciiRasterizer rasterizes frames]
@@ -294,7 +294,7 @@ flowchart TD
 
 - `magoSanduiche/Services/ImageGeneration/ImageGenerator.swift` / `ImageGenerator`: current Apple image-generation wrapper. Use this for local/on-device image generation if the old app image feature can map to `ImagePlayground`.
 - `magoSanduiche/Features/Game/GameViewModel.swift` / `selectedImage` and `getImage()`: current unrendered generated-image state. This is the most direct place to trigger generation from AI output and expose images to the view.
-- `magoSanduiche/Features/Game/Subviews/VisionPanel.swift` / `VisionPanel`: current game visual panel. It should accept an optional generated image or media source rather than hard-coding only `mageIntro`.
+- `magoSanduiche/Features/Game/Subviews/VisionPanel.swift` / `VisionPanel`: current game visual panel. It should accept an optional generated image or media source rather than hard-coding only `mageOpening`.
 - `magoSanduiche/Shared/Views/AsciiMediaView.swift` / `AsciiMediaView`: already supports `CGImage`, `UIImage`, remote image URLs, and videos. This should be reused for generated images rather than introducing another image renderer.
 
 ### Persistence Layer
@@ -366,7 +366,7 @@ Risky integration points:
 4. Attach image generation to turn results.
    - Add an image prompt field to `PromptOutput` or derive one from narrative after each turn.
    - Trigger `GameViewModel.getImage()` or a new async image method after narrative generation.
-   - Pass `selectedImage` into `VisionPanel` and render it with `AsciiMediaView(image:)`, falling back to `mageIntro`.
+   - Pass `selectedImage` into `VisionPanel` and render it with `AsciiMediaView(image:)`, falling back to `mageOpening`.
    - Persist generated images as files or regenerate from saved prompts; do not persist raw `CGImage` in `UserDefaults`.
 
 5. Add durable session persistence before implementing real load-run UX.

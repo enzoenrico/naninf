@@ -12,8 +12,8 @@
 	"argv": [
 		"/opt/homebrew/bin/xcode-build-server"
 	],
-	"workspace": "/Users/enzoenrico/code/academy/smorki/smorki.xcodeproj/project.xcworkspace",
-	"build_root": "/Users/enzoenrico/Library/Developer/Xcode/DerivedData/smorki-ghgonxrymjiwpudckpigbbkvadsa",
-	"scheme": "smorki",
+	"workspace": "/Users/enzoenrico/code/academy/published/magoSanduiche/magoSanduiche.xcodeproj/project.xcworkspace",
+	"build_root": "/Users/enzoenrico/Library/Developer/Xcode/DerivedData/magoSanduiche-bkvcqzunzvitagbeqfqzydkzcosz",
+	"scheme": "magoSanduiche",
 	"kind": "xcode"
 }

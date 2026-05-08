@@ -12,15 +12,16 @@ struct HomeHeroBanner: View {
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 12) {
-			VStack(alignment: .leading, spacing: 4) {
-				CRTRevealText(
-					text: "Welcome to NanInf",
-					font: .monocraft(relativeTo: .title2, weight: .bold),
-					color: .accent,
-					delay: .milliseconds(60)
-				)
-				.shadow(color: Color.accent.opacity(0.55), radius: 8)
-			}
+			//VStack(alignment: .leading, spacing: 4) {
+			//	//CRTRevealText(
+			//	//	text: "Welcome to NanInf",
+			//	//	font: .monocraft(relativeTo: .title2, weight: .bold),
+			//	//	color: .accent,
+			//	//	delay: .milliseconds(60)
+			//	//)
+			//	//.shadow(color: Color.accent.opacity(0.55), radius: 8)
+			//}
+			//.padding(14)
 
 			//			CRTRevealText(
 			//				text: HomeAsciiArt.crest,
@@ -30,12 +31,12 @@ struct HomeHeroBanner: View {
 			//				charInterval: .milliseconds(4),
 			//				scrambleSwaps: 0
 			//			)
-			AsciiMediaView(catalogVideoNamed: "mageIntro")
+			AsciiMediaView(catalogVideoNamed: "mageOpening")
 				.asciiScaleMode(.fill)
-				.frame(maxWidth: .infinity, maxHeight: .infinity)
-			//.asciiColor(.accent)
-			//.asciiBackground(.background)
-			//.asciiCharacters(String(" ..:-=+#"))
+				.asciiColumns(228)
+				.asciiFontSize(8)
+				.frame(maxWidth: .infinity)
+				.padding(.vertical)
 
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
 				CRTRevealText(
@@ -49,8 +50,8 @@ struct HomeHeroBanner: View {
 				.frame(maxHeight: 44, alignment: .leading)
 			}
 			.padding(.horizontal, 4)
+			.padding(14)
 		}
-		.padding(14)
 		.frame(maxWidth: .infinity)
 		.drawBorder(String(localized: "nan_home_hero_border_title"), color: .accent, lineWidth: 1, animate: true)
 		.enableInjection()

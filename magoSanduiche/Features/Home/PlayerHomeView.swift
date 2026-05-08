@@ -34,9 +34,7 @@ struct PlayerHomeView: View {
 				VStack(spacing: 18) {
 					HomeHeroBanner(tagline: tagline)
 						.padding(.horizontal, 20)
-
 					menuList
-
 					Spacer(minLength: 0)
 				}
 			}
