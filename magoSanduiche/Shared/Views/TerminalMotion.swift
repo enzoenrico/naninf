@@ -20,6 +20,16 @@ enum TerminalMotion {
 	static let textAnimation = Animation.easeOut(duration: 0.18)
 	static let panelAnimation = Animation.snappy(duration: 0.28)
 	static let quickPressAnimation = Animation.easeOut(duration: 0.12)
+	/// Boot screen → app shell crossfade. Slightly slower than `panelAnimation`
+	/// because the entire root view is being swapped underneath.
+	static let bootCrossfadeAnimation = Animation.easeOut(duration: 0.35)
+	/// Onboarding option toggle. Snappier than `panelAnimation` so multi-select
+	/// taps feel immediate even when several rows update in sequence.
+	static let optionToggleAnimation = Animation.snappy(duration: 0.22)
+
+	/// Press scale used by every bordered or subtle button style. Keeping it as
+	/// a single constant prevents drift (0.98 vs 0.985 vs 0.99) across styles.
+	static let pressScale: CGFloat = 0.985
 
 	static func animation(_ reduceMotion: Bool, _ animation: Animation) -> Animation? {
 		reduceMotion ? nil : animation

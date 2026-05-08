@@ -40,7 +40,7 @@ struct GameHeader: View {
 							.font(.monocraft(relativeTo: .caption, weight: .semibold))
 							.foregroundStyle(statusColor)
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(TerminalSubtleButtonStyle())
 					.accessibilityLabel("Back to main menu")
 				}
 				VStack(alignment: .leading, spacing: 6) {

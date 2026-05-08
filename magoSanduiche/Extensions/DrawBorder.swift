@@ -113,7 +113,7 @@ private struct DrawBorderModifierContent<Content: View>: View {
 										)
 									}
 								)
-								.offset(x: -geo.size.width * 0.3, y: -geo.size.height / 2)
+								.offset(x: -geo.size.width * 0.33, y: -geo.size.height / 2)
 								.zIndex(1)
 						}
 					}
@@ -139,11 +139,17 @@ private struct DrawBorderModifierContent<Content: View>: View {
 }
 
 extension Color {
-	static let terminalSurface = Color(red: 0.02, green: 0.05, blue: 0.10)
-	static let terminalActiveSurface = Color(red: 0.03, green: 0.09, blue: 0.07)
+	// `terminalSurface`, `terminalActiveSurface`, `terminalMutedText`, `terminalDanger`,
+	// `terminalMana`, and `terminalWarning` are defined in Asset Catalog colorsets;
+	// Xcode generates `Color.<name>` in `GeneratedAssetSymbols.swift` — do not
+	// redeclare them here (invalid redeclaration).
+	// Derived from accent so it tracks the asset's light/dark variants automatically.
 	static let terminalGrid = Color.accent.opacity(0.18)
-	static let terminalMutedText = Color(red: 0.43, green: 0.55, blue: 0.50)
-	static let terminalDanger = Color(red: 0.96, green: 0.25, blue: 0.25)
-	static let terminalMana = Color(red: 0.25, green: 0.78, blue: 1.00)
-	static let terminalWarning = Color(red: 1.00, green: 0.75, blue: 0.24)
+
+	// Two named tones for muted accent borders. Sites that mean
+	// "idle / disabled / unfocused" use `accentBorderIdle`; sites that mean
+	// "active / focused / temporary status" use `accentBorderActive`. Avoid
+	// inventing new opacities — extend this set instead.
+	static let accentBorderIdle = Color.accent.opacity(0.55)
+	static let accentBorderActive = Color.accent.opacity(0.8)
 }

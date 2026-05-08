@@ -67,8 +67,8 @@ struct LoadRunView: View {
 				.multilineTextAlignment(.center)
 				.fixedSize(horizontal: false, vertical: true)
 		}
-		.padding(.vertical, 28)
-		.padding(.horizontal, 18)
+		.padding(.vertical, Spacing.layoutBottom)
+		.padding(.horizontal, Spacing.layoutLeading)
 		.frame(maxWidth: .infinity)
 		.background(Color.terminalSurface)
 		.drawBorder(String(localized: "nan_load_panel_border"), color: .terminalWarning, lineWidth: 1)

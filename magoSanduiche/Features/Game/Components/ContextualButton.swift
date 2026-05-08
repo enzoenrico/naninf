@@ -100,7 +100,7 @@ private struct TerminalButtonStyle: ButtonStyle {
 				color: isLoading ? Color.terminalWarning : Color.accent,
 				lineWidth: configuration.isPressed ? 3 : 2
 			)
-			.scaleEffect(configuration.isPressed ? 0.985 : 1)
+			.scaleEffect(configuration.isPressed ? TerminalMotion.pressScale : 1)
 			.opacity(isLoading ? 0.78 : 1)
 			.shadow(color: Color.accent.opacity(configuration.isPressed ? 0.18 : 0.35), radius: 10)
 			.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.quickPressAnimation), value: configuration.isPressed)

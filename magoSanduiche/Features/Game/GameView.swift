@@ -68,7 +68,14 @@ struct GameSessionView: View {
 
 		AppLayout(
 			background: .terminalGrid,
-			contentPadding: EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16)
+			// Session screen runs tighter than the document/hub default so the
+			// scanline backdrop and bordered panels fill more of the viewport.
+			contentPadding: EdgeInsets(
+				top: Spacing.layoutTop,
+				leading: Spacing.layoutTop,
+				bottom: Spacing.layoutTop,
+				trailing: Spacing.layoutTop
+			)
 		) {
 			VStack(spacing: 12) {
 				GameHeader(

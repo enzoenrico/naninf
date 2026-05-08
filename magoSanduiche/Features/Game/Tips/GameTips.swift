@@ -41,12 +41,12 @@ struct AsciiTipStyle: TipViewStyle {
 				}
 				configuration.title
 					.foregroundStyle(.accent)
-					.font(.headline)
+					.font(.monocraft(relativeTo: .headline, weight: .semibold))
 			}
 
 			if let message = configuration.message {
 				message
-					.font(.footnote)
+					.font(.monocraft(relativeTo: .footnote))
 					.foregroundStyle(.accent)
 			}
 		}

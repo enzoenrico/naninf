@@ -19,7 +19,7 @@ struct OnboardingView: View {
 
 		AppLayout(
 			background: .gradient,
-			contentPadding: EdgeInsets(top: 18, leading: 0, bottom: 18, trailing: 0)
+			contentPadding: EdgeInsets(top: Spacing.layoutTop, leading: 0, bottom: Spacing.layoutTop, trailing: 0)
 		) {
 			VStack(spacing: 16) {
 				OnboardingProgressView(progress: vm.progress, text: vm.progressText)
@@ -185,7 +185,7 @@ private struct OnboardingProgressView: View {
 				}
 			}
 			.frame(height: 8)
-			.drawBorder(nil, color: Color.accent.opacity(0.7), lineWidth: 1)
+			.drawBorder(nil, color: .accentBorderActive, lineWidth: 1)
 			.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: progress)
 		}
 	}
@@ -248,7 +248,7 @@ private struct QuestionScreen: View {
 							"allows_multiple_selection": allowsMultipleSelection,
 							"was_selected": vm.isSelected(option, for: kind)
 						])
-						TerminalMotion.perform(reduceMotion: reduceMotion, animation: .snappy(duration: 0.22)) {
+						TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.optionToggleAnimation) {
 							allowsMultipleSelection ? vm.toggle(option, for: kind) : vm.selectSingle(option, for: kind)
 						}
 					}
@@ -292,9 +292,9 @@ private struct OptionCard: View {
 			}
 			.padding(12)
 			.background(isSelected ? Color.terminalActiveSurface : Color.terminalSurface)
-			.drawBorder(nil, color: isSelected ? .terminalWarning : .accent.opacity(0.65), lineWidth: isSelected ? 2 : 1)
+			.drawBorder(nil, color: isSelected ? .terminalWarning : .accentBorderIdle, lineWidth: isSelected ? 2 : 1)
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(TerminalSubtleButtonStyle())
 	}
 
 	private var selectionMark: String {
@@ -341,7 +341,7 @@ private struct SocialProofScreen: View {
 				.padding(14)
 				.frame(maxWidth: .infinity, alignment: .leading)
 				.background(Color.terminalSurface)
-				.drawBorder(nil, color: .accent.opacity(0.65), lineWidth: 1)
+				.drawBorder(nil, color: .accentBorderIdle, lineWidth: 1)
 			}
 		}
 	}
@@ -592,7 +592,7 @@ private struct DemoGameCover: View {
 						.font(.monocraft(relativeTo: .caption, weight: .semibold))
 						.foregroundStyle(Color.terminalMana)
 				}
-				.buttonStyle(.plain)
+				.buttonStyle(TerminalSubtleButtonStyle())
 			}
 			.padding(.horizontal, 16)
 			.padding(.vertical, 12)
@@ -645,11 +645,14 @@ private struct PaywallOnboardingScreen: View {
 					.font(.monocraft(relativeTo: .caption))
 					.multilineTextAlignment(.center)
 					.foregroundStyle(Color.terminalMutedText)
-				Button(String(localized: "nan_onboarding_paywall_restore")) {
+				Button {
 					AppAnalytics.capture("onboarding_paywall_restore_tapped")
+				} label: {
+					Text(String(localized: "nan_onboarding_paywall_restore"))
+						.font(.monocraft(relativeTo: .caption, weight: .semibold))
+						.foregroundStyle(Color.terminalMana)
 				}
-					.font(.monocraft(relativeTo: .caption, weight: .semibold))
-					.foregroundStyle(Color.terminalMana)
+				.buttonStyle(TerminalSubtleButtonStyle())
 			}
 			.padding(14)
 			.frame(maxWidth: .infinity)

@@ -8,12 +8,18 @@ colors:
   background-dark: "#1e1e1e"
   accent: "#3033ee"
   accent-dark: "#09ff00"
-  terminal-surface: "#050d19"
-  terminal-active-surface: "#081712"
-  terminal-muted-text: "#6e8c80"
-  terminal-mana: "#40c7ff"
-  terminal-warning: "#ffbf3d"
-  terminal-danger: "#f44040"
+  terminal-surface: "#1a2018"
+  terminal-surface-dark: "#050d19"
+  terminal-active-surface: "#222a23"
+  terminal-active-surface-dark: "#081712"
+  terminal-muted-text: "#4a685c"
+  terminal-muted-text-dark: "#6e8c80"
+  terminal-mana: "#0a78a8"
+  terminal-mana-dark: "#40c7ff"
+  terminal-warning: "#a86c00"
+  terminal-warning-dark: "#ffbf3d"
+  terminal-danger: "#b22d2d"
+  terminal-danger-dark: "#f44040"
   terminal-grid-line: "{colors.accent} @ 18% opacity"
   on-terminal-surface: "{colors.accent}"
 
@@ -149,21 +155,24 @@ flowchart LR
 
 - **Accent (`{colors.accent}` / `{colors.accent-dark}`)** — Light appearance uses **extended sRGB** approximately `#3033ee` (catalog red/green/blue components 0.187 / 0.200 / 0.935). Dark appearance: `#09ff00`. Used for primary labels, links, default `drawBorder` strokes, text fields, and hub gradient washes.
 - Accent at **18% opacity** defines **`{colors.terminal-grid-line}`** (`Color.terminalGrid`).
+- Two named muted-accent border tones live on `Color`: **`accentBorderIdle`** (accent @ 55%) for unfocused/idle frames and **`accentBorderActive`** (accent @ 80%) for focused/active frames or temporary status chips. Don't introduce new accent opacities for borders — extend these.
 
 ### Terminal surfaces
 
-- **`{colors.terminal-surface}`** — Deep blue-green panel (`srgb ~0.02, 0.05, 0.10` → `#050d19`): panels, status strips, list wells.
-- **`{colors.terminal-active-surface}`** — Slightly lifted green when focused (~`0.03, 0.09, 0.07` → `#081712`): focused `InputBox`, selected onboarding rows (`HomeMenuRow` pattern).
+All terminal semantics ship as Asset Catalog colorsets with explicit light/dark appearances; the Swift `Color` extension just exposes friendly aliases.
+
+- **`{colors.terminal-surface}`** — Light: `#1a2018` (warm-tinted near-black). Dark: `#050d19`. Used for panels, status strips, list wells.
+- **`{colors.terminal-active-surface}`** — Light: `#222a23`. Dark: `#081712`. Used for focused `InputBox`, selected onboarding rows.
 
 ### Semantic accents
 
-- **`{colors.terminal-mana}`** — `#40c7ff`: framing copy, mana-themed borders, secondary hub wash alongside accent.
-- **`{colors.terminal-warning}`** — `#ffbf3d`: loading dice / busy chrome, emphasis in prologue panels, DEBUG controls.
-- **`{colors.terminal-danger}`** — `#f44040`: error or danger callouts (e.g. media / vision error paths).
+- **`{colors.terminal-mana}`** — Light: `#0a78a8` (deeper teal for ≥4.5:1 on cream). Dark: `#40c7ff`. Framing copy, mana-themed borders, secondary hub wash alongside accent.
+- **`{colors.terminal-warning}`** — Light: `#a86c00` (warm amber). Dark: `#ffbf3d`. Loading dice / busy chrome, emphasis in prologue panels, DEBUG controls.
+- **`{colors.terminal-danger}`** — Light: `#b22d2d` (brick red). Dark: `#f44040`. Error or danger callouts (e.g. media / vision error paths).
 
 ### Text
 
-- **`{colors.terminal-muted-text}`** — `#6e8c80`: secondary body, placeholders tone, subdued borders when disabled.
+- **`{colors.terminal-muted-text}`** — Light: `#4a685c` (deepened teal-grey). Dark: `#6e8c80`. Secondary body, placeholders tone, subdued borders when disabled.
 
 ## Typography
 
@@ -281,7 +290,7 @@ flowchart LR
 
 ### Light / Dark
 
-- **`background`** and **`accent`** adapt via asset catalog luminosity appearances; terminal RGB colors are **fixed** (`Color` extension)—they intentionally stay “terminal” across modes. If contrast issues appear, tune terminal constants or add appearance variants explicitly (document any change here).
+- **All canvas, accent, and terminal-semantic colors** adapt via asset catalog luminosity appearances. The dark variants preserve the original CRT-flavored hues (`#40c7ff` mana, `#ffbf3d` warning, `#050d19` surfaces); the light variants are darkened/desaturated for ≥4.5:1 contrast on the `#fefcf0` cream background. The `Color` extension in [`DrawBorder.swift`](magoSanduiche/Extensions/DrawBorder.swift) is just a thin alias on top of the assets, so every call site picks up appearance changes automatically.
 
 ### Safe area & navigation
 
@@ -303,7 +312,6 @@ flowchart LR
 ## Known gaps
 
 - **No formal radius scale** beyond “none”; if rounded surfaces are introduced, add `{rounded.sm}` … tokens and migrate components.
-- **Terminal RGB palette** does not automatically track light/dark canvas—review contrast if backgrounds shift.
 - **Form validation affordances** beyond `InputBox` shake are not cataloged here.
 - **Pixel icons** (`Assets.xcassets/PixelIcons`) are content assets; template tint follows **`accent`** or semantic colors at call sites, not enumerated per icon.
 - **Vision / AI panels** vary copy and border titles by feature state; structure is repeating `terminalSurface` + `drawBorder`, not additional tokens.

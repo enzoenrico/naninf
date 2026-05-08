@@ -19,7 +19,7 @@ struct AppStartupGate: View {
 					.transition(TerminalMotion.panelTransition(reduceMotion: reduceMotion, edge: .bottom))
 			} else {
 				StartupBootView {
-					TerminalMotion.perform(reduceMotion: reduceMotion, animation: .easeOut(duration: 0.35)) {
+					TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.bootCrossfadeAnimation) {
 						hasCompletedStartup = true
 					}
 				}
@@ -73,7 +73,6 @@ private struct StartupBootView: View {
 				)
 
 				BootScanlineOverlay(opacity: 0.22, spacing: 3, lineHeight: 1)
-//				StartupCRTVignette()
 
 				VStack(alignment: .leading, spacing: 20) {
 					VStack(alignment: .leading, spacing: 6) {
@@ -110,26 +109,6 @@ private struct StartupBootView: View {
 			.ignoresSafeArea()
 		}
 		.accessibilityAddTraits(.isModal)
-	}
-}
-
-private struct StartupCRTVignette: View {
-	var body: some View {
-		ZStack {
-			LinearGradient(
-				colors: [.black.opacity(0.55), .clear, .black.opacity(0.55)],
-				startPoint: .leading,
-				endPoint: .trailing
-			)
-
-			LinearGradient(
-				colors: [.black.opacity(0.45), .clear, .black.opacity(0.62)],
-				startPoint: .top,
-				endPoint: .bottom
-			)
-		}
-		.blendMode(.multiply)
-		.allowsHitTesting(false)
 	}
 }
 

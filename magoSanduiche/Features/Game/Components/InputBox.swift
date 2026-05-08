@@ -16,7 +16,6 @@ struct InputBox: View {
 	var onSubmit: () -> Void
 
 	@FocusState private var isFocused: Bool
-	@State private var shakeOffset: CGFloat = 0
 
 	init(
 		with bind: Binding<String>,
@@ -55,20 +54,10 @@ struct InputBox: View {
 			lineWidth: isFocused ? 2 : 1
 		)
 		.opacity(isDisabled ? 0.65 : 1)
-		.offset(x: shakeOffset)
+		.shakeOnInvalid(invalidAttempts: invalidAttempts, isEnabled: !reduceMotion)
 		.onAppear {
 			guard !isDisabled else { return }
 			isFocused = true
-		}
-		.onChange(of: invalidAttempts) { _, _ in
-			guard !reduceMotion else { return }
-			withAnimation(.linear(duration: 0.06).repeatCount(5, autoreverses: true)) {
-				shakeOffset = 6
-			}
-			Task {
-				try? await Task.sleep(for: .milliseconds(340))
-				shakeOffset = 0
-			}
 		}
 		.accessibilityLabel(String(localized: "nan_input_a11y_label"))
 		.accessibilityHint(
@@ -76,5 +65,39 @@ struct InputBox: View {
 				? String(localized: "nan_input_a11y_hint_disabled")
 				: String(localized: "nan_input_a11y_hint_enabled")
 		)
+	}
+}
+
+// MARK: - Shake
+
+private extension View {
+	/// Symmetric left/right shake driven by a `keyframeAnimator`. Each bump in
+	/// `invalidAttempts` retriggers the full sequence; the animator self-
+	/// terminates at offset `0` so there's no racing cleanup task.
+	func shakeOnInvalid(invalidAttempts: Int, isEnabled: Bool) -> some View {
+		modifier(InvalidShakeModifier(invalidAttempts: invalidAttempts, isEnabled: isEnabled))
+	}
+}
+
+private struct InvalidShakeModifier: ViewModifier {
+	let invalidAttempts: Int
+	let isEnabled: Bool
+
+	func body(content: Content) -> some View {
+		content.keyframeAnimator(
+			initialValue: CGFloat.zero,
+			trigger: invalidAttempts
+		) { view, offset in
+			view.offset(x: isEnabled ? offset : 0)
+		} keyframes: { _ in
+			KeyframeTrack {
+				CubicKeyframe(-6, duration: 0.06)
+				CubicKeyframe(6, duration: 0.06)
+				CubicKeyframe(-4, duration: 0.06)
+				CubicKeyframe(4, duration: 0.06)
+				CubicKeyframe(-2, duration: 0.06)
+				CubicKeyframe(0, duration: 0.06)
+			}
+		}
 	}
 }

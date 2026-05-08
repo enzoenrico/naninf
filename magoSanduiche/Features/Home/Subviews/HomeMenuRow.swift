@@ -143,7 +143,7 @@ private struct HomeMenuRowButtonStyle: ButtonStyle {
 		return configuration.label
 			.background(isFocused ? Color.terminalActiveSurface : Color.terminalSurface)
 			.drawBorder(nil, color: borderColor, lineWidth: lineWidth, animate: true)
-			.scaleEffect(configuration.isPressed ? 0.985 : 1)
+			.scaleEffect(configuration.isPressed ? TerminalMotion.pressScale : 1)
 			.shadow(color: borderColor.opacity(isFocused ? 0.28 : 0), radius: isFocused ? 10 : 0)
 			.animation(
 				TerminalMotion.animation(reduceMotion, TerminalMotion.quickPressAnimation),

@@ -70,10 +70,10 @@ struct PlayerHomeView: View {
 			TerminalGlyphLoader(style: .blocks, textStyle: .caption, color: .terminalWarning)
 				.accessibilityHidden(true)
 		}
-		.padding(.horizontal, 20)
-		.padding(.top, 10)
-		.padding(.bottom, 8)
-		.background(Color.background.opacity(0.96))
+		.padding(.horizontal, Spacing.layoutLeading)
+		.padding(.top, Spacing.md)
+		.padding(.bottom, Spacing.sm)
+		.background(Color.background)
 	}
 
 	private var menuList: some View {
@@ -107,9 +107,9 @@ struct PlayerHomeView: View {
 				.foregroundStyle(Color.terminalMutedText)
 				.lineLimit(1)
 		}
-		.padding(.horizontal, 20)
-		.padding(.vertical, 10)
-		.background(Color.background.opacity(0.96))
+		.padding(.horizontal, Spacing.layoutLeading)
+		.padding(.vertical, Spacing.md)
+		.background(Color.background)
 	}
 
 	// MARK: - Actions

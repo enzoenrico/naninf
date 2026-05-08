@@ -8,6 +8,10 @@
 import SwiftUI
 import Foundation
 
+#if canImport(UIKit)
+import UIKit
+#endif
+
 enum BarTypes: String {
 	case health
 	case mana
@@ -85,14 +89,25 @@ struct AsciiProgressBar: View {
 		let maxProgress: Int
 
 		private let chars = ["█", "▓", "▒", "░"]
-		private let fontSize: CGFloat = 16
+
+		/// Tracks Dynamic Type so the bar glyphs scale alongside the surrounding
+		/// `.monocraft(relativeTo:)` label and counter. Without this the bar
+		/// stays at a fixed 16pt while the labels grow at accessibility sizes.
+		private var fontSize: CGFloat {
+			#if canImport(UIKit)
+			UIFont.preferredFont(forTextStyle: .body).pointSize
+			#else
+			17
+			#endif
+		}
+
 		private var charWidth: CGFloat { fontSize * 0.65 }
 
 		var body: some View {
 			GeometryReader { geo in
 				let charCount = max(1, Int(geo.size.width / charWidth))
 				Text(populateBar(charCount: charCount))
-					.font(.monocraft(size: fontSize))
+					.font(.monocraft(relativeTo: .body))
 					.frame(height: geo.size.height, alignment: .center)
 			}
 			.enableInjection()

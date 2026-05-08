@@ -57,12 +57,6 @@ struct InlineResponseStatusRow: View {
 			}
 
 			Spacer(minLength: 0)
-
-//			if status.isTemporary {
-//				Text("SWIPE")
-//					.font(.monocraft(relativeTo: .caption2, weight: .semibold))
-//					.foregroundStyle(Color.terminalMutedText)
-//			}
 		}
 		.padding(.horizontal, 10)
 		.padding(.vertical, 8)

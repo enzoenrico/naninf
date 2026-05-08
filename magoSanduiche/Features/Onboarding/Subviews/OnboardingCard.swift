@@ -33,6 +33,6 @@ struct OnboardingCard: View {
 		}
 		.padding(24)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.drawBorder(nil, color: isSelected ? .terminalWarning : .accent.opacity(0.7), lineWidth: isSelected ? 2 : 1)
+		.drawBorder(nil, color: isSelected ? .terminalWarning : .accentBorderActive, lineWidth: isSelected ? 2 : 1)
 	}
 }

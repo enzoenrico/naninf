@@ -96,7 +96,7 @@ private struct SuggestedOptionRow: View {
 	}
 
 	private var borderColor: Color {
-		Color.accent.opacity(isDisabled ? 0.35 : 0.65)
+		isDisabled ? Color.accent.opacity(0.35) : Color.accentBorderIdle
 	}
 
 	private var textColumnMaxWidth: CGFloat {
@@ -131,10 +131,6 @@ private struct SuggestedOptionRow: View {
 						measuredCardWidth = geo.size.width
 					}
 			}
-		)
-		.border(
-			needsRevealStep || isExpanded ? Color.clear : Color.red,
-			width: 6
 		)
 	}
 
@@ -224,8 +220,11 @@ private struct SuggestedOptionButtonStyle: ButtonStyle {
 	func makeBody(configuration: Configuration) -> some View {
 		configuration.label
 			.opacity(configuration.isPressed ? 0.92 : 1)
-			.scaleEffect(configuration.isPressed && !reduceMotion ? 0.98 : 1)
-			.animation(.easeOut(duration: 0.14), value: configuration.isPressed)
+			.scaleEffect(configuration.isPressed && !reduceMotion ? TerminalMotion.pressScale : 1)
+			.animation(
+				TerminalMotion.animation(reduceMotion, TerminalMotion.quickPressAnimation),
+				value: configuration.isPressed
+			)
 	}
 }
 
@@ -240,8 +239,11 @@ private struct SuggestedOptionConfirmButtonStyle: ButtonStyle {
 					: Color.terminalSurface.opacity(0.001)
 			)
 			.opacity(configuration.isPressed ? 0.92 : 1)
-			.scaleEffect(configuration.isPressed && !reduceMotion ? 0.98 : 1)
-			.animation(.easeOut(duration: 0.14), value: configuration.isPressed)
+			.scaleEffect(configuration.isPressed && !reduceMotion ? TerminalMotion.pressScale : 1)
+			.animation(
+				TerminalMotion.animation(reduceMotion, TerminalMotion.quickPressAnimation),
+				value: configuration.isPressed
+			)
 	}
 }
 
