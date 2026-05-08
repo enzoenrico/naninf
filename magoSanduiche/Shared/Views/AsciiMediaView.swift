@@ -120,19 +120,27 @@ struct AsciiMediaView: View {
 	#endif
 
 	var body: some View {
-		content
-			.frame(maxWidth: .infinity)
-			.background(configuration.background)
-			.clipped()
-			.task(id: loadIdentity) {
-				await loadMedia()
+		Group {
+			if configuration.scaleMode == .fill {
+				content
+					.frame(maxWidth: .infinity)
+					.frame(height: configuration.placeholderHeight)
+			} else {
+				content
+					.frame(maxWidth: .infinity)
 			}
-			.task(id: playbackIdentity) {
-				await runPlayback()
-			}
-			.accessibilityElement(children: .ignore)
-			.accessibilityLabel(accessibilityLabel)
-			.enableInjection()
+		}
+		.background(configuration.background)
+		.clipped()
+		.task(id: loadIdentity) {
+			await loadMedia()
+		}
+		.task(id: playbackIdentity) {
+			await runPlayback()
+		}
+		.accessibilityElement(children: .ignore)
+		.accessibilityLabel(accessibilityLabel)
+		.enableInjection()
 	}
 
 	#if DEBUG
@@ -466,7 +474,12 @@ private struct AsciiMediaStatusView: View {
 				.lineLimit(3)
 		}
 		.padding(12)
-		.frame(maxWidth: .infinity, minHeight: configuration.placeholderHeight, alignment: .leading)
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.frame(
+			maxHeight: configuration.scaleMode == .fill ? .infinity : nil,
+			alignment: .topLeading
+		)
+		.frame(minHeight: configuration.scaleMode == .fit ? configuration.placeholderHeight : nil, alignment: .leading)
 	}
 }
 
