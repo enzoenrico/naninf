@@ -5,8 +5,8 @@
 //  Created by Cursor on 04/05/26.
 //
 
-import SwiftUI
 import Foundation
+import SwiftUI
 
 #if canImport(UIKit)
 	import UIKit
@@ -34,8 +34,8 @@ struct PlayerHomeView: View {
 				VStack(spacing: 18) {
 					HomeHeroBanner(tagline: tagline)
 						.padding(.horizontal, 20)
+					Spacer()
 					menuList
-					Spacer(minLength: 0)
 				}
 			}
 		}
@@ -73,7 +73,7 @@ struct PlayerHomeView: View {
 		.padding(.horizontal, Spacing.layoutLeading)
 		.padding(.top, Spacing.md)
 		.padding(.bottom, Spacing.sm)
-		.background(Color.background)
+		.background(.thinMaterial)
 	}
 
 	private var menuList: some View {
@@ -109,7 +109,7 @@ struct PlayerHomeView: View {
 		}
 		.padding(.horizontal, Spacing.layoutLeading)
 		.padding(.vertical, Spacing.md)
-		.background(Color.background)
+		.background(.thinMaterial)
 	}
 
 	// MARK: - Actions
@@ -117,10 +117,12 @@ struct PlayerHomeView: View {
 	private func handleSelect(_ item: HomeMenuItem) {
 		focus(item)
 		triggerImpactHaptic()
-		AppAnalytics.capture("home_menu_item_selected", properties: [
-			"item_id": item.id,
-			"route": String(describing: item.route)
-		])
+		AppAnalytics.capture(
+			"home_menu_item_selected",
+			properties: [
+				"item_id": item.id,
+				"route": String(describing: item.route),
+			])
 		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 			coordinator.navigate(to: item.route)
 		}

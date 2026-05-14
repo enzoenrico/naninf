@@ -131,7 +131,7 @@ struct GameSessionView: View {
 						vm.applyToolEffectsFromDebug(effects)
 					}
 				}
-				.presentationDetents([.small, .medium])
+				.presentationDetents([.fraction(0.25), .medium])
 			}
 		#endif
 	}

@@ -52,3 +52,4 @@ nonisolated struct ChangeHealthTool: ModelTool {
 		return Result(amount: amount)
 	}
 }
+
