@@ -16,23 +16,16 @@ struct HomeHeroBanner: View {
 				.asciiScaleMode(.fill)
 				.asciiColumns(228)
 				.asciiFontSize(8)
-				.frame(maxWidth: .infinity)
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
 				.padding(.vertical, Spacing.layoutTop)
 
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
-				CRTRevealText( /// change this text 
-					text: tagline,
-					font: .monocraft(relativeTo: .callout, weight: .semibold),
-					color: .accent,
-					lineLimit: 2,
-					delay: .milliseconds(220),
-					showsCursorWhileTyping: true
-				)
-				.frame(maxHeight: 44, alignment: .leading)
+				TypeWriterView(tagline, embedsScrollView: false, lineLimit: 2)
+					.frame(maxHeight: 44, alignment: .leading)
 			}
 			.padding(Spacing.xl)
 		}
-		.frame(maxWidth: .infinity)
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.drawBorder(String(localized: "nan_home_hero_border_title"), color: .accent, lineWidth: 1, animate: true)
 		.enableInjection()
 	}

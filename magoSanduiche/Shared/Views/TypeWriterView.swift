@@ -11,6 +11,7 @@ import Foundation
 struct TypeWriterView: View {
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	var embedsScrollView: Bool
+	var lineLimit: Int?
 	var content: [Character]
 	var onFinished: (() -> Void)?
 
@@ -21,9 +22,11 @@ struct TypeWriterView: View {
 	init(
 		_ content: String,
 		embedsScrollView: Bool = false,
+		lineLimit: Int? = nil,
 		onFinished: (() -> Void)? = nil
 	) {
 		self.embedsScrollView = embedsScrollView
+		self.lineLimit = lineLimit
 		self.content = content.map { $0 }
 		self.onFinished = onFinished
 		_temp = State(initialValue: Array(repeating: " ", count: self.content.count))
@@ -61,6 +64,7 @@ struct TypeWriterView: View {
 		Text(renderedText)
 			.font(.monocraft())
 			.foregroundStyle(Color.accent)
+			.lineLimit(lineLimit)
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.task(id: fullText) { await buildContent() }
 			.task { await blinkCursor() }

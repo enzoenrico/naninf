@@ -36,6 +36,7 @@ struct PlayerHomeView: View {
 						.padding(.horizontal, 20)
 					Spacer()
 					menuList
+					Spacer(minLength: 0)
 				}
 			}
 		}
