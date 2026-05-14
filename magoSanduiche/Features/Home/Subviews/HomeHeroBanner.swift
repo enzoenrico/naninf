@@ -11,7 +11,7 @@ struct HomeHeroBanner: View {
 	let tagline: String
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: 12) {
+		VStack(alignment: .leading) {
 			AsciiMediaView(catalogVideoNamed: "mageOpening")
 				.asciiScaleMode(.fill)
 				.asciiColumns(228)
@@ -20,10 +20,10 @@ struct HomeHeroBanner: View {
 				.padding(.vertical, Spacing.layoutTop)
 
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
-				CRTRevealText(
+				CRTRevealText( /// change this text 
 					text: tagline,
 					font: .monocraft(relativeTo: .callout, weight: .semibold),
-					color: .terminalWarning,
+					color: .accent,
 					lineLimit: 2,
 					delay: .milliseconds(220),
 					showsCursorWhileTyping: true

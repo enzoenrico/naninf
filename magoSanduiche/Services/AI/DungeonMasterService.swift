@@ -20,11 +20,57 @@ enum AIAvailabilityErrors: Error, LocalizedError {
 }
 
 @MainActor
-final class DungeonMasterService {
-	private let service: OpenAIService
+protocol DungeonMasterModelClient: AnyObject {
+	func generateDungeonTurn(
+		_ scenario: String,
+		tools: [AnyModelTool],
+		model: Model,
+		analyticsContext: AIAnalyticsContext?
+	) async throws -> AITurnResult<PromptOutput>
 
-	init(actionCallback: ((Int) -> Void)? = nil) throws {
-		DecideActionTool.onActionRequested = actionCallback
+	func clearHistory()
+}
+
+extension OpenAIService: DungeonMasterModelClient {
+	func generateDungeonTurn(
+		_ scenario: String,
+		tools: [AnyModelTool],
+		model: Model,
+		analyticsContext: AIAnalyticsContext?
+	) async throws -> AITurnResult<PromptOutput> {
+		try await generate(
+			scenario,
+			returning: PromptOutput.self,
+			tools: tools,
+			model: model,
+			analyticsContext: analyticsContext
+		)
+	}
+}
+
+@MainActor
+final class DungeonMasterService {
+	@MainActor
+	static var modelTools: [AnyModelTool] {
+		[
+			AnyModelTool(RollDiceTool.self),
+			AnyModelTool(DecideActionTool.self),
+			AnyModelTool(ChangeHealthTool.self),
+		]
+	}
+
+	private let service: any DungeonMasterModelClient
+
+	init() throws {
+		#if DEBUG
+			if OpenAIService.isDebugStubBypassingNetwork {
+				self.service = OpenAIService(
+					apiKey: "debug-stub",
+					instructions: Prompts.systemPrompt
+				)
+				return
+			}
+		#endif
 
 		guard let apiKey = Bundle.main.object(forInfoDictionaryKey: "OPENAI_API_KEY") as? String,
 			!apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -38,11 +84,10 @@ final class DungeonMasterService {
 		)
 	}
 
-	func generate(_ scenario: String, analyticsContext: AIAnalyticsContext? = nil) async throws -> PromptOutput {
-		try await service.generate(
+	func generate(_ scenario: String, analyticsContext: AIAnalyticsContext? = nil) async throws -> AITurnResult<PromptOutput> {
+		try await service.generateDungeonTurn(
 			scenario,
-			returning: PromptOutput.self,
-			tools: [RollDiceTool.self, DecideActionTool.self, ChangeHealthTool.self],
+			tools: Self.modelTools,
 			model: .gpt4_o_mini,
 			analyticsContext: analyticsContext
 		)

@@ -6,36 +6,46 @@
 //
 
 import Foundation
-import OpenAI
 
-struct DecideActionTool: ExecutableTool {
+nonisolated struct DecideActionTool: ModelTool {
 	static let name = "decideAction"
-	nonisolated(unsafe) static var onActionRequested: ((Int) -> Void)?
+	static let description = "Choose the next player input type. Use 0 for text input and 1 for dice roll."
 
-	static let definition = ChatQuery.ChatCompletionToolParam(
-		function: .init(
-			name: name,
-			description:
-				"Choose the next player input type. Use 0 for text input and 1 for dice roll."
-		)
+	static let parameters = ToolParameterSchema(
+		integerFields: [
+			ToolIntegerParameter(
+				name: "action",
+				description: "The next input mode. Use 0 for text input and 1 for dice roll.",
+				minimum: 0,
+				maximum: 1,
+				defaultValue: 0
+			)
+		]
 	)
 
-	struct Arguments: Codable {
+	struct Arguments: Codable, Sendable {
 		let action: Int
 	}
 
-	static func execute(arguments: String) async throws -> String {
-		guard let data = arguments.data(using: .utf8) else {
-			return "Error: Invalid arguments"
+	struct Result: ModelToolResult {
+		let action: GameAction
+
+		var modelMessage: String {
+			switch action {
+			case .write:
+				"Action requested: text input. UI should show the text input interface."
+			case .roll:
+				"Action requested: dice roll. UI should show the dice roll interface."
+			}
 		}
 
-		let args = try JSONDecoder().decode(Arguments.self, from: data)
-		let actionType = args.action == 0 ? "text input" : "dice roll"
-
-		await MainActor.run {
-			onActionRequested?(args.action)
+		var effects: [GameToolEffect] {
+			[.requestAction(action)]
 		}
+	}
 
-		return "Action requested: \(actionType). UI updated to show \(actionType) interface."
+	static func call(arguments: Arguments) async throws -> Result {
+		let action: GameAction = arguments.action == 1 ? .roll : .write
+		return Result(action: action)
 	}
 }

@@ -10,6 +10,278 @@
     "  " : {
 
     },
+    "nan_auth_body_binding" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Binding your player profile to the cloud gate..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinculando seu perfil de jogador ao portal na nuvem..."
+          }
+        }
+      }
+    },
+    "nan_auth_body_checking" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looking for a saved Supabase session before opening the hub."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Procurando uma sessão Supabase salva antes de abrir o hub."
+          }
+        }
+      }
+    },
+    "nan_auth_body_ready" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a fast sign-in method to bind this run to your account."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha um login rápido para vincular esta jornada à sua conta."
+          }
+        }
+      }
+    },
+    "nan_auth_config_missing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auth is waiting for Supabase and Google client values in the app configuration."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A autenticação aguarda os valores de cliente do Supabase e Google na configuração do app."
+          }
+        }
+      }
+    },
+    "nan_auth_footnote" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "// tokens stay in Keychain; only your public login state is mirrored locally"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "// tokens ficam no Keychain; só o estado público do login é espelhado localmente"
+          }
+        }
+      }
+    },
+    "nan_auth_hero_border_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ACCOUNT_GATE"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PORTAL_DE_CONTA"
+          }
+        }
+      }
+    },
+    "nan_auth_hero_headline" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bind your spellbook"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vincule seu grimório"
+          }
+        }
+      }
+    },
+    "nan_auth_hero_kicker" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Onboarding complete. Account binding required before entering the hub."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Onboarding completo. Vincule uma conta antes de entrar no hub."
+          }
+        }
+      }
+    },
+    "nan_auth_sign_in_google" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in with Google"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrar com Google"
+          }
+        }
+      }
+    },
+    "nan_auth_status_binding" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> BINDING ACCOUNT"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> VINCULANDO CONTA"
+          }
+        }
+      }
+    },
+    "nan_auth_status_checking" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> CHECKING SESSION"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> VERIFICANDO SESSAO"
+          }
+        }
+      }
+    },
+    "nan_auth_status_config" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> CONFIG REQUIRED"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> CONFIGURACAO NECESSARIA"
+          }
+        }
+      }
+    },
+    "nan_auth_status_error" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> AUTH ERROR"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ERRO DE AUTH"
+          }
+        }
+      }
+    },
+    "nan_auth_status_panel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SESSION_STATUS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "STATUS_DA_SESSAO"
+          }
+        }
+      }
+    },
+    "nan_auth_status_ready" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> READY TO BIND"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> PRONTO PARA VINCULAR"
+          }
+        }
+      }
+    },
+    "nan_auth_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Apple or Google for quick signup. Supabase creates or restores your account behind the gate."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Apple ou Google para cadastro rápido. O Supabase cria ou restaura sua conta por trás do portal."
+          }
+        }
+      }
+    },
+    "nan_auth_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick signup keeps the dungeon ready across launches."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cadastro rápido mantém a masmorra pronta entre aberturas."
+          }
+        }
+      }
+    },
     "[" : {
 
     },
@@ -686,6 +958,310 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "> ESCREVENDO A HISTÓRIA"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_action_dice" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dice"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dado"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_action_label" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Input mode"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo de entrada"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_action_text" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texto"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_arguments" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ARGUMENT BUILDER"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> MONTAGEM DE ARGUMENTOS"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_footnote" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Runs the canonical typed model tool. OpenAI and future local model providers adapt from this same contract; game/UI changes are returned as typed effects."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Executa a ferramenta tipada canônica do modelo. OpenAI e futuros provedores locais adaptam esse mesmo contrato; mudanças de jogo/UI voltam como efeitos tipados."
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_heading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> CALL MODEL TOOLS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> CHAMAR FERRAMENTAS DO MODELO"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_kicker" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ":: DEBUG SESSION"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ":: SESSÃO DE DEBUG"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_nav" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> AI MODEL TOOLS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> FERRAMENTAS DO MODELO"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_nav_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open developer screen to invoke model tools directly"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir tela de desenvolvimento para chamar ferramentas do modelo diretamente"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_chat_entry" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> DM TOOLS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> FERRAMENTAS DM"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_chat_entry_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens the developer screen to invoke model tools and applies effects to this session when enabled."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre a tela de desenvolvimento para invocar ferramentas do modelo e aplica efeitos nesta sessão quando habilitado."
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_output" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> OUTPUT LOG"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> LOG DE SAÍDA"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_output_empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No runs yet."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nenhuma execução ainda."
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_pick_tool" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> TOOL"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> FERRAMENTA"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_raw_json" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit raw JSON arguments"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar JSON bruto dos argumentos"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_run" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> RUN TOOL"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> EXECUTAR"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAN / DEBUG TOOLS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAN / FERRAMENTAS DEBUG"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI TOOLS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FERRAMENTAS IA"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_unknown_tool" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No builder for this tool - use raw JSON."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem formulário para esta ferramenta - use JSON bruto."
           }
         }
       }
@@ -3301,6 +3877,38 @@
         }
       }
     },
+    "nan_profile_key_account" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ACCOUNT"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CONTA"
+          }
+        }
+      }
+    },
+    "nan_profile_key_provider" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PROVIDER"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PROVEDOR"
+          }
+        }
+      }
+    },
     "nan_profile_counter_loading" : {
       "localizations" : {
         "en" : {
@@ -3537,6 +4145,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "IDENT.SYS"
+          }
+        }
+      }
+    },
+    "nan_profile_sign_out" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SIGN OUT"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SAIR DA CONTA"
+          }
+        }
+      }
+    },
+    "nan_profile_sign_out_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signs out and returns to the account gate."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sai da conta e retorna ao portal de conta."
           }
         }
       }

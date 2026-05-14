@@ -5,8 +5,8 @@
 //  Created by Enzo Enrico on 05/12/25.
 //
 
-import SwiftUI
 import Foundation
+import SwiftUI
 
 struct ContextualButton: View {
 	var type: GameAction
@@ -80,7 +80,9 @@ struct ContextualButton: View {
 		} else {
 			switch type {
 			case .write:
-				isInputVisible ? String(localized: "nan_a11y_action_send_command") : String(localized: "nan_a11y_action_write_command")
+				isInputVisible
+					? String(localized: "nan_a11y_action_send_command")
+					: String(localized: "nan_a11y_action_write_command")
 			case .roll:
 				String(localized: "nan_a11y_action_roll_d20")
 			}
@@ -103,7 +105,9 @@ private struct TerminalButtonStyle: ButtonStyle {
 			.scaleEffect(configuration.isPressed ? TerminalMotion.pressScale : 1)
 			.opacity(isLoading ? 0.78 : 1)
 			.shadow(color: Color.accent.opacity(configuration.isPressed ? 0.18 : 0.35), radius: 10)
-			.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.quickPressAnimation), value: configuration.isPressed)
+			.animation(
+				TerminalMotion.animation(reduceMotion, TerminalMotion.quickPressAnimation),
+				value: configuration.isPressed)
 	}
 }
 

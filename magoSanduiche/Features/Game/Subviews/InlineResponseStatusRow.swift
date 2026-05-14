@@ -5,8 +5,8 @@
 //  Created by Enzo Enrico on 01/12/25.
 //
 
-import SwiftUI
 import Foundation
+import SwiftUI
 
 struct ResponseStatus: Identifiable, Equatable {
 	let id = UUID()
@@ -86,4 +86,3 @@ struct InlineResponseStatusRow: View {
 		)
 	}
 }
-

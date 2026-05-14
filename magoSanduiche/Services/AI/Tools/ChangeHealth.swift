@@ -6,43 +6,49 @@
 //
 
 import Foundation
-import OpenAI
 
-struct ChangeHealthTool: ExecutableTool {
+nonisolated struct ChangeHealthTool: ModelTool {
 	static let name = "changeHealth"
-	nonisolated(unsafe) static var onHealthChange: ((Int) -> Void)?
+	static let description =
+		"Changes the player's health value. Use positive amounts to heal and negative amounts for damage. Range: -40 to 40."
 
-	static let definition = ChatQuery.ChatCompletionToolParam(
-		function: .init(
-			name: name,
-			description:
-				"Changes the player's health value. Use positive amounts to heal and negative amounts for damage. Range: -40 to 40."
-		)
+	static let parameters = ToolParameterSchema(
+		integerFields: [
+			ToolIntegerParameter(
+				name: "amount",
+				description: "The health delta. Positive values heal, negative values damage, and zero leaves health unchanged.",
+				minimum: -40,
+				maximum: 40,
+				defaultValue: -5
+			)
+		]
 	)
 
-	struct Arguments: Codable {
+	struct Arguments: Codable, Sendable {
 		let amount: Int
 	}
 
-	static func execute(arguments: String) async throws -> String {
-		guard let data = arguments.data(using: .utf8) else {
-			return "Error: Invalid arguments"
+	struct Result: ModelToolResult {
+		let amount: Int
+
+		var modelMessage: String {
+			switch amount {
+			case let value where value > 0:
+				"Health increased by \(value)"
+			case let value where value < 0:
+				"Health decreased by \(abs(value))"
+			default:
+				"Health unchanged"
+			}
 		}
 
-		let args = try JSONDecoder().decode(Arguments.self, from: data)
-		let amount = min(max(args.amount, -40), 40)
-
-		await MainActor.run {
-			onHealthChange?(amount)
+		var effects: [GameToolEffect] {
+			[.changeHealth(amount)]
 		}
+	}
 
-		switch amount {
-		case let value where value > 0:
-			return "Health increased by \(value)"
-		case let value where value < 0:
-			return "Health decreased by \(abs(value))"
-		default:
-			return "Health unchanged"
-		}
+	static func call(arguments: Arguments) async throws -> Result {
+		let amount = min(max(arguments.amount, -40), 40)
+		return Result(amount: amount)
 	}
 }

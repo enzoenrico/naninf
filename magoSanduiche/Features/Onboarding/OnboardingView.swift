@@ -11,6 +11,7 @@ import Foundation
 struct OnboardingView: View {
 	@Environment(AppCoordinator.self) private var coordinator
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+	@AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 	@AppStorage("hasUnlockedFullGame") private var hasUnlockedFullGame = false
 	@State private var vm = OnboardingViewModel()
 
@@ -70,6 +71,7 @@ struct OnboardingView: View {
 			vm.persistResponsesOnUnlock()
 			AppAnalytics.capture("onboarding_unlocked", properties: onboardingProperties)
 			TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
+				hasCompletedOnboarding = true
 				hasUnlockedFullGame = true
 				coordinator.popToRoot()
 			}

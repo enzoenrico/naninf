@@ -141,10 +141,9 @@ private struct HomeMenuRowButtonStyle: ButtonStyle {
 		let lineWidth: CGFloat = configuration.isPressed ? 3 : (isFocused ? 2 : 1)
 
 		return configuration.label
-			.background(isFocused ? Color.terminalActiveSurface : Color.terminalSurface)
+			.background(.thinMaterial)
 			.drawBorder(nil, color: borderColor, lineWidth: lineWidth, animate: true)
 			.scaleEffect(configuration.isPressed ? TerminalMotion.pressScale : 1)
-			.shadow(color: borderColor.opacity(isFocused ? 0.28 : 0), radius: isFocused ? 10 : 0)
 			.animation(
 				TerminalMotion.animation(reduceMotion, TerminalMotion.quickPressAnimation),
 				value: configuration.isPressed

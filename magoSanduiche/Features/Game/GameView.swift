@@ -47,6 +47,10 @@ struct GameSessionView: View {
 
 	@AppStorage("hasSeenGameTips") private var hasSeenGameTips = false
 
+	#if DEBUG
+		@State private var showAIToolsDebug = false
+	#endif
+
 	init(
 		vm: GameViewModel,
 		coordinator: AppCoordinator,
@@ -96,10 +100,20 @@ struct GameSessionView: View {
 				}
 			}
 		}
-		.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: inlineResponseStatus?.id)
-		.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: coordinator.isDicePromptVisible)
-		.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: coordinator.isContextualInputVisible)
-		.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: coordinator.isImageCollapsed)
+		.animation(
+			TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: inlineResponseStatus?.id
+		)
+		.animation(
+			TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation),
+			value: coordinator.isDicePromptVisible
+		)
+		.animation(
+			TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation),
+			value: coordinator.isContextualInputVisible
+		)
+		.animation(
+			TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: coordinator.isImageCollapsed
+		)
 		.tipViewStyle(AsciiTipStyle())
 		.task {
 			vm.attachCoordinator(coordinator)
@@ -110,6 +124,16 @@ struct GameSessionView: View {
 		.onChange(of: vm.uiPhase) { _, newPhase in
 			presentInlineStatus(for: newPhase)
 		}
+		#if DEBUG
+			.sheet(isPresented: $showAIToolsDebug) {
+				NavigationStack {
+					AIToolsDebugView { effects in
+						vm.applyToolEffectsFromDebug(effects)
+					}
+				}
+				.presentationDetents([.small, .medium])
+			}
+		#endif
 	}
 
 	#if DEBUG
@@ -164,6 +188,21 @@ struct GameSessionView: View {
 
 	private func terminalPanel(coordinator: AppCoordinator, vm: GameViewModel) -> some View {
 		VStack(alignment: .leading, spacing: 12) {
+			#if DEBUG
+				HStack {
+					Spacer(minLength: 0)
+					Button {
+						showAIToolsDebug = true
+					} label: {
+						Text("nan_debug_ai_tools_chat_entry")
+							.font(.monocraft(relativeTo: .caption2, weight: .semibold))
+							.foregroundStyle(Color.terminalWarning)
+					}
+					.buttonStyle(.plain)
+					.accessibilityHint(String(localized: "nan_debug_ai_tools_chat_entry_a11y"))
+				}
+			#endif
+
 			if let inlineResponseStatus {
 				InlineResponseStatusRow(status: inlineResponseStatus) {
 					dismissInlineStatus()

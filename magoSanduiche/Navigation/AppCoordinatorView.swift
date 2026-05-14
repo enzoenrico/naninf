@@ -10,48 +10,57 @@ import Foundation
 
 struct AppCoordinatorView: View {
 	@Environment(AppCoordinator.self) private var coordinator
+	@Environment(AuthSessionStore.self) private var authSessionStore
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+	@AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 	@AppStorage("hasUnlockedFullGame") private var hasUnlockedFullGame = false
 
 	var body: some View {
 		@Bindable var coordinator = coordinator
 
 		NavigationStack(path: $coordinator.path) {
-			Group {
-				if hasUnlockedFullGame {
-					PlayerHomeView()
-				} else {
-					OnboardingView()
-				}
-			}
+			rootScreen
 			.transition(TerminalMotion.panelTransition(reduceMotion: reduceMotion, edge: .bottom))
 			.navigationDestination(for: AppRoute.self) { route in
 				switch route {
 				case .home:
-					PlayerHomeView()
+					gatedHomeScreen
 				case .onboarding:
 					OnboardingView()
 				case .game:
-					if hasUnlockedFullGame {
+					if canEnterHome {
 						GameView()
 					} else {
-						OnboardingView()
+						rootScreen
 					}
 				case .profile:
-					ProfileView()
+					if canEnterHome {
+						ProfileView()
+					} else {
+						rootScreen
+					}
 				case .load:
-					LoadRunView()
+					if canEnterHome {
+						LoadRunView()
+					} else {
+						rootScreen
+					}
 				case .about:
-					AboutView()
+					if canEnterHome {
+						AboutView()
+					} else {
+						rootScreen
+					}
 				}
 			}
 		}
 		.background(Color.background)
 		.overlay(alignment: .bottomTrailing) {
 			#if DEBUG
-				if hasUnlockedFullGame {
+				if hasFinishedOnboarding {
 					Button {
 						TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
+							hasCompletedOnboarding = false
 							hasUnlockedFullGame = false
 							coordinator.popToRoot()
 						}
@@ -69,6 +78,32 @@ struct AppCoordinatorView: View {
 					.accessibilityLabel(String(localized: "nan_debug_onboarding_a11y"))
 				}
 			#endif
+		}
+	}
+
+	private var hasFinishedOnboarding: Bool {
+		hasCompletedOnboarding || hasUnlockedFullGame
+	}
+
+	private var canEnterHome: Bool {
+		hasFinishedOnboarding && authSessionStore.isAuthenticated
+	}
+
+	@ViewBuilder
+	private var rootScreen: some View {
+		if !hasFinishedOnboarding {
+			OnboardingView()
+		} else {
+			gatedHomeScreen
+		}
+	}
+
+	@ViewBuilder
+	private var gatedHomeScreen: some View {
+		if authSessionStore.isAuthenticated {
+			PlayerHomeView()
+		} else {
+			AuthView()
 		}
 	}
 }

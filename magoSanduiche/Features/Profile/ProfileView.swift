@@ -10,6 +10,7 @@ import Foundation
 
 struct ProfileView: View {
 	@Environment(AppCoordinator.self) private var coordinator
+	@Environment(AuthSessionStore.self) private var authSessionStore
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 	@AppStorage("onboardingResponses") private var onboardingResponsesData: Data = Data()
@@ -28,6 +29,18 @@ struct ProfileView: View {
 
 				ProfileSection(title: String(localized: "nan_profile_section_identity"), accent: .accent) {
 					ProfileKeyValueRow(key: String(localized: "nan_profile_key_callsign"), value: String(localized: "nan_profile_value_wizard"))
+					if let loginSnapshot = authSessionStore.loginSnapshot {
+						ProfileKeyValueRow(
+							key: String(localized: "nan_profile_key_account"),
+							value: loginSnapshot.email ?? loginSnapshot.userID,
+							valueColor: .terminalMana
+						)
+						ProfileKeyValueRow(
+							key: String(localized: "nan_profile_key_provider"),
+							value: loginSnapshot.provider.rawValue.uppercased(),
+							valueColor: .terminalWarning
+						)
+					}
 					ProfileKeyValueRow(
 						key: String(localized: "nan_profile_key_unlocked"),
 						value: unlockedDateString,
@@ -70,6 +83,7 @@ struct ProfileView: View {
 
 				Spacer(minLength: 12)
 
+				signOutButton
 				backButton
 			}
 		}
@@ -114,6 +128,34 @@ struct ProfileView: View {
 		}
 		.buttonStyle(OnboardingPrimaryButtonStyle())
 		.accessibilityHint(String(localized: "nan_profile_back_a11y"))
+	}
+
+	private var signOutButton: some View {
+		Button {
+			Task { @MainActor in
+				await authSessionStore.signOut()
+				TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
+					coordinator.popToRoot()
+				}
+			}
+		} label: {
+			HStack(spacing: 8) {
+				Text("nan_profile_sign_out")
+					.font(.monocraft(relativeTo: .headline, weight: .semibold))
+				if authSessionStore.isAuthenticating {
+					TerminalGlyphLoader(style: .blocks, textStyle: .caption, color: .terminalDanger)
+						.accessibilityHidden(true)
+				}
+			}
+			.frame(maxWidth: .infinity)
+			.padding(.vertical, 14)
+		}
+		.buttonStyle(.plain)
+		.foregroundStyle(Color.terminalDanger)
+		.drawBorder(nil, color: .terminalDanger, lineWidth: 2)
+		.opacity(authSessionStore.isAuthenticating ? 0.7 : 1)
+		.disabled(authSessionStore.isAuthenticating)
+		.accessibilityHint(String(localized: "nan_profile_sign_out_a11y"))
 	}
 
 	// MARK: - Data
@@ -196,4 +238,5 @@ struct ProfileView: View {
 #Preview {
 	ProfileView()
 		.environment(AppCoordinator())
+		.environment(AuthSessionStore())
 }

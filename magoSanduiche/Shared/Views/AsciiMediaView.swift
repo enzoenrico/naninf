@@ -90,6 +90,7 @@ struct AsciiMediaView: View {
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@State private var phase: AsciiMediaPhase = .idle
 	@State private var currentFrameIndex = 0
+	@State private var reservedLayoutAspectRatio: CGFloat?
 
 	init(source: Source) {
 		self.source = source
@@ -120,27 +121,19 @@ struct AsciiMediaView: View {
 	#endif
 
 	var body: some View {
-		Group {
-			if configuration.scaleMode == .fill {
-				content
-					.frame(maxWidth: .infinity)
-					.frame(height: configuration.placeholderHeight)
-			} else {
-				content
-					.frame(maxWidth: .infinity)
+		content
+			.frame(maxWidth: .infinity)
+			.background(configuration.background)
+			.clipped()
+			.task(id: loadIdentity) {
+				await loadMedia()
 			}
-		}
-		.background(configuration.background)
-		.clipped()
-		.task(id: loadIdentity) {
-			await loadMedia()
-		}
-		.task(id: playbackIdentity) {
-			await runPlayback()
-		}
-		.accessibilityElement(children: .ignore)
-		.accessibilityLabel(accessibilityLabel)
-		.enableInjection()
+			.task(id: playbackIdentity) {
+				await runPlayback()
+			}
+			.accessibilityElement(children: .ignore)
+			.accessibilityLabel(accessibilityLabel)
+			.enableInjection()
 	}
 
 	#if DEBUG
@@ -155,14 +148,18 @@ struct AsciiMediaView: View {
 				title: "ASCII MEDIA",
 				message: source.isVideo ? "preloading video frames" : "preloading image",
 				isLoading: true,
-				configuration: configuration
+				configuration: configuration,
+				reservedAspectRatio: reservedLayoutAspectRatio,
+				isVideoSource: source.isVideo
 			)
 		case .failed(let message):
 			AsciiMediaStatusView(
 				title: "ASCII ERROR",
 				message: message,
 				isLoading: false,
-				configuration: configuration
+				configuration: configuration,
+				reservedAspectRatio: reservedLayoutAspectRatio,
+				isVideoSource: source.isVideo
 			)
 		case .ready(let frames):
 			if frames.isEmpty {
@@ -170,7 +167,9 @@ struct AsciiMediaView: View {
 					title: "ASCII ERROR",
 					message: "no frames decoded",
 					isLoading: false,
-					configuration: configuration
+					configuration: configuration,
+					reservedAspectRatio: reservedLayoutAspectRatio,
+					isVideoSource: source.isVideo
 				)
 			} else {
 				let frame = frames[min(currentFrameIndex, frames.count - 1)]
@@ -187,7 +186,8 @@ struct AsciiMediaView: View {
 				.aspectRatio(frame.displayAspectRatio, contentMode: .fit)
 		case .fill:
 			AsciiMediaCanvas(frame: frame, configuration: configuration)
-				.frame(maxWidth: .infinity, maxHeight: .infinity)
+				.aspectRatio(frame.displayAspectRatio, contentMode: .fit)
+				.frame(maxWidth: .infinity)
 				.clipped()
 		}
 	}
@@ -234,6 +234,7 @@ struct AsciiMediaView: View {
 
 	private func loadMedia() async {
 		currentFrameIndex = 0
+		reservedLayoutAspectRatio = await AsciiMediaLoader.probeDisplayAspectRatio(from: source)
 		phase = .loading
 
 		do {
@@ -330,6 +331,12 @@ extension AsciiMediaView {
 		copy.configuration.background = color
 		return copy
 	}
+
+	func asciiFallbackVideoAspectRatio(_ ratio: CGFloat) -> Self {
+		var copy = self
+		copy.configuration.fallbackVideoAspectRatio = max(0.01, ratio)
+		return copy
+	}
 }
 
 private enum AsciiMediaPhase {
@@ -351,6 +358,8 @@ private struct AsciiMediaConfiguration {
 	var background = Color.clear
 	var fontSize: CGFloat = 8
 	var placeholderHeight: CGFloat = 360
+	/// Used when aspect ratio is unknown but the source is video (avoids a tall `minHeight` placeholder).
+	var fallbackVideoAspectRatio: CGFloat = 16.0 / 9.0
 
 	var sanitizedCharacters: String {
 		let characters = characters.filter { character in
@@ -450,8 +459,38 @@ private struct AsciiMediaStatusView: View {
 	let message: String
 	let isLoading: Bool
 	let configuration: AsciiMediaConfiguration
+	let reservedAspectRatio: CGFloat?
+	let isVideoSource: Bool
+
+	private var effectiveAspectRatio: CGFloat? {
+		if let r = reservedAspectRatio, r.isFinite, r > 0.01 {
+			return r
+		}
+		if isVideoSource {
+			return configuration.fallbackVideoAspectRatio
+		}
+		return nil
+	}
 
 	var body: some View {
+		Group {
+			if let ratio = effectiveAspectRatio {
+				Color.clear
+					.aspectRatio(ratio, contentMode: .fit)
+					.frame(maxWidth: .infinity)
+					.overlay(alignment: .topLeading) {
+						statusContent.padding(12)
+					}
+			} else {
+				statusContent
+					.padding(12)
+					.frame(maxWidth: .infinity, minHeight: configuration.placeholderHeight, alignment: .leading)
+			}
+		}
+	}
+
+	@ViewBuilder
+	private var statusContent: some View {
 		VStack(alignment: .leading, spacing: 8) {
 			HStack(spacing: 6) {
 				Text(title)
@@ -473,17 +512,33 @@ private struct AsciiMediaStatusView: View {
 				.foregroundStyle(Color.terminalMutedText)
 				.lineLimit(3)
 		}
-		.padding(12)
-		.frame(maxWidth: .infinity, alignment: .leading)
-		.frame(
-			maxHeight: configuration.scaleMode == .fill ? .infinity : nil,
-			alignment: .topLeading
-		)
-		.frame(minHeight: configuration.scaleMode == .fit ? configuration.placeholderHeight : nil, alignment: .leading)
 	}
 }
 
 private enum AsciiMediaLoader {
+	static func probeDisplayAspectRatio(from source: AsciiMediaView.Source) async -> CGFloat? {
+		switch source {
+		case .image(let cgImage):
+			guard cgImage.height > 0 else { return nil }
+			return CGFloat(cgImage.width) / CGFloat(cgImage.height)
+		case .imageFile(let url):
+			return probeImageFileAspectRatio(url: url)
+		case .videoFile(let url), .remoteVideo(let url):
+			return await probeVideoDisplayAspectRatio(url: url)
+		case .remoteImage:
+			return nil
+		#if canImport(UIKit)
+			case .uiImage(let image):
+				let size = image.size
+				guard size.height > 0 else { return nil }
+				return size.width / size.height
+			case .catalogVideo(let name):
+				guard let url = try? catalogVideoFileURL(named: name) else { return nil }
+				return await probeVideoDisplayAspectRatio(url: url)
+		#endif
+		}
+	}
+
 	static func loadFrames(
 		from source: AsciiMediaView.Source,
 		configuration: AsciiConversionConfiguration
@@ -523,6 +578,38 @@ private enum AsciiMediaLoader {
 		} onCancel: {
 			task.cancel()
 		}
+	}
+
+	private static func probeImageFileAspectRatio(url: URL) -> CGFloat? {
+		guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
+			let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [String: Any],
+			let widthNumber = properties[kCGImagePropertyPixelWidth as String] as? NSNumber,
+			let heightNumber = properties[kCGImagePropertyPixelHeight as String] as? NSNumber
+		else {
+			return nil
+		}
+		let w = CGFloat(truncating: widthNumber)
+		let h = CGFloat(truncating: heightNumber)
+		guard h > 0 else { return nil }
+		return w / h
+	}
+
+	private static func probeVideoDisplayAspectRatio(url: URL) async -> CGFloat? {
+		let asset = AVURLAsset(url: url)
+		guard let track = try? await asset.loadTracks(withMediaType: .video).first else {
+			return nil
+		}
+		guard
+			let naturalSize = try? await track.load(.naturalSize),
+			let transform = try? await track.load(.preferredTransform)
+		else {
+			return nil
+		}
+		let rect = CGRect(origin: .zero, size: naturalSize).applying(transform)
+		let w = abs(rect.width)
+		let h = abs(rect.height)
+		guard h > 0 else { return nil }
+		return w / h
 	}
 
 	#if canImport(UIKit)

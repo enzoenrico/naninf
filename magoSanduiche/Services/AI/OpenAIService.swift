@@ -9,12 +9,6 @@ import Foundation
 import Observation
 import OpenAI
 
-protocol ExecutableTool: Sendable {
-	static var definition: ChatQuery.ChatCompletionToolParam { get }
-	static var name: String { get }
-	static func execute(arguments: String) async throws -> String
-}
-
 enum OpenAIServiceError: Error, LocalizedError {
 	case noResponseContent
 	case decodingFailed(String)
@@ -54,45 +48,46 @@ final class OpenAIService {
 	func generate<T: StructuredOutput>(
 		_ prompt: String,
 		returning type: T.Type,
-		tools: [any ExecutableTool.Type] = [],
+		tools: [AnyModelTool] = [],
 		model: Model = .gpt4_o,
 		analyticsContext: AIAnalyticsContext? = nil
-	) async throws -> T {
+	) async throws -> AITurnResult<T> {
 		let fullPrompt = "\(prompt)\n\n\(schemaInstruction(for: type))"
 		conversationHistory.append(.init(role: .user, content: fullPrompt)!)
 
-		let content = try await runAgentLoop(
+		let turn = try await runAgentLoop(
 			tools: tools,
-			toolDefinitions: tools.map { $0.definition },
+			toolDefinitions: tools.map(\.openAIToolDefinition),
 			responseFormat: .jsonObject,
 			model: model,
 			analyticsContext: analyticsContext
 		)
 
-		guard let jsonData = content.data(using: .utf8) else {
+		guard let jsonData = turn.output.data(using: .utf8) else {
 			throw OpenAIServiceError.decodingFailed("Failed to convert response to data")
 		}
 
 		do {
-			return try JSONDecoder().decode(T.self, from: jsonData)
+			let output = try JSONDecoder().decode(T.self, from: jsonData)
+			return AITurnResult(output: output, toolEffects: turn.toolEffects)
 		} catch {
 			throw OpenAIServiceError.decodingFailed(
-				"\(error.localizedDescription)\nRaw content: \(content)"
+				"\(error.localizedDescription)\nRaw content: \(turn.output)"
 			)
 		}
 	}
 
 	func generate(
 		_ prompt: String,
-		tools: [any ExecutableTool.Type] = [],
+		tools: [AnyModelTool] = [],
 		model: Model = .gpt4_o,
 		analyticsContext: AIAnalyticsContext? = nil
-	) async throws -> String {
+	) async throws -> AITurnResult<String> {
 		conversationHistory.append(.init(role: .user, content: prompt)!)
 
 		return try await runAgentLoop(
 			tools: tools,
-			toolDefinitions: tools.map { $0.definition },
+			toolDefinitions: tools.map(\.openAIToolDefinition),
 			responseFormat: nil,
 			model: model,
 			analyticsContext: analyticsContext
@@ -153,16 +148,29 @@ final class OpenAIService {
 	}
 
 	private func runAgentLoop(
-		tools: [any ExecutableTool.Type],
+		tools: [AnyModelTool],
 		toolDefinitions: [ChatQuery.ChatCompletionToolParam],
 		responseFormat: ChatQuery.ResponseFormat?,
 		model: Model,
 		analyticsContext: AIAnalyticsContext?
-	) async throws -> String {
+	) async throws -> AITurnResult<String> {
 		let traceID = analyticsContext?.turnID ?? UUID().uuidString
 		let sessionID = analyticsContext?.sessionID
 		let turnStartedAt = Date()
 		var accumulatedUsage = TokenUsageAccumulator()
+		var accumulatedToolEffects: [GameToolEffect] = []
+
+		#if DEBUG
+			if Self.isDebugStubBypassingNetwork {
+				return try await runDebugStubTurn(
+					tools: tools,
+					responseFormat: responseFormat,
+					traceID: traceID,
+					sessionID: sessionID,
+					turnStartedAt: turnStartedAt
+				)
+			}
+		#endif
 
 		for iteration in 0..<maxIterations {
 			let requestPayload = jsonObject(from: conversationHistory)
@@ -242,51 +250,17 @@ final class OpenAIService {
 			)
 
 			if let toolCalls = message.toolCalls, !toolCalls.isEmpty {
-				conversationHistory.append(
-					.init(
-						role: .assistant,
-						content: message.content,
-						toolCalls: toolCalls.map { toolCall in
-							.init(
-								id: toolCall.id,
-								function: .init(
-									arguments: toolCall.function.arguments,
-									name: toolCall.function.name
-								)
-							)
-						}
-					)!
+				let processedToolCalls = await processAssistantToolCalls(
+					assistantText: message.content,
+					toolCalls: toolCalls,
+					tools: tools,
+					sessionID: sessionID,
+					traceID: traceID,
+					spanID: spanID,
+					iteration: iteration,
+					responseFormat: responseFormat
 				)
-
-				for toolCall in toolCalls {
-					let toolName = toolCall.function.name
-					guard let tool = tools.first(where: { $0.name == toolName }) else {
-						appendToolResult("Error: Tool '\(toolName)' not found", toolCallId: toolCall.id)
-						continue
-					}
-
-					do {
-						let result = try await tool.execute(arguments: toolCall.function.arguments)
-						appendToolResult(result, toolCallId: toolCall.id)
-					} catch {
-						var properties = analyticsProperties(
-							sessionID: sessionID,
-							traceID: traceID,
-							spanID: spanID,
-							iteration: iteration,
-							responseFormat: responseFormat,
-							extra: [
-								"tool_name": toolName,
-								"tool_call_id": toolCall.id,
-								"error_type": String(describing: type(of: error)),
-								"error_message": error.localizedDescription
-							]
-						)
-						properties["$ai_is_error"] = true
-						AppAnalytics.capture("ai_tool_execution_failed", properties: properties)
-						appendToolResult("Error executing tool: \(error.localizedDescription)", toolCallId: toolCall.id)
-					}
-				}
+				accumulatedToolEffects.append(contentsOf: processedToolCalls.effects)
 
 				continue
 			}
@@ -311,7 +285,7 @@ final class OpenAIService {
 				accumulatedUsage: accumulatedUsage,
 				iterationCount: iteration + 1
 			)
-			return content
+			return AITurnResult(output: content, toolEffects: accumulatedToolEffects)
 		}
 
 		let error = OpenAIServiceError.maxIterationsReached
@@ -323,6 +297,74 @@ final class OpenAIService {
 			error: error
 		)
 		throw OpenAIServiceError.maxIterationsReached
+	}
+
+	@discardableResult
+	private func processAssistantToolCalls(
+		assistantText: String?,
+		toolCalls: [ChatQuery.ChatCompletionMessageParam.AssistantMessageParam.ToolCallParam],
+		tools: [AnyModelTool],
+		sessionID: String?,
+		traceID: String,
+		spanID: String,
+		iteration: Int,
+		responseFormat: ChatQuery.ResponseFormat?
+	) async -> ProcessedToolCalls {
+		conversationHistory.append(
+			.init(
+				role: .assistant,
+				content: assistantText,
+				toolCalls: toolCalls
+			)!
+		)
+
+		var summaries: [String] = []
+		var effects: [GameToolEffect] = []
+		for toolCall in toolCalls {
+			let toolName = toolCall.function.name
+			guard let tool = tools.first(where: { $0.name == toolName }) else {
+				let message = "Error: Tool '\(toolName)' not found"
+				appendToolResult(message, toolCallId: toolCall.id)
+				summaries.append("\(toolName): \(message)")
+				continue
+			}
+
+			do {
+				let toolOutput = try await tool.call(jsonArguments: toolCall.function.arguments)
+				appendToolResult(toolOutput.modelMessage, toolCallId: toolCall.id)
+				summaries.append("\(toolName): \(toolOutput.modelMessage)")
+				effects.append(contentsOf: toolOutput.effects)
+			} catch {
+				var properties = analyticsProperties(
+					sessionID: sessionID,
+					traceID: traceID,
+					spanID: spanID,
+					iteration: iteration,
+					responseFormat: responseFormat,
+					extra: [
+						"tool_name": toolName,
+						"tool_call_id": toolCall.id,
+						"error_type": String(describing: type(of: error)),
+						"error_message": error.localizedDescription,
+					]
+				)
+				properties["$ai_is_error"] = true
+				AppAnalytics.capture("ai_tool_execution_failed", properties: properties)
+				let message = "Error executing tool: \(error.localizedDescription)"
+				appendToolResult(message, toolCallId: toolCall.id)
+				summaries.append("\(toolName): \(message)")
+			}
+		}
+		return ProcessedToolCalls(summaries: summaries, effects: effects)
+	}
+
+	private func latestUserPromptText() -> String {
+		for message in conversationHistory.reversed() {
+			if case .user(let user) = message, let text = user.content.string {
+				return text
+			}
+		}
+		return ""
 	}
 
 	private func captureSuccessfulAIGeneration(
@@ -344,7 +386,7 @@ final class OpenAIService {
 			"tool_call_count": toolCallCount,
 			"is_final_response": toolCallCount == 0,
 			"choice_count": result.choices.count,
-			"system_fingerprint": result.systemFingerprint ?? "unknown"
+			"system_fingerprint": result.systemFingerprint ?? "unknown",
 		]
 		if let serviceTier = result.serviceTier {
 			extra["service_tier"] = String(describing: serviceTier)
@@ -421,7 +463,7 @@ final class OpenAIService {
 			"duration": Date().timeIntervalSince(startedAt),
 			"input_tokens": accumulatedUsage.inputTokens,
 			"output_tokens": accumulatedUsage.outputTokens,
-			"total_tokens": accumulatedUsage.totalTokens
+			"total_tokens": accumulatedUsage.totalTokens,
 		]
 		if let sessionID {
 			properties["game_session_id"] = sessionID
@@ -443,7 +485,7 @@ final class OpenAIService {
 			"$ai_trace_id": traceID,
 			"span_id": spanID,
 			"iteration": iteration + 1,
-			"response_format": responseFormat == nil ? "text" : "json_object"
+			"response_format": responseFormat == nil ? "text" : "json_object",
 		]
 		if let sessionID {
 			properties["game_session_id"] = sessionID
@@ -473,6 +515,165 @@ final class OpenAIService {
 		)
 	}
 }
+
+private struct ProcessedToolCalls {
+	let summaries: [String]
+	let effects: [GameToolEffect]
+}
+
+private extension AnyModelTool {
+	var openAIToolDefinition: ChatQuery.ChatCompletionToolParam {
+		ChatQuery.ChatCompletionToolParam(
+			function: .init(
+				name: name,
+				description: description,
+				parameters: parameters.openAIJSONSchema
+			)
+		)
+	}
+}
+
+private extension ToolParameterSchema {
+	var openAIJSONSchema: JSONSchema {
+		var fields: [JSONSchemaField] = [
+			.type(.object),
+			.properties(
+				Dictionary(uniqueKeysWithValues: integerFields.map { field in
+					(field.name, field.openAIJSONSchema)
+				})
+			),
+			.additionalProperties(.boolean(false)),
+		]
+
+		if !requiredPropertyNames.isEmpty {
+			fields.append(.required(requiredPropertyNames))
+		}
+
+		return JSONSchema(fields: fields)
+	}
+}
+
+private extension ToolIntegerParameter {
+	var openAIJSONSchema: JSONSchema {
+		var fields: [JSONSchemaField] = [
+			.type(.integer),
+			.description(description),
+		]
+
+		if let minimum {
+			fields.append(.minimum(minimum))
+		}
+		if let maximum {
+			fields.append(.maximum(maximum))
+		}
+
+		return JSONSchema(fields: fields)
+	}
+}
+
+extension OpenAIService {
+	#if DEBUG
+		/// When `true`, `runAgentLoop` skips `client.chats` and runs a local tool round + stub final message (see `debugStubUserDefaultsKey`).
+		/// Turn on for simulator work without an API key: set this to `true` early in launch (e.g. `RootView`), or `UserDefaults.standard.set(true, forKey: OpenAIService.debugStubUserDefaultsKey)`.
+		static var debugStubBypassNetwork = false
+		static let debugStubUserDefaultsKey = "OpenAIService.debugStubBypassNetwork"
+
+		static var isDebugStubBypassingNetwork: Bool {
+			debugStubBypassNetwork || UserDefaults.standard.bool(forKey: debugStubUserDefaultsKey)
+		}
+	#else
+		static var isDebugStubBypassingNetwork: Bool { false }
+	#endif
+}
+
+#if DEBUG
+	extension OpenAIService {
+		fileprivate func runDebugStubTurn(
+			tools: [AnyModelTool],
+			responseFormat: ChatQuery.ResponseFormat?,
+			traceID: String,
+			sessionID: String?,
+			turnStartedAt: Date
+		) async throws -> AITurnResult<String> {
+			let accumulatedUsage = TokenUsageAccumulator()
+			let spanID = "debug_stub"
+			var summaries: [String] = []
+			var effects: [GameToolEffect] = []
+
+			if !tools.isEmpty {
+				let syntheticToolCalls = tools.enumerated().map { index, toolType in
+					ChatQuery.ChatCompletionMessageParam.AssistantMessageParam.ToolCallParam(
+						id: "debug_stub_tool_\(index)",
+						function: .init(
+							arguments: toolType.parameters.jsonString(argumentValues: toolType.parameters.defaultArgumentValues()),
+							name: toolType.name
+						)
+					)
+				}
+				let processedToolCalls = await processAssistantToolCalls(
+					assistantText: nil,
+					toolCalls: syntheticToolCalls,
+					tools: tools,
+					sessionID: sessionID,
+					traceID: traceID,
+					spanID: spanID,
+					iteration: 0,
+					responseFormat: responseFormat
+				)
+				summaries = processedToolCalls.summaries
+				effects = processedToolCalls.effects
+			}
+
+			let finalContent: String
+			if responseFormat != nil {
+				finalContent = Self.debugStubStructuredJSON(
+					userPromptSnippet: latestUserPromptText(),
+					toolSummaries: summaries
+				)
+			} else {
+				finalContent =
+					summaries.isEmpty
+					? "[DEBUG STUB] Network bypass (no tools configured)."
+					: "[DEBUG STUB] " + summaries.joined(separator: " | ")
+			}
+
+			conversationHistory.append(.init(role: .assistant, content: finalContent)!)
+			captureAITurnCompleted(
+				traceID: traceID,
+				sessionID: sessionID,
+				startedAt: turnStartedAt,
+				accumulatedUsage: accumulatedUsage,
+				iterationCount: tools.isEmpty ? 1 : 2
+			)
+			return AITurnResult(output: finalContent, toolEffects: effects)
+		}
+
+		private static func debugStubStructuredJSON(
+			userPromptSnippet: String,
+			toolSummaries: [String]
+		) -> String {
+			let narrativePrefix = "> [DEBUG STUB] Simulated dungeon master. Player said:\n> "
+			let clipped = userPromptSnippet.trimmingCharacters(in: .whitespacesAndNewlines)
+			let narrativeBody = clipped.isEmpty ? "(empty)" : String(clipped.prefix(280))
+			let narrative = narrativePrefix + narrativeBody
+			let toolResults =
+				toolSummaries.isEmpty
+				? "debug_stub: no tools executed"
+				: toolSummaries.joined(separator: ". ")
+			let output = PromptOutput(
+				narrative: narrative,
+				toolResults: toolResults,
+				options: [
+					"Look for another path",
+					"Talk to the glowing runes",
+					"Rest here a moment",
+				]
+			)
+			let data = (try? JSONEncoder().encode(output)).flatMap { String(data: $0, encoding: .utf8) }
+			return data ?? #"{"narrative":"[DEBUG STUB] encode failed","toolResults":"","options":[]}"#
+		}
+	}
+#endif
 
 private struct TokenUsageAccumulator {
 	private(set) var inputTokens = 0

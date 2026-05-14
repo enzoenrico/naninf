@@ -37,15 +37,17 @@ final class GameViewModel {
 
 	init(coordinator: AppCoordinator? = nil) {
 		self.coordinator = coordinator
-		self.dungeonMaster = try? DungeonMasterService(actionCallback: handleAction)
-		AppAnalytics.capture("game_session_started", properties: [
-			"game_session_id": gameSessionID,
-			"has_dungeon_master": dungeonMaster != nil,
-			"health": health,
-			"mana": mana,
-			"max_health": maxHealth,
-			"max_mana": maxMana
-		])
+		self.dungeonMaster = try? DungeonMasterService()
+		AppAnalytics.capture(
+			"game_session_started",
+			properties: [
+				"game_session_id": gameSessionID,
+				"has_dungeon_master": dungeonMaster != nil,
+				"health": health,
+				"mana": mana,
+				"max_health": maxHealth,
+				"max_mana": maxMana,
+			])
 	}
 
 	func attachCoordinator(_ coordinator: AppCoordinator) {
@@ -77,14 +79,16 @@ final class GameViewModel {
 		contextualInput = ""
 		let turnID = UUID().uuidString
 		let startedAt = Date()
-		AppAnalytics.capture("player_turn_submitted", properties: [
-			"game_session_id": gameSessionID,
-			"turn_id": turnID,
-			"prompt_length": trimmed.count,
-			"terminal_entry_count": terminalEntries.count,
-			"health": health,
-			"mana": mana
-		])
+		AppAnalytics.capture(
+			"player_turn_submitted",
+			properties: [
+				"game_session_id": gameSessionID,
+				"turn_id": turnID,
+				"prompt_length": trimmed.count,
+				"terminal_entry_count": terminalEntries.count,
+				"health": health,
+				"mana": mana,
+			])
 
 		Task {
 			await fetchNarrative(for: trimmed, turnID: turnID, startedAt: startedAt)
@@ -106,10 +110,12 @@ final class GameViewModel {
 	func registerEmptyInput() {
 		invalidInputAttempts += 1
 		uiPhase = .composing
-		AppAnalytics.capture("player_empty_input_submitted", properties: [
-			"game_session_id": gameSessionID,
-			"invalid_input_attempts": invalidInputAttempts
-		])
+		AppAnalytics.capture(
+			"player_empty_input_submitted",
+			properties: [
+				"game_session_id": gameSessionID,
+				"invalid_input_attempts": invalidInputAttempts,
+			])
 	}
 
 	func rollDice(reduceMotion: Bool = false) {
@@ -120,11 +126,13 @@ final class GameViewModel {
 		diceResultText = String(localized: "nan_dice_rolling")
 		let healthBeforeRoll = health
 		let manaBeforeRoll = mana
-		AppAnalytics.capture("dice_roll_started", properties: [
-			"game_session_id": gameSessionID,
-			"health": health,
-			"mana": mana
-		])
+		AppAnalytics.capture(
+			"dice_roll_started",
+			properties: [
+				"game_session_id": gameSessionID,
+				"health": health,
+				"mana": mana,
+			])
 
 		Task {
 			if !reduceMotion {
@@ -137,17 +145,19 @@ final class GameViewModel {
 			let finalRoll = Int.random(in: 1...20)
 			diceValue = finalRoll
 			resolveDiceRoll(finalRoll)
-			AppAnalytics.capture("dice_roll_completed", properties: [
-				"game_session_id": gameSessionID,
-				"roll": finalRoll,
-				"outcome": diceOutcomeName(for: finalRoll),
-				"health_before": healthBeforeRoll,
-				"health_after": health,
-				"health_delta": health - healthBeforeRoll,
-				"mana_before": manaBeforeRoll,
-				"mana_after": mana,
-				"mana_delta": mana - manaBeforeRoll
-			])
+			AppAnalytics.capture(
+				"dice_roll_completed",
+				properties: [
+					"game_session_id": gameSessionID,
+					"roll": finalRoll,
+					"outcome": diceOutcomeName(for: finalRoll),
+					"health_before": healthBeforeRoll,
+					"health_after": health,
+					"health_delta": health - healthBeforeRoll,
+					"mana_before": manaBeforeRoll,
+					"mana_after": mana,
+					"mana_delta": mana - manaBeforeRoll,
+				])
 			contextAction = .write
 			coordinator?.finishDicePrompt()
 			loading = false
@@ -164,40 +174,50 @@ final class GameViewModel {
 		}
 
 		do {
-			guard let result = try await dungeonMaster?.generate(
-				prompt,
-				analyticsContext: AIAnalyticsContext(sessionID: gameSessionID, turnID: turnID)
-			) else {
+			guard
+				let turn = try await dungeonMaster?.generate(
+					prompt,
+					analyticsContext: AIAnalyticsContext(sessionID: gameSessionID, turnID: turnID)
+				)
+			else {
 				appendSystemMessage(String(localized: "nan_dm_silent"))
-				AppAnalytics.capture("dm_turn_empty_response", properties: [
-					"game_session_id": gameSessionID,
-					"turn_id": turnID,
-					"duration": Date().timeIntervalSince(startedAt)
-				])
+				AppAnalytics.capture(
+					"dm_turn_empty_response",
+					properties: [
+						"game_session_id": gameSessionID,
+						"turn_id": turnID,
+						"duration": Date().timeIntervalSince(startedAt),
+					])
 				return
 			}
 
+			let result = turn.output
 			suggestedOptions = result.options
 				.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
 				.filter { !$0.isEmpty }
 			terminalEntries.append(TerminalEntry(kind: .dungeonMaster, text: result.narrative))
 			uiPhase = .result
-			AppAnalytics.capture("dm_turn_succeeded", properties: [
-				"game_session_id": gameSessionID,
-				"turn_id": turnID,
-				"duration": Date().timeIntervalSince(startedAt),
-				"narrative_length": result.narrative.count,
-				"suggested_option_count": suggestedOptions.count,
-				"terminal_entry_count": terminalEntries.count
-			])
+			applyToolEffects(turn.toolEffects)
+			AppAnalytics.capture(
+				"dm_turn_succeeded",
+				properties: [
+					"game_session_id": gameSessionID,
+					"turn_id": turnID,
+					"duration": Date().timeIntervalSince(startedAt),
+					"narrative_length": result.narrative.count,
+					"suggested_option_count": suggestedOptions.count,
+					"terminal_entry_count": terminalEntries.count,
+				])
 		} catch {
-			AppAnalytics.capture("dm_turn_failed", properties: [
-				"game_session_id": gameSessionID,
-				"turn_id": turnID,
-				"duration": Date().timeIntervalSince(startedAt),
-				"error_type": String(describing: type(of: error)),
-				"error_message": error.localizedDescription
-			])
+			AppAnalytics.capture(
+				"dm_turn_failed",
+				properties: [
+					"game_session_id": gameSessionID,
+					"turn_id": turnID,
+					"duration": Date().timeIntervalSince(startedAt),
+					"error_type": String(describing: type(of: error)),
+					"error_message": error.localizedDescription,
+				])
 			appendSystemMessage(String(localized: "nan_dm_error"))
 		}
 	}
@@ -235,37 +255,61 @@ final class GameViewModel {
 		}
 	}
 
-	private func handleAction(_ option: Int) {
-		Task { @MainActor in
-			switch option {
-			case 0:
+	private func applyToolEffects(_ effects: [GameToolEffect]) {
+		for effect in effects {
+			applyToolEffect(effect)
+		}
+	}
+
+	private func applyToolEffect(_ effect: GameToolEffect) {
+		switch effect {
+		case .requestAction(let action):
+			applyRequestedAction(action)
+		case .changeHealth(let amount):
+			let healthBefore = health
+			health = min(maxHealth, max(0, health + amount))
+			AppAnalytics.capture(
+				"dm_health_changed",
+				properties: [
+					"game_session_id": gameSessionID,
+					"amount": amount,
+					"health_before": healthBefore,
+					"health_after": health,
+					"health_delta": health - healthBefore,
+				])
+		}
+	}
+
+	private func applyRequestedAction(_ action: GameAction) {
+		switch action {
+		case .write:
 				contextAction = .write
 				uiPhase = .composing
 				coordinator?.prepareForTextInput()
-				AppAnalytics.capture("dm_action_requested", properties: [
-					"game_session_id": gameSessionID,
-					"option": option,
-					"action": "write"
-				])
-			case 1:
+				AppAnalytics.capture(
+					"dm_action_requested",
+					properties: [
+						"game_session_id": gameSessionID,
+						"action": "write",
+					])
+		case .roll:
 				contextAction = .roll
 				uiPhase = .rollingDice
 				coordinator?.showDicePrompt()
-				AppAnalytics.capture("dm_action_requested", properties: [
-					"game_session_id": gameSessionID,
-					"option": option,
-					"action": "roll"
-				])
-			default:
-				contextAction = .write
-				uiPhase = .ready
-				coordinator?.resetActionPresentation()
-				AppAnalytics.capture("dm_action_requested", properties: [
-					"game_session_id": gameSessionID,
-					"option": option,
-					"action": "ready"
-				])
-			}
+				AppAnalytics.capture(
+					"dm_action_requested",
+					properties: [
+						"game_session_id": gameSessionID,
+						"action": "roll",
+					])
 		}
 	}
 }
+
+#if DEBUG
+	extension GameViewModel {
+		func applyToolEffectsFromDebug(_ effects: [GameToolEffect]) {
+			applyToolEffects(effects)
+		}
+	}
+#endif

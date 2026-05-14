@@ -9,6 +9,8 @@ import SwiftUI
 
 @main
 struct magoSanduicheApp: App {
+	@State private var authSessionStore = AuthSessionStore()
+
 	init() {
 		AppAnalytics.configure()
 	}
@@ -18,6 +20,13 @@ struct magoSanduicheApp: App {
 			AppStartupGate()
 				.background(Color.background)
 				.font(.monocraft())
+				.environment(authSessionStore)
+				.task {
+					await authSessionStore.start()
+				}
+				.onOpenURL { url in
+					authSessionStore.handleOpenURL(url)
+				}
 		}
 	}
 }
