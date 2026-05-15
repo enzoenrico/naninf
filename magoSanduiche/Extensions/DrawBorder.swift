@@ -123,6 +123,8 @@ private struct DrawBorderModifierContent<Content: View>: View {
 					}
 				}
 			}
+			.compositingGroup()
+			.terminalChromeGlow(color: color, progress: trimEnd, preset: .chrome)
 	}
 
 	private var trimEnd: CGFloat {

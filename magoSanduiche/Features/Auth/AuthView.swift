@@ -4,6 +4,7 @@
 //
 
 import AuthenticationServices
+import GoogleSignIn
 import SwiftUI
 
 struct AuthView: View {
@@ -144,9 +145,9 @@ struct AuthView: View {
 			.frame(height: 48)
 			.disabled(isDisabled)
 
-			GoogleSignInButton(
-				isDisabled: isDisabled,
-				colorScheme: colorScheme
+			GoogleSignInButtonRepresentable(
+				colorScheme: colorScheme,
+				isDisabled: isDisabled
 			) {
 				Task { @MainActor in
 					await authSessionStore.signIn(with: .google)
@@ -154,6 +155,8 @@ struct AuthView: View {
 			}
 			.frame(maxWidth: .infinity)
 			.frame(height: 48)
+			.disabled(isDisabled)
+			.accessibilityLabel(Text("nan_auth_sign_in_google"))
 		}
 	}
 
@@ -208,64 +211,54 @@ struct AuthView: View {
 	}
 }
 
-private struct GoogleSignInButton: View {
-	var isDisabled: Bool
+private struct GoogleSignInButtonRepresentable: UIViewRepresentable {
 	var colorScheme: ColorScheme
+	var isDisabled: Bool
 	var onTap: () -> Void
 
-	var body: some View {
-		Button(action: onTap) {
-			HStack(spacing: 9) {
-				GoogleGlyph()
-					.frame(width: 18, height: 18)
-
-				Text("nan_auth_sign_in_google")
-					.font(.system(size: 19, weight: .medium))
-			}
-			.frame(maxWidth: .infinity, maxHeight: .infinity)
-			.padding(.horizontal, 18)
-			.foregroundStyle(foregroundColor)
-			.contentShape(Rectangle())
-		}
-		.buttonStyle(.plain)
-		.background(backgroundColor)
-		.clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
-		.opacity(isDisabled ? 0.55 : 1)
-		.disabled(isDisabled)
-		.accessibilityLabel(Text("nan_auth_sign_in_google"))
+	func makeCoordinator() -> Coordinator {
+		Coordinator(onTap: onTap)
 	}
 
-	private var foregroundColor: Color {
+	func makeUIView(context: Context) -> GIDSignInButton {
+		let button = GIDSignInButton()
+		button.style = .wide
+		button.colorScheme = mappedColorScheme
+		button.addTarget(
+			context.coordinator,
+			action: #selector(Coordinator.handleTap),
+			for: .touchUpInside
+		)
+		button.setContentHuggingPriority(.defaultLow, for: .horizontal)
+		button.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+		return button
+	}
+
+	func updateUIView(_ button: GIDSignInButton, context: Context) {
+		button.colorScheme = mappedColorScheme
+		button.isEnabled = !isDisabled
+		button.alpha = isDisabled ? 0.55 : 1.0
+		context.coordinator.onTap = onTap
+	}
+
+	private var mappedColorScheme: GIDSignInButtonColorScheme {
 		switch colorScheme {
-		case .light:
-			.white
-		case .dark:
-			.black
-		@unknown default:
-			.white
+		case .light: .light
+		case .dark: .dark
+		@unknown default: .light
 		}
 	}
 
-	private var backgroundColor: Color {
-		switch colorScheme {
-		case .light:
-			.black
-		case .dark:
-			.white
-		@unknown default:
-			.black
-		}
-	}
-}
+	final class Coordinator {
+		var onTap: () -> Void
 
-private struct GoogleGlyph: View {
-	var body: some View {
-		Image("GoogleLogo")
-			.resizable()
-			.renderingMode(.original)
-			.scaledToFit()
-			.frame(width: 18, height: 18)
-			.accessibilityHidden(true)
+		init(onTap: @escaping () -> Void) {
+			self.onTap = onTap
+		}
+
+		@objc func handleTap() {
+			onTap()
+		}
 	}
 }
 

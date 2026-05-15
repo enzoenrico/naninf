@@ -171,15 +171,7 @@ struct GameSessionView: View {
 		shouldShowTips: Bool
 	) -> some View {
 		ActionStack(title: vm.uiPhase.actionTitle) {
-			if coordinator.isDicePromptVisible {
-				DicePromptView(
-					diceValue: vm.diceValue,
-					resultText: vm.diceResultText,
-					isRolling: vm.uiPhase == .rollingDice && vm.loading
-				)
-			} else {
-				terminalPanel(coordinator: coordinator, vm: vm)
-			}
+			terminalPanel(coordinator: coordinator, vm: vm)
 		}
 		.popoverTipIf(actionAreaTip, arrowEdge: .top, when: shouldShowTips)
 		.frame(maxWidth: .infinity)
@@ -246,6 +238,15 @@ struct GameSessionView: View {
 			VStack(alignment: .leading, spacing: 16) {
 				ForEach(vm.terminalEntries) { entry in
 					terminalEntryView(entry: entry, vm: vm, coordinator: coordinator)
+				}
+
+				if coordinator.isDicePromptVisible {
+				DicePromptView(
+					diceValue: vm.diceValue,
+					resultText: vm.diceResultText,
+					isRolling: vm.uiPhase == .rollingDice && vm.loading
+				)
+				.drawBorder()
 				}
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)

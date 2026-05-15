@@ -18,6 +18,7 @@ struct TerminalSubtleButtonStyle: ButtonStyle {
 		configuration.label
 			.scaleEffect(configuration.isPressed && !reduceMotion ? TerminalMotion.pressScale : 1)
 			.opacity(configuration.isPressed ? 0.92 : 1)
+			.terminalChromeGlow(color: .accent, preset: .subtle)
 			.animation(
 				TerminalMotion.animation(reduceMotion, TerminalMotion.quickPressAnimation),
 				value: configuration.isPressed

@@ -19,7 +19,6 @@ struct OnboardingPrimaryButtonStyle: ButtonStyle {
 				lineWidth: configuration.isPressed ? 3 : 2
 			)
 			.scaleEffect(configuration.isPressed ? TerminalMotion.pressScale : 1)
-			.shadow(color: Color.accent.opacity(0.28), radius: 10)
 			.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.quickPressAnimation), value: configuration.isPressed)
 	}
 }

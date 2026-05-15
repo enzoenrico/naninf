@@ -1074,70 +1074,6 @@
         }
       }
     },
-    "nan_debug_ai_tools_nav" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> AI MODEL TOOLS"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> FERRAMENTAS DO MODELO"
-          }
-        }
-      }
-    },
-    "nan_debug_ai_tools_nav_a11y" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open developer screen to invoke model tools directly"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir tela de desenvolvimento para chamar ferramentas do modelo diretamente"
-          }
-        }
-      }
-    },
-    "nan_debug_ai_tools_chat_entry" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> DM TOOLS"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> FERRAMENTAS DM"
-          }
-        }
-      }
-    },
-    "nan_debug_ai_tools_chat_entry_a11y" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opens the developer screen to invoke model tools and applies effects to this session when enabled."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abre a tela de desenvolvimento para invocar ferramentas do modelo e aplica efeitos nesta sessão quando habilitado."
-          }
-        }
-      }
-    },
     "nan_debug_ai_tools_output" : {
       "localizations" : {
         "en" : {
@@ -1214,22 +1150,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "> EXECUTAR"
-          }
-        }
-      }
-    },
-    "nan_debug_ai_tools_section" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NAN / DEBUG TOOLS"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NAN / FERRAMENTAS DEBUG"
           }
         }
       }
