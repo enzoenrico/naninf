@@ -58,18 +58,22 @@ extension View {
 	///   `\.crtRevealPhase` from the environment and animates its stroke via
 	///   `Shape.trim(from:to:)`, producing a CRT-style pen-trace. Defaults to
 	///   `false` so every existing call site renders unchanged.
+	/// - Parameter glowPreset: Phosphor bloom strength around the bordered group;
+	///   defaults to `.chrome` to match existing panels.
 	func drawBorder(
 		_ desc: String? = nil,
 		color: Color = .accent,
 		lineWidth: CGFloat = 2,
-		animate: Bool = false
+		animate: Bool = false,
+		glowPreset: TerminalGlowPreset = .chrome
 	) -> some View {
 		DrawBorderModifierContent(
 			content: self,
 			desc: desc,
 			color: color,
 			lineWidth: lineWidth,
-			animate: animate
+			animate: animate,
+			glowPreset: glowPreset
 		)
 	}
 }
@@ -82,6 +86,7 @@ private struct DrawBorderModifierContent<Content: View>: View {
 	let color: Color
 	let lineWidth: CGFloat
 	let animate: Bool
+	let glowPreset: TerminalGlowPreset
 
 	@State private var labelFrame: CGRect = .zero
 
@@ -113,7 +118,9 @@ private struct DrawBorderModifierContent<Content: View>: View {
 										)
 									}
 								)
-								.offset(x: -geo.size.width * 0.33, y: -geo.size.height / 2)
+								.frame(maxWidth: .infinity, alignment: .leading)
+								.padding(.leading, lineWidth + 6)
+								.offset(y: -geo.size.height / 2)
 								.zIndex(1)
 						}
 					}
@@ -124,7 +131,7 @@ private struct DrawBorderModifierContent<Content: View>: View {
 				}
 			}
 			.compositingGroup()
-			.terminalChromeGlow(color: color, progress: trimEnd, preset: .chrome)
+			.terminalChromeGlow(color: color, progress: trimEnd, preset: glowPreset)
 	}
 
 	private var trimEnd: CGFloat {

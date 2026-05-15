@@ -16,8 +16,7 @@ struct DicePromptView: View {
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 16) {
-			TerminalStatusStrip(phase: .rollingDice, isLoading: isRolling)
-
+			//TerminalStatusStrip(phase: .rollingDice, isLoading: isRolling)
 			HStack(alignment: .center, spacing: 18) {
 				Text("\(diceValue)")
 					.font(.monocraft(relativeTo: .largeTitle, weight: .bold))
@@ -25,14 +24,23 @@ struct DicePromptView: View {
 					.monospacedDigit()
 					.frame(width: 96, height: 96)
 					.background(Color.terminalActiveSurface)
-					.drawBorder(String(localized: "nan_dice_panel_title"), color: isRolling ? .terminalWarning : .accent, lineWidth: 2)
+					.drawBorder(
+						String(localized: "nan_dice_panel_title"),
+						color: isRolling ? .terminalWarning : .accent,
+						lineWidth: 2,
+						glowPreset: .subtle
+					)
 					.scaleEffect(isRolling && !reduceMotion ? 1.04 : 1)
-					.animation(TerminalMotion.animation(reduceMotion, TerminalMotion.quickPressAnimation), value: diceValue)
+					.animation(
+						TerminalMotion.animation(reduceMotion, TerminalMotion.quickPressAnimation), value: diceValue)
 
 				VStack(alignment: .leading, spacing: 8) {
-					Text(isRolling ? String(localized: "nan_dice_flavor_rolling") : String(localized: "nan_dice_flavor_idle"))
-						.font(.monocraft(relativeTo: .headline, weight: .semibold))
-						.foregroundStyle(Color.accent)
+					Text(
+						isRolling
+							? String(localized: "nan_dice_flavor_rolling") : String(localized: "nan_dice_flavor_idle")
+					)
+					.font(.monocraft(relativeTo: .headline, weight: .semibold))
+					.foregroundStyle(Color.accent)
 					Text(resultText)
 						.font(.monocraft(relativeTo: .callout))
 						.foregroundStyle(Color.terminalMutedText)

@@ -241,12 +241,12 @@ struct GameSessionView: View {
 				}
 
 				if coordinator.isDicePromptVisible {
-				DicePromptView(
-					diceValue: vm.diceValue,
-					resultText: vm.diceResultText,
-					isRolling: vm.uiPhase == .rollingDice && vm.loading
-				)
-				.drawBorder()
+					DicePromptView(
+						diceValue: vm.diceValue,
+						resultText: vm.diceResultText,
+						isRolling: vm.uiPhase == .rollingDice && vm.loading
+					)
+					.drawBorder("nan_dice_prompt", color: .accent, lineWidth: 2, animate: true, glowPreset: .chrome)
 				}
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
