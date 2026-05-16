@@ -243,8 +243,10 @@ struct GameSessionView: View {
 				if coordinator.isDicePromptVisible {
 					DicePromptView(
 						diceValue: vm.diceValue,
+						revealStage: vm.diceRevealStage,
 						resultText: vm.diceResultText,
-						isRolling: vm.uiPhase == .rollingDice && vm.loading
+						showRollingFlavor:
+							vm.loading && vm.uiPhase == .rollingDice && vm.diceRevealStage != .bamReveal
 					)
 					.drawBorder("nan_dice_prompt", color: .accent, lineWidth: 2, animate: true, glowPreset: .chrome)
 				}

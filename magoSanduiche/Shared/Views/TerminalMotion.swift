@@ -23,6 +23,26 @@ enum TerminalMotion {
 	/// Boot screen → app shell crossfade. Slightly slower than `panelAnimation`
 	/// because the entire root view is being swapped underneath.
 	static let bootCrossfadeAnimation = Animation.easeOut(duration: 0.35)
+	/// D20 blackout after scramble; strong ease-out (see design-eng motion notes).
+	static let diceFadeAnimation = Animation.timingCurve(
+		0.23, 1, 0.32, 1,
+		duration: Double(DiceRollRevealTiming.fadeOutMillis) / 1000)
+	static let diceFadeAnimationReduceMotion = Animation.easeOut(
+		duration: Double(DiceRollRevealTiming.fadeOutMillisReduceMotion) / 1000)
+	/// Final number “popup” after suspense.
+	static let diceRevealAnimation = Animation.timingCurve(
+		0.23, 1, 0.32, 1,
+		duration: Double(DiceRollRevealTiming.bamRevealMillis) / 1000)
+	static let diceRevealAnimationReduceMotion = Animation.easeOut(
+		duration: Double(DiceRollRevealTiming.bamRevealMillisReduceMotion) / 1000)
+
+	static func diceFadeAnimation(reduceMotion: Bool) -> Animation {
+		reduceMotion ? diceFadeAnimationReduceMotion : diceFadeAnimation
+	}
+
+	static func diceRevealAnimation(reduceMotion: Bool) -> Animation {
+		reduceMotion ? diceRevealAnimationReduceMotion : diceRevealAnimation
+	}
 	/// Onboarding option toggle. Snappier than `panelAnimation` so multi-select
 	/// taps feel immediate even when several rows update in sequence.
 	static let optionToggleAnimation = Animation.snappy(duration: 0.22)

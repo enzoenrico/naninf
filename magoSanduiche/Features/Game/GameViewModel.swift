@@ -7,6 +7,7 @@
 
 import CoreGraphics
 import Foundation
+import SwiftUI
 
 @Observable
 @MainActor
@@ -25,6 +26,7 @@ final class GameViewModel {
 	var maxHealth = 18
 	var maxMana = 18
 	var diceValue = 20
+	var diceRevealStage = DiceRevealStage.idle
 	var diceResultText = String(localized: "nan_dice_idle_cold")
 	var invalidInputAttempts = 0
 	var contextualInput = ""
@@ -134,17 +136,41 @@ final class GameViewModel {
 				"mana": mana,
 			])
 
+		diceRevealStage = .scrambling
+
 		Task {
-			if !reduceMotion {
-				for _ in 0..<12 {
+			let finalRoll = Int.random(in: 1...20)
+
+			if reduceMotion {
+				diceValue = Int.random(in: 1...20)
+			} else {
+				for step in 0..<DiceRollRevealTiming.scrambleTicks {
 					diceValue = Int.random(in: 1...20)
-					try? await Task.sleep(for: .milliseconds(55))
+					try? await Task.sleep(for: .milliseconds(DiceRollRevealTiming.scrambleSleepMillis(step: step)))
 				}
 			}
 
-			let finalRoll = Int.random(in: 1...20)
-			diceValue = finalRoll
+			withAnimation(TerminalMotion.diceFadeAnimation(reduceMotion: reduceMotion)) {
+				diceRevealStage = .fadingOut
+			}
+			try? await Task.sleep(for: .seconds(DiceRollRevealTiming.fadeOutSeconds(reduceMotion: reduceMotion)))
+
+			var settleTransaction = Transaction()
+			settleTransaction.disablesAnimations = true
+			withTransaction(settleTransaction) {
+				diceValue = finalRoll
+				diceRevealStage = .suspense
+			}
+
+			try? await Task.sleep(for: .seconds(DiceRollRevealTiming.suspenseSeconds(reduceMotion: reduceMotion)))
+
+			TerminalHaptics.playDiceReveal(roll: finalRoll)
+			withAnimation(TerminalMotion.diceRevealAnimation(reduceMotion: reduceMotion)) {
+				diceRevealStage = .bamReveal
+			}
 			resolveDiceRoll(finalRoll)
+			try? await Task.sleep(for: .seconds(DiceRollRevealTiming.bamRevealSeconds(reduceMotion: reduceMotion)))
+
 			AppAnalytics.capture(
 				"dice_roll_completed",
 				properties: [
@@ -162,6 +188,13 @@ final class GameViewModel {
 			coordinator?.finishDicePrompt()
 			loading = false
 			uiPhase = .result
+
+			var idleTransaction = Transaction()
+			idleTransaction.disablesAnimations = true
+			withTransaction(idleTransaction) {
+				diceRevealStage = .idle
+			}
+
 			onCompletedPlayerAction?()
 		}
 	}
@@ -295,6 +328,7 @@ final class GameViewModel {
 		case .roll:
 				contextAction = .roll
 				uiPhase = .rollingDice
+				diceRevealStage = .idle
 				coordinator?.showDicePrompt()
 				AppAnalytics.capture(
 					"dm_action_requested",
