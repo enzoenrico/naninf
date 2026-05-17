@@ -7,6 +7,7 @@
 
 import CoreGraphics
 import Foundation
+import SwiftData
 import SwiftUI
 
 @Observable
@@ -14,8 +15,17 @@ import SwiftUI
 final class GameViewModel {
 	private weak var coordinator: AppCoordinator?
 	private let imageGenService = ImageGenerator(concept: "An old wizard eating a sandwich")
-	private let gameSessionID = UUID().uuidString
+	private(set) var gameSessionID: String
 	private var dungeonMaster: DungeonMasterService?
+
+	/// When set, `persistRun()` writes to the shared SwiftData store (`LoadRunView`).
+	var modelContext: ModelContext?
+	/// Persist to the run library (off for onboarding demo).
+	let persistRunsToLibrary: Bool
+	/// Stable id for the `StoredGameRun` row once created.
+	private(set) var persistedRunID: UUID?
+	/// Plain transcript for loaded runs; cleared on the next player submission.
+	var suppressTerminalAnimations = false
 
 	var loading = false
 	var selectedImage: CGImage?
@@ -39,8 +49,10 @@ final class GameViewModel {
 		TerminalEntry(kind: .dungeonMaster, text: Introduction.intro)
 	]
 
-	init(coordinator: AppCoordinator? = nil) {
+	init(coordinator: AppCoordinator? = nil, persistRunsToLibrary: Bool = true) {
 		self.coordinator = coordinator
+		self.gameSessionID = UUID().uuidString
+		self.persistRunsToLibrary = persistRunsToLibrary
 		self.dungeonMaster = try? DungeonMasterService()
 		AppAnalytics.capture(
 			"game_session_started",
@@ -51,11 +63,123 @@ final class GameViewModel {
 				"mana": mana,
 				"max_health": maxHealth,
 				"max_mana": maxMana,
+				"persist_runs": persistRunsToLibrary,
 			])
 	}
 
 	func attachCoordinator(_ coordinator: AppCoordinator) {
 		self.coordinator = coordinator
+	}
+
+	/// Loads a saved run from SwiftData. Call from `GameView` when resuming.
+	func restore(runID: UUID, modelContext: ModelContext) {
+		guard let stored = GameRunSnapshotMapper.fetch(id: runID, context: modelContext) else { return }
+		self.modelContext = modelContext
+		persistedRunID = stored.id
+		gameSessionID = stored.analyticsSessionID
+		do {
+			let lines = try GameRunSnapshotMapper.decodeTranscript(from: stored.transcriptBlob)
+			if lines.isEmpty {
+				terminalEntries = [TerminalEntry(kind: .dungeonMaster, text: Introduction.intro)]
+			} else {
+				terminalEntries = lines.map {
+					TerminalEntry(id: $0.id, kind: $0.kind.terminalKind, text: $0.text)
+				}
+			}
+		} catch {
+			terminalEntries = [TerminalEntry(kind: .dungeonMaster, text: Introduction.intro)]
+		}
+
+		health = stored.health
+		mana = stored.mana
+		maxHealth = stored.maxHealth
+		maxMana = stored.maxMana
+		diceValue = stored.diceValue
+		pendingDiceRoll = stored.pendingDiceRoll
+		diceRevealStage = GameRunSnapshotMapper.diceRevealStage(from: stored.diceRevealStageRaw)
+		diceResultText = stored.diceResultText
+		invalidInputAttempts = stored.invalidInputAttempts
+		contextualInput = stored.contextualInput
+		contextAction = GameRunSnapshotMapper.contextAction(from: stored.contextActionRaw)
+		uiPhase = GameRunSnapshotMapper.uiPhase(from: stored.uiPhaseRaw)
+		suggestedOptions = GameRunSnapshotMapper.decodeSuggestedOptions(from: stored.suggestedOptionsBlob)
+		suppressTerminalAnimations = stored.suppressTerminalAnimations
+		dungeonMaster = try? DungeonMasterService()
+	}
+
+	func saveSnapshot(modelContext: ModelContext) {
+		self.modelContext = modelContext
+		persistRun()
+	}
+
+	private func persistRun() {
+		guard persistRunsToLibrary, let modelContext else { return }
+
+		do {
+			let now = Date()
+			let id = persistedRunID ?? UUID()
+			let existing = GameRunSnapshotMapper.fetch(id: id, context: modelContext)
+			let createdAt = existing?.createdAt ?? now
+
+			let persistedLines = GameRunSnapshotMapper.persistedLines(from: terminalEntries)
+			let transcriptBlob = try GameRunSnapshotMapper.encodeTranscript(persistedLines)
+			let suggestedBlob = try GameRunSnapshotMapper.encodeSuggestedOptions(suggestedOptions)
+			let title = GameRunSnapshotMapper.displayTitle(entries: terminalEntries, fallback: createdAt)
+
+			if let existing {
+				existing.updatedAt = now
+				existing.displayTitle = title
+				existing.transcriptBlob = transcriptBlob
+				existing.health = health
+				existing.mana = mana
+				existing.maxHealth = maxHealth
+				existing.maxMana = maxMana
+				existing.diceValue = diceValue
+				existing.pendingDiceRoll = pendingDiceRoll
+				existing.diceRevealStageRaw = GameRunSnapshotMapper.diceRevealStageRaw(diceRevealStage)
+				existing.diceResultText = diceResultText
+				existing.invalidInputAttempts = invalidInputAttempts
+				existing.contextualInput = contextualInput
+				existing.contextActionRaw = GameRunSnapshotMapper.contextActionRaw(contextAction)
+				existing.uiPhaseRaw = GameRunSnapshotMapper.uiPhaseRaw(uiPhase)
+				existing.suggestedOptionsBlob = suggestedBlob
+				existing.suppressTerminalAnimations = suppressTerminalAnimations
+				existing.schemaVersion = GameRunPersistSchema.currentVersion
+				existing.analyticsSessionID = gameSessionID
+			} else {
+				let inserted = StoredGameRun(
+					id: id,
+					createdAt: createdAt,
+					updatedAt: now,
+					displayTitle: title,
+					transcriptBlob: transcriptBlob,
+					health: health,
+					mana: mana,
+					maxHealth: maxHealth,
+					maxMana: maxMana,
+					diceValue: diceValue,
+					pendingDiceRoll: pendingDiceRoll,
+					diceRevealStageRaw: GameRunSnapshotMapper.diceRevealStageRaw(diceRevealStage),
+					diceResultText: diceResultText,
+					invalidInputAttempts: invalidInputAttempts,
+					contextualInput: contextualInput,
+					contextActionRaw: GameRunSnapshotMapper.contextActionRaw(contextAction),
+					uiPhaseRaw: GameRunSnapshotMapper.uiPhaseRaw(uiPhase),
+					suggestedOptionsBlob: suggestedBlob,
+					suppressTerminalAnimations: suppressTerminalAnimations,
+					isEphemeralTutorial: false,
+					schemaVersion: GameRunPersistSchema.currentVersion,
+					analyticsSessionID: gameSessionID
+				)
+				modelContext.insert(inserted)
+			}
+			try modelContext.save()
+			persistedRunID = id
+		} catch {
+			#if DEBUG
+				print("GameViewModel persist failed: \(error)")
+			#endif
+		}
 	}
 
 	func getImage() {
@@ -76,6 +200,7 @@ final class GameViewModel {
 		}
 		guard !loading else { return false }
 
+		suppressTerminalAnimations = false
 		suggestedOptions = []
 		loading = true
 		uiPhase = .awaitingDungeonMaster
@@ -181,6 +306,7 @@ final class GameViewModel {
 			withTransaction(idleTransaction) {
 				diceRevealStage = .idle
 			}
+			persistRun()
 		}
 	}
 
@@ -209,12 +335,15 @@ final class GameViewModel {
 		uiPhase = .result
 
 		onCompletedPlayerAction?()
+
+		persistRun()
 	}
 
 	private func fetchNarrative(for prompt: String, turnID: String, startedAt: Date) async {
 		loading = true
 		defer {
 			loading = false
+			persistRun()
 			onCompletedPlayerAction?()
 		}
 
@@ -241,6 +370,7 @@ final class GameViewModel {
 				.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
 				.filter { !$0.isEmpty }
 			terminalEntries.append(TerminalEntry(kind: .dungeonMaster, text: result.narrative))
+			suppressTerminalAnimations = false
 			uiPhase = .result
 			applyToolEffects(turn.toolEffects)
 			AppAnalytics.capture(
@@ -344,27 +474,27 @@ final class GameViewModel {
 	private func applyRequestedAction(_ action: GameAction) {
 		switch action {
 		case .write:
-				contextAction = .write
-				uiPhase = .composing
-				coordinator?.prepareForTextInput()
-				AppAnalytics.capture(
-					"dm_action_requested",
-					properties: [
-						"game_session_id": gameSessionID,
-						"action": "write",
-					])
+			contextAction = .write
+			uiPhase = .composing
+			coordinator?.prepareForTextInput()
+			AppAnalytics.capture(
+				"dm_action_requested",
+				properties: [
+					"game_session_id": gameSessionID,
+					"action": "write",
+				])
 		case .roll:
-				contextAction = .roll
-				uiPhase = .rollingDice
-				diceRevealStage = .idle
-				pendingDiceRoll = nil
-				coordinator?.showDicePrompt()
-				AppAnalytics.capture(
-					"dm_action_requested",
-					properties: [
-						"game_session_id": gameSessionID,
-						"action": "roll",
-					])
+			contextAction = .roll
+			uiPhase = .rollingDice
+			diceRevealStage = .idle
+			pendingDiceRoll = nil
+			coordinator?.showDicePrompt()
+			AppAnalytics.capture(
+				"dm_action_requested",
+				properties: [
+					"game_session_id": gameSessionID,
+					"action": "roll",
+				])
 		}
 	}
 }

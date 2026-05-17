@@ -5,8 +5,8 @@
 //  Created by Cursor on 04/05/26.
 //
 
-import SwiftUI
 import Foundation
+import SwiftUI
 
 struct ProfileView: View {
 	@Environment(AppCoordinator.self) private var coordinator
@@ -28,7 +28,9 @@ struct ProfileView: View {
 				header
 
 				ProfileSection(title: String(localized: "nan_profile_section_identity"), accent: .accent) {
-					ProfileKeyValueRow(key: String(localized: "nan_profile_key_callsign"), value: String(localized: "nan_profile_value_wizard"))
+					ProfileKeyValueRow(
+						key: String(localized: "nan_profile_key_callsign"),
+						value: String(localized: "nan_profile_value_wizard"))
 					if let loginSnapshot = authSessionStore.loginSnapshot {
 						ProfileKeyValueRow(
 							key: String(localized: "nan_profile_key_account"),
@@ -70,10 +72,18 @@ struct ProfileView: View {
 				}
 
 				ProfileSection(title: String(localized: "nan_profile_section_counters"), accent: .terminalWarning) {
-					ProfileCounterRow(key: String(localized: "nan_profile_key_runs_started"), value: runsStarted, isLoading: !countersHydrated)
-					ProfileCounterRow(key: String(localized: "nan_profile_key_victories"), value: runsVictories, isLoading: !countersHydrated)
-					ProfileCounterRow(key: String(localized: "nan_profile_key_defeats"), value: runsDefeats, isLoading: !countersHydrated)
-					ProfileCounterRow(key: String(localized: "nan_profile_key_best_streak"), value: bestStreak, isLoading: !countersHydrated)
+					ProfileCounterRow(
+						key: String(localized: "nan_profile_key_runs_started"), value: runsStarted,
+						isLoading: !countersHydrated)
+					ProfileCounterRow(
+						key: String(localized: "nan_profile_key_victories"), value: runsVictories,
+						isLoading: !countersHydrated)
+					ProfileCounterRow(
+						key: String(localized: "nan_profile_key_defeats"), value: runsDefeats,
+						isLoading: !countersHydrated)
+					ProfileCounterRow(
+						key: String(localized: "nan_profile_key_best_streak"), value: bestStreak,
+						isLoading: !countersHydrated)
 
 					Text("nan_profile_counters_footnote")
 						.font(.monocraft(relativeTo: .caption2, weight: .semibold))

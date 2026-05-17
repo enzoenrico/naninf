@@ -5,11 +5,13 @@
 //  Created by Enzo Enrico on 01/12/25.
 //
 
+import SwiftData
 import SwiftUI
 import TipKit
 
 struct GameView: View {
 	@Environment(AppCoordinator.self) private var coordinator
+	@Environment(\.modelContext) private var modelContext
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@State private var vm = GameViewModel()
 
@@ -20,12 +22,23 @@ struct GameView: View {
 			showsTips: true,
 			onNavigateBack: {
 				AppAnalytics.capture("game_back_tapped")
+				vm.saveSnapshot(modelContext: modelContext)
 				TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 					coordinator.resetGamePresentation()
 					coordinator.back()
 				}
 			}
 		)
+		.onAppear {
+			vm.modelContext = modelContext
+			if let runID = coordinator.consumePendingResumeRunID() {
+				vm.restore(runID: runID, modelContext: modelContext)
+				coordinator.applyResumePresentationState()
+			}
+		}
+		.onDisappear {
+			vm.saveSnapshot(modelContext: modelContext)
+		}
 	}
 }
 
@@ -262,7 +275,10 @@ struct GameSessionView: View {
 	@ViewBuilder
 	private func terminalEntryView(entry: TerminalEntry, vm: GameViewModel, coordinator: AppCoordinator) -> some View {
 		let isLatest = entry.id == vm.terminalEntries.last?.id
-		let useTypewriter = isLatest && (entry.kind == .dungeonMaster || entry.kind == .system)
+		let useTypewriter =
+			!vm.suppressTerminalAnimations
+			&& isLatest
+			&& (entry.kind == .dungeonMaster || entry.kind == .system)
 
 		if useTypewriter {
 			TypeWriterView(entry.renderedText, embedsScrollView: false) {

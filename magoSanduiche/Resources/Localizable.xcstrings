@@ -1738,13 +1738,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start a new run from the hub. Your progress is saved between sessions in the next patch."
+            "value" : "Start a new run from the hub. Every turn is saved on this device."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comece uma nova run no hub. Seu progresso será salvo entre sessões no próximo patch."
+            "value" : "Comece uma nova run no hub. Cada turno é salvo neste aparelho."
           }
         }
       }
@@ -1802,13 +1802,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Auto-save will land here once the dungeon writes its first checkpoint."
+            "value" : "Resume any run below. Swipe to delete a save from this device."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O salvamento automático aparecerá aqui quando a masmorra gravar o primeiro checkpoint."
+            "value" : "Retome qualquer run abaixo. Deslize para apagar um save deste aparelho."
           }
         }
       }
@@ -1825,6 +1825,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Carregar uma run anterior"
+          }
+        }
+      }
+    },
+    "nan_load_resume_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens this saved run."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre esta run salva."
+          }
+        }
+      }
+    },
+    "nan_load_run_stats_format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HP %1$d/%2$d  ·  MP %3$d/%4$d"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PV %1$d/%2$d  ·  PM %3$d/%4$d"
+          }
+        }
+      }
+    },
+    "nan_load_run_title_fallback_format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run — %@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run — %@"
           }
         }
       }

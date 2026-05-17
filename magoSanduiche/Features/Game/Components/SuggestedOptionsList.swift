@@ -158,7 +158,7 @@ private struct SuggestedOptionRow: View {
 			.padding(.horizontal, horizontalPadding)
 			.padding(.vertical, 12)
 			.frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-			.background(Color.terminalSurface)
+			//.background(Color.terminalSurface)
 			.drawBorder(nil, color: borderColor, lineWidth: 1)
 		}
 		.buttonStyle(SuggestedOptionButtonStyle())
@@ -192,7 +192,7 @@ private struct SuggestedOptionRow: View {
 				.frame(height: 1)
 				.accessibilityHidden(true)
 		}
-		.background(Color.terminalSurface)
+		//.background(Color.terminalSurface)
 		.drawBorder(nil, color: borderColor, lineWidth: 1)
 		.accessibilityElement(children: .contain)
 		.accessibilityLabel(text)
@@ -233,11 +233,11 @@ private struct SuggestedOptionConfirmButtonStyle: ButtonStyle {
 
 	func makeBody(configuration: Configuration) -> some View {
 		configuration.label
-			.background(
-				configuration.isPressed && !reduceMotion
-					? Color.terminalActiveSurface.opacity(0.55)
-					: Color.terminalSurface.opacity(0.001)
-			)
+			//.background(
+			//	configuration.isPressed && !reduceMotion
+			//		? Color.terminalActiveSurface.opacity(0.55)
+			//		: Color.terminalSurface.opacity(0.001)
+			//)
 			.opacity(configuration.isPressed ? 0.92 : 1)
 			.scaleEffect(configuration.isPressed && !reduceMotion ? TerminalMotion.pressScale : 1)
 			.animation(

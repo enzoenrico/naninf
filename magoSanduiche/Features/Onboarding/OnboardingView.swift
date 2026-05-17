@@ -5,8 +5,8 @@
 //  Created by Enzo Enrico on 09/12/25.
 //
 
-import SwiftUI
 import Foundation
+import SwiftUI
 
 struct OnboardingView: View {
 	@Environment(AppCoordinator.self) private var coordinator
@@ -62,10 +62,12 @@ struct OnboardingView: View {
 	#endif
 
 	private func handlePrimaryAction() {
-		AppAnalytics.capture("onboarding_primary_tapped", properties: onboardingProperties.merging([
-			"can_continue": vm.canContinue,
-			"is_final_page": vm.isOnFinalPage
-		]) { _, new in new })
+		AppAnalytics.capture(
+			"onboarding_primary_tapped",
+			properties: onboardingProperties.merging([
+				"can_continue": vm.canContinue,
+				"is_final_page": vm.isOnFinalPage,
+			]) { _, new in new })
 
 		if vm.isOnFinalPage {
 			vm.persistResponsesOnUnlock()
@@ -90,7 +92,7 @@ struct OnboardingView: View {
 			"selected_pain_point_ids": Array(vm.responses.selectedPainPointIDs),
 			"selected_preference_ids": Array(vm.responses.selectedPreferenceIDs),
 			"completed_demo_actions": vm.completedDemoActions,
-			"demo_action_target": vm.demoActionTarget
+			"demo_action_target": vm.demoActionTarget,
 		]
 		if let selectedGoalID = vm.responses.selectedGoalID {
 			properties["selected_goal_id"] = selectedGoalID
@@ -219,8 +221,6 @@ private struct WelcomeOnboardingScreen: View {
 	}
 }
 
-
-
 private struct QuestionScreen: View {
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -243,14 +243,18 @@ private struct QuestionScreen: View {
 						isSelected: vm.isSelected(option, for: kind),
 						allowsMultipleSelection: allowsMultipleSelection
 					) {
-						AppAnalytics.capture("onboarding_option_selected", properties: [
-							"step": String(describing: vm.currentStep),
-							"option_kind": String(describing: kind),
-							"option_id": option.id,
-							"allows_multiple_selection": allowsMultipleSelection,
-							"was_selected": vm.isSelected(option, for: kind)
-						])
-						TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.optionToggleAnimation) {
+						AppAnalytics.capture(
+							"onboarding_option_selected",
+							properties: [
+								"step": String(describing: vm.currentStep),
+								"option_kind": String(describing: kind),
+								"option_id": option.id,
+								"allows_multiple_selection": allowsMultipleSelection,
+								"was_selected": vm.isSelected(option, for: kind),
+							])
+						TerminalMotion.perform(
+							reduceMotion: reduceMotion, animation: TerminalMotion.optionToggleAnimation
+						) {
 							allowsMultipleSelection ? vm.toggle(option, for: kind) : vm.selectSingle(option, for: kind)
 						}
 					}
@@ -328,8 +332,8 @@ private struct SocialProofScreen: View {
 							testimonial.quote
 						)
 					)
-						.font(.monocraft(relativeTo: .callout))
-						.foregroundStyle(Color.accent)
+					.font(.monocraft(relativeTo: .callout))
+					.foregroundStyle(Color.accent)
 					Text(
 						String(
 							format: String(localized: "nan_onboarding_testimonial_attribution_format"),
@@ -337,8 +341,8 @@ private struct SocialProofScreen: View {
 							testimonial.persona
 						)
 					)
-						.font(.monocraft(relativeTo: .caption2, weight: .semibold))
-						.foregroundStyle(Color.terminalMutedText)
+					.font(.monocraft(relativeTo: .caption2, weight: .semibold))
+					.foregroundStyle(Color.terminalMutedText)
 				}
 				.padding(14)
 				.frame(maxWidth: .infinity, alignment: .leading)
@@ -458,7 +462,7 @@ private struct DemoOnboardingScreen: View {
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 	let vm: OnboardingViewModel
-	@State private var gameVM = GameViewModel()
+	@State private var gameVM = GameViewModel(persistRunsToLibrary: false)
 	@State private var demoCoordinator = AppCoordinator()
 	@State private var isDemoPresented = false
 	@State private var hasAutoPresentedDemo = false
@@ -480,9 +484,9 @@ private struct DemoOnboardingScreen: View {
 					vm.demoProgressText
 				)
 			)
-				.font(.monocraft(relativeTo: .caption, weight: .semibold))
-				.foregroundStyle(Color.terminalWarning)
-				.frame(maxWidth: .infinity, alignment: .leading)
+			.font(.monocraft(relativeTo: .caption, weight: .semibold))
+			.foregroundStyle(Color.terminalWarning)
+			.frame(maxWidth: .infinity, alignment: .leading)
 
 			VStack(alignment: .leading, spacing: 10) {
 				Text(String(localized: "nan_onboarding_demo_bullet_fullscreen"))
@@ -498,11 +502,13 @@ private struct DemoOnboardingScreen: View {
 			.drawBorder(String(localized: "nan_onboarding_demo_mode_border"), color: .terminalMana, lineWidth: 1)
 
 			Button {
-				AppAnalytics.capture("onboarding_demo_opened", properties: [
-					"completed_demo_actions": vm.completedDemoActions,
-					"demo_action_target": vm.demoActionTarget,
-					"is_resume": vm.completedDemoActions > 0
-				])
+				AppAnalytics.capture(
+					"onboarding_demo_opened",
+					properties: [
+						"completed_demo_actions": vm.completedDemoActions,
+						"demo_action_target": vm.demoActionTarget,
+						"is_resume": vm.completedDemoActions > 0,
+					])
 				isDemoPresented = true
 			} label: {
 				Text(
@@ -513,9 +519,9 @@ private struct DemoOnboardingScreen: View {
 							: String(localized: "nan_onboarding_demo_cta_resume")
 					)
 				)
-					.font(.monocraft(relativeTo: .headline, weight: .semibold))
-					.frame(maxWidth: .infinity)
-					.padding(.vertical, 14)
+				.font(.monocraft(relativeTo: .headline, weight: .semibold))
+				.frame(maxWidth: .infinity)
+				.padding(.vertical, 14)
 			}
 			.buttonStyle(OnboardingPrimaryButtonStyle())
 		}
@@ -523,10 +529,12 @@ private struct DemoOnboardingScreen: View {
 			guard vm.completedDemoActions < vm.demoActionTarget else { return }
 			guard !hasAutoPresentedDemo else { return }
 			hasAutoPresentedDemo = true
-			AppAnalytics.capture("onboarding_demo_auto_presented", properties: [
-				"completed_demo_actions": vm.completedDemoActions,
-				"demo_action_target": vm.demoActionTarget
-			])
+			AppAnalytics.capture(
+				"onboarding_demo_auto_presented",
+				properties: [
+					"completed_demo_actions": vm.completedDemoActions,
+					"demo_action_target": vm.demoActionTarget,
+				])
 			isDemoPresented = true
 		}
 		.fullScreenCover(isPresented: $isDemoPresented) {
@@ -536,10 +544,12 @@ private struct DemoOnboardingScreen: View {
 				demoCoordinator: demoCoordinator,
 				onCompletedPlayerAction: handleCompletedPlayerAction
 			) {
-				AppAnalytics.capture("onboarding_demo_closed", properties: [
-					"completed_demo_actions": vm.completedDemoActions,
-					"demo_action_target": vm.demoActionTarget
-				])
+				AppAnalytics.capture(
+					"onboarding_demo_closed",
+					properties: [
+						"completed_demo_actions": vm.completedDemoActions,
+						"demo_action_target": vm.demoActionTarget,
+					])
 				isDemoPresented = false
 			}
 		}
@@ -547,17 +557,21 @@ private struct DemoOnboardingScreen: View {
 
 	private func handleCompletedPlayerAction() {
 		let shouldShowPaywall = vm.recordCompletedDemoAction()
-		AppAnalytics.capture("onboarding_demo_action_completed", properties: [
-			"completed_demo_actions": vm.completedDemoActions,
-			"demo_action_target": vm.demoActionTarget,
-			"did_complete_demo": shouldShowPaywall
-		])
+		AppAnalytics.capture(
+			"onboarding_demo_action_completed",
+			properties: [
+				"completed_demo_actions": vm.completedDemoActions,
+				"demo_action_target": vm.demoActionTarget,
+				"did_complete_demo": shouldShowPaywall,
+			])
 		guard shouldShowPaywall else { return }
 
-		AppAnalytics.capture("onboarding_demo_completed", properties: [
-			"completed_demo_actions": vm.completedDemoActions,
-			"demo_action_target": vm.demoActionTarget
-		])
+		AppAnalytics.capture(
+			"onboarding_demo_completed",
+			properties: [
+				"completed_demo_actions": vm.completedDemoActions,
+				"demo_action_target": vm.demoActionTarget,
+			])
 		isDemoPresented = false
 		Task { @MainActor in
 			try? await Task.sleep(for: .milliseconds(250))
@@ -584,8 +598,8 @@ private struct DemoGameCover: View {
 						vm.demoProgressText
 					)
 				)
-					.font(.monocraft(relativeTo: .caption, weight: .semibold))
-					.foregroundStyle(Color.terminalWarning)
+				.font(.monocraft(relativeTo: .caption, weight: .semibold))
+				.foregroundStyle(Color.terminalWarning)
 
 				Spacer()
 

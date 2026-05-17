@@ -354,7 +354,8 @@ private struct AsciiMediaConfiguration {
 	var characters = AsciiMediaView.defaultCharacters
 	var frameRate = 8.0
 	var maxVideoFrames = 180
-	var foreground = Color.accent
+	/// When `nil`, uses adaptive terminal styling (matches light/dark like other terminal surfaces).
+	var foreground: Color?
 	var background = Color.clear
 	var fontSize: CGFloat = 8
 	var placeholderHeight: CGFloat = 360
@@ -383,6 +384,15 @@ private struct AsciiMediaConfiguration {
 			maxVideoFrames: maxVideoFrames,
 			cellSize: cellSize
 		)
+	}
+
+	func resolvedForeground(for colorScheme: ColorScheme) -> Color {
+		if let foreground { return foreground }
+		switch colorScheme {
+		case .light: return Color.primary.opacity(0.82)
+		case .dark: return Color.terminalMana
+		@unknown default: return Color.primary.opacity(0.82)
+		}
 	}
 }
 
@@ -416,6 +426,8 @@ private struct AsciiMediaCanvas: View {
 	let frame: AsciiMediaFrame
 	let configuration: AsciiMediaConfiguration
 
+	@Environment(\.colorScheme) private var colorScheme
+
 	var body: some View {
 		Canvas { context, size in
 			context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(configuration.background))
@@ -444,11 +456,12 @@ private struct AsciiMediaCanvas: View {
 		context.scaleBy(x: scale, y: scale)
 
 		let font = Font.monocraft(size: configuration.fontSize)
+		let asciiForeground = configuration.resolvedForeground(for: colorScheme)
 		for (index, row) in frame.rows.enumerated() {
 			let point = CGPoint(x: 0, y: CGFloat(index) * frame.cellSize.height)
 			let text = Text(row)
 				.font(font)
-				.foregroundStyle(configuration.foreground)
+				.foregroundStyle(asciiForeground)
 			context.draw(text, at: point, anchor: .topLeading)
 		}
 	}

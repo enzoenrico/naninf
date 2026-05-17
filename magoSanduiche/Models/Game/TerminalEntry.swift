@@ -28,9 +28,15 @@ enum TerminalEntryKind {
 }
 
 struct TerminalEntry: Identifiable {
-	let id = UUID()
+	let id: UUID
 	let kind: TerminalEntryKind
 	let text: String
+
+	init(id: UUID = UUID(), kind: TerminalEntryKind, text: String) {
+		self.id = id
+		self.kind = kind
+		self.text = text
+	}
 
 	var renderedText: String {
 		"\(kind.prefix)\n\(text)"

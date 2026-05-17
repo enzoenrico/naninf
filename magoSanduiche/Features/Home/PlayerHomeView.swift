@@ -125,6 +125,9 @@ struct PlayerHomeView: View {
 				"route": String(describing: item.route),
 			])
 		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
+			if item.route == .game {
+				coordinator.beginFreshGame()
+			}
 			coordinator.navigate(to: item.route)
 		}
 	}

@@ -5,6 +5,7 @@
 //  Created by Enzo Enrico on 01/12/25.
 //
 
+import SwiftData
 import SwiftUI
 
 @main
@@ -21,6 +22,7 @@ struct magoSanduicheApp: App {
 				.background(Color.background)
 				.font(.monocraft())
 				.environment(authSessionStore)
+				.modelContainer(for: StoredGameRun.self)
 				.task {
 					await authSessionStore.start()
 				}

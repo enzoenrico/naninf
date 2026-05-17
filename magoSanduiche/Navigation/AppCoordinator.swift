@@ -14,7 +14,35 @@ final class AppCoordinator {
 	var hasCompletedInitialText = false
 	var showActionButton = false
 
+	/// When set, the next `GameView` appearance resumes this run from SwiftData.
+	private var pendingResumeRunID: UUID?
+
 	private var isUpdatingPresentationState = false
+
+	func beginFreshGame() {
+		pendingResumeRunID = nil
+	}
+
+	func beginResume(runID: UUID) {
+		pendingResumeRunID = runID
+	}
+
+	func consumePendingResumeRunID() -> UUID? {
+		let id = pendingResumeRunID
+		pendingResumeRunID = nil
+		return id
+	}
+
+	/// After restoring a run, match chrome to an in-progress session (typewriter is suppressed in the VM).
+	func applyResumePresentationState() {
+		updatePresentationState {
+			hasCompletedInitialText = true
+			showActionButton = true
+			isImageCollapsed = false
+			isContextualInputVisible = false
+			isDicePromptVisible = false
+		}
+	}
 
 	var isImageCollapsed = true {
 		didSet {
@@ -37,11 +65,13 @@ final class AppCoordinator {
 	}
 
 	func handleContextualAction(_ action: GameAction, onSubmit: () -> Bool) {
-		AppAnalytics.capture("game_contextual_action_tapped", properties: [
-			"action": String(describing: action),
-			"is_contextual_input_visible": isContextualInputVisible,
-			"is_dice_prompt_visible": isDicePromptVisible
-		])
+		AppAnalytics.capture(
+			"game_contextual_action_tapped",
+			properties: [
+				"action": String(describing: action),
+				"is_contextual_input_visible": isContextualInputVisible,
+				"is_dice_prompt_visible": isDicePromptVisible,
+			])
 
 		switch action {
 		case .write:
@@ -110,32 +140,40 @@ final class AppCoordinator {
 		guard hasCompletedInitialText else { return }
 		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 			isImageCollapsed.toggle()
-			AppAnalytics.capture("game_image_toggled", properties: [
-				"is_collapsed": isImageCollapsed
-			])
+			AppAnalytics.capture(
+				"game_image_toggled",
+				properties: [
+					"is_collapsed": isImageCollapsed
+				])
 		}
 	}
 
 	func navigate(to route: AppRoute) {
-		AppAnalytics.capture("navigation_route_opened", properties: [
-			"route": String(describing: route),
-			"path_depth_before": path.count
-		])
+		AppAnalytics.capture(
+			"navigation_route_opened",
+			properties: [
+				"route": String(describing: route),
+				"path_depth_before": path.count,
+			])
 		path.append(route)
 	}
 
 	func back() {
 		guard !path.isEmpty else { return }
-		AppAnalytics.capture("navigation_back_tapped", properties: [
-			"path_depth_before": path.count
-		])
+		AppAnalytics.capture(
+			"navigation_back_tapped",
+			properties: [
+				"path_depth_before": path.count
+			])
 		path.removeLast()
 	}
 
 	func popToRoot() {
-		AppAnalytics.capture("navigation_pop_to_root", properties: [
-			"path_depth_before": path.count
-		])
+		AppAnalytics.capture(
+			"navigation_pop_to_root",
+			properties: [
+				"path_depth_before": path.count
+			])
 		path.removeLast(path.count)
 	}
 

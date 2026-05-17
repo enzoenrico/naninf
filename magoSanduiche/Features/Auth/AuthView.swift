@@ -49,26 +49,12 @@ struct AuthView: View {
 		}
 	}
 
-	private var asciiForeground: Color {
-		switch colorScheme {
-		case .light: Color.primary.opacity(0.82)
-		case .dark: Color.terminalMana
-		@unknown default: Color.primary.opacity(0.82)
-		}
-	}
-
-	private var asciiBackground: Color {
-		Color.clear
-	}
-
 	private var authHero: some View {
 		VStack(alignment: .leading, spacing: 12) {
 			AsciiMediaView(catalogVideoNamed: "mageOpening")
 				.asciiScaleMode(.fill)
 				.asciiColumns(160)
 				.asciiFontSize(7)
-				.asciiColor(asciiForeground)
-				.asciiBackground(asciiBackground)
 				.frame(maxWidth: .infinity)
 				.padding(.vertical, Spacing.sm)
 
