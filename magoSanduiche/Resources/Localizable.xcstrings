@@ -370,6 +370,22 @@
         }
       }
     },
+    "nan_a11y_confirm_dice" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RECORD DICE ROLL IN TRANSCRIPT"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "REGISTRAR ROLAGEM NO TRANSCRITO"
+          }
+        }
+      }
+    },
     "nan_a11y_action_send_command" : {
       "localizations" : {
         "en" : {
@@ -782,6 +798,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "> ROLAR D20"
+          }
+        }
+      }
+    },
+    "nan_action_confirm_dice" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> RECORD ROLL"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> REGISTRAR ROLAGEM"
           }
         }
       }

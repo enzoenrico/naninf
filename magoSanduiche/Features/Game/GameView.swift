@@ -290,7 +290,8 @@ struct GameSessionView: View {
 				type: vm.contextAction,
 				isInputVisible: coordinator.isContextualInputVisible,
 				isLoading: vm.loading,
-				phase: vm.uiPhase
+				phase: vm.uiPhase,
+				confirmDiceOutcome: vm.pendingDiceRoll != nil
 			) {
 				submitPrimaryAction(vm: vm, coordinator: coordinator)
 			}
@@ -311,7 +312,13 @@ struct GameSessionView: View {
 			}
 		case .roll:
 			if coordinator.isDicePromptVisible {
-				vm.rollDice(reduceMotion: reduceMotion)
+				if vm.pendingDiceRoll != nil {
+					TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
+						vm.commitDiceRollOutcome()
+					}
+				} else {
+					vm.rollDice(reduceMotion: reduceMotion)
+				}
 			} else {
 				TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 					coordinator.handleContextualAction(.roll) { false }

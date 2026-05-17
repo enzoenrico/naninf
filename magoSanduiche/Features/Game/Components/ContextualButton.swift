@@ -13,6 +13,8 @@ struct ContextualButton: View {
 	var isInputVisible = false
 	var isLoading = false
 	var phase: GameUIPhase = .ready
+	/// When true with `.roll`, primary action commits the pending outcome instead of rolling again.
+	var confirmDiceOutcome = false
 	var action: () -> Void
 
 	var body: some View {
@@ -29,7 +31,7 @@ struct ContextualButton: View {
 						color: .terminalWarning
 					)
 				} else {
-					Image(type.buttonImage.rawValue)
+					Image(displayedIcon.rawValue)
 						.renderingMode(.template)
 						.foregroundStyle(Color.accent)
 				}
@@ -52,6 +54,13 @@ struct ContextualButton: View {
 		@ObserveInjection var forceRedraw
 	#endif
 
+	private var displayedIcon: Icons {
+		if type == .roll, confirmDiceOutcome {
+			return .ink
+		}
+		return type.buttonImage
+	}
+
 	private var buttonTitle: String {
 		if isLoading {
 			switch phase {
@@ -63,7 +72,11 @@ struct ContextualButton: View {
 				String(localized: "nan_button_loading_processing")
 			}
 		} else {
-			type.buttonTitle(isInputVisible: isInputVisible)
+			if type == .roll, confirmDiceOutcome {
+				String(localized: "nan_action_confirm_dice")
+			} else {
+				type.buttonTitle(isInputVisible: isInputVisible)
+			}
 		}
 	}
 
@@ -84,7 +97,9 @@ struct ContextualButton: View {
 					? String(localized: "nan_a11y_action_send_command")
 					: String(localized: "nan_a11y_action_write_command")
 			case .roll:
-				String(localized: "nan_a11y_action_roll_d20")
+				confirmDiceOutcome
+					? String(localized: "nan_a11y_confirm_dice")
+					: String(localized: "nan_a11y_action_roll_d20")
 			}
 		}
 	}

@@ -27,6 +27,8 @@ final class GameViewModel {
 	var maxMana = 18
 	var diceValue = 20
 	var diceRevealStage = DiceRevealStage.idle
+	/// After reveal animation; transcript and stat effects apply only after `commitDiceRollOutcome()`.
+	var pendingDiceRoll: Int?
 	var diceResultText = String(localized: "nan_dice_idle_cold")
 	var invalidInputAttempts = 0
 	var contextualInput = ""
@@ -122,12 +124,11 @@ final class GameViewModel {
 
 	func rollDice(reduceMotion: Bool = false) {
 		guard !loading else { return }
+		guard pendingDiceRoll == nil else { return }
 
 		loading = true
 		uiPhase = .rollingDice
 		diceResultText = String(localized: "nan_dice_rolling")
-		let healthBeforeRoll = health
-		let manaBeforeRoll = mana
 		AppAnalytics.capture(
 			"dice_roll_started",
 			properties: [
@@ -168,24 +169,10 @@ final class GameViewModel {
 			withAnimation(TerminalMotion.diceRevealAnimation(reduceMotion: reduceMotion)) {
 				diceRevealStage = .bamReveal
 			}
-			resolveDiceRoll(finalRoll)
+			updateDiceOutcomePreview(for: finalRoll)
 			try? await Task.sleep(for: .seconds(DiceRollRevealTiming.bamRevealSeconds(reduceMotion: reduceMotion)))
 
-			AppAnalytics.capture(
-				"dice_roll_completed",
-				properties: [
-					"game_session_id": gameSessionID,
-					"roll": finalRoll,
-					"outcome": diceOutcomeName(for: finalRoll),
-					"health_before": healthBeforeRoll,
-					"health_after": health,
-					"health_delta": health - healthBeforeRoll,
-					"mana_before": manaBeforeRoll,
-					"mana_after": mana,
-					"mana_delta": mana - manaBeforeRoll,
-				])
-			contextAction = .write
-			coordinator?.finishDicePrompt()
+			pendingDiceRoll = finalRoll
 			loading = false
 			uiPhase = .result
 
@@ -194,9 +181,34 @@ final class GameViewModel {
 			withTransaction(idleTransaction) {
 				diceRevealStage = .idle
 			}
-
-			onCompletedPlayerAction?()
 		}
+	}
+
+	func commitDiceRollOutcome() {
+		guard let roll = pendingDiceRoll else { return }
+		pendingDiceRoll = nil
+
+		let healthBeforeRoll = health
+		let manaBeforeRoll = mana
+		resolveDiceRoll(roll)
+		AppAnalytics.capture(
+			"dice_roll_completed",
+			properties: [
+				"game_session_id": gameSessionID,
+				"roll": roll,
+				"outcome": diceOutcomeName(for: roll),
+				"health_before": healthBeforeRoll,
+				"health_after": health,
+				"health_delta": health - healthBeforeRoll,
+				"mana_before": manaBeforeRoll,
+				"mana_after": mana,
+				"mana_delta": mana - manaBeforeRoll,
+			])
+		contextAction = .write
+		coordinator?.finishDicePrompt()
+		uiPhase = .result
+
+		onCompletedPlayerAction?()
 	}
 
 	private func fetchNarrative(for prompt: String, turnID: String, startedAt: Date) async {
@@ -260,19 +272,35 @@ final class GameViewModel {
 		uiPhase = .result
 	}
 
-	private func resolveDiceRoll(_ roll: Int) {
-		let outcome: String
+	private func applyDiceMechanics(for roll: Int) {
 		switch roll {
 		case 1...6:
 			health = max(0, health - 2)
-			outcome = String(format: String(localized: "nan_dice_outcome_low"), roll)
 		case 7...14:
-			outcome = String(format: String(localized: "nan_dice_outcome_mid"), roll)
+			break
 		default:
 			mana = min(maxMana, mana + 2)
-			outcome = String(format: String(localized: "nan_dice_outcome_high"), roll)
 		}
+	}
 
+	private func diceOutcomeDescription(for roll: Int) -> String {
+		switch roll {
+		case 1...6:
+			String(format: String(localized: "nan_dice_outcome_low"), roll)
+		case 7...14:
+			String(format: String(localized: "nan_dice_outcome_mid"), roll)
+		default:
+			String(format: String(localized: "nan_dice_outcome_high"), roll)
+		}
+	}
+
+	private func updateDiceOutcomePreview(for roll: Int) {
+		diceResultText = diceOutcomeDescription(for: roll)
+	}
+
+	private func resolveDiceRoll(_ roll: Int) {
+		applyDiceMechanics(for: roll)
+		let outcome = diceOutcomeDescription(for: roll)
 		diceResultText = outcome
 		terminalEntries.append(TerminalEntry(kind: .dice, text: outcome))
 	}
@@ -329,6 +357,7 @@ final class GameViewModel {
 				contextAction = .roll
 				uiPhase = .rollingDice
 				diceRevealStage = .idle
+				pendingDiceRoll = nil
 				coordinator?.showDicePrompt()
 				AppAnalytics.capture(
 					"dm_action_requested",
