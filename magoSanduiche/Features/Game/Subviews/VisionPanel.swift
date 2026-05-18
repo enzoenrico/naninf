@@ -21,9 +21,7 @@ struct VisionPanel: View {
 		ZStack(alignment: .topLeading) {
 			AsciiMediaView(catalogVideoNamed: "mageOpening")
 				.asciiScaleMode(.fill)
-				.padding(24)
-				.frame(maxWidth: .infinity)
-				.frame(height: isCollapsed ? 0 : 220)
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
 				.opacity(isLoading ? 0.55 : 1)
 
 			Text(
@@ -40,7 +38,7 @@ struct VisionPanel: View {
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
 			}
 		}
-		.frame(maxWidth: .infinity)
+		.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 		.drawBorder(String(localized: "nan_vision_panel_title"), color: .terminalMana, lineWidth: 1)
 		.clipped()
 		.accessibilityLabel(
@@ -97,6 +95,7 @@ struct CollapsedVisionBar: View {
 			.frame(maxWidth: .infinity)
 		}
 		.buttonStyle(.plain)
+		.fixedSize(horizontal: false, vertical: true)
 		.drawBorder(nil, color: Color.terminalMutedText.opacity(0.7), lineWidth: 1)
 		.accessibilityLabel(String(localized: "nan_vision_collapsed_a11y"))
 	}

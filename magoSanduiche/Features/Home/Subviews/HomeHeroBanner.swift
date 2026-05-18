@@ -11,17 +11,17 @@ struct HomeHeroBanner: View {
 	let tagline: String
 
 	var body: some View {
-		VStack(alignment: .leading) {
+		VStack(alignment: .leading, spacing: Spacing.sm) {
 			AsciiMediaView(catalogVideoNamed: "mageOpening")
 				.asciiScaleMode(.fill)
 				.asciiColumns(228)
 				.asciiFontSize(8)
 				.frame(maxWidth: .infinity, maxHeight: .infinity)
-				.padding(.vertical, Spacing.layoutTop)
+				.layoutPriority(1)
 
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
 				TypeWriterView(tagline, embedsScrollView: false, lineLimit: 2)
-					.frame(maxHeight: 44, alignment: .leading)
+					.fixedSize(horizontal: false, vertical: true)
 			}
 			.padding(Spacing.xl)
 		}

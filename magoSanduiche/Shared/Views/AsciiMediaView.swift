@@ -122,7 +122,11 @@ struct AsciiMediaView: View {
 
 	var body: some View {
 		content
-			.frame(maxWidth: .infinity)
+			.frame(
+				maxWidth: .infinity,
+				maxHeight: configuration.scaleMode == .fill ? .infinity : nil
+			)
+			.frame(minHeight: configuration.scaleMode == .fill ? configuration.fillLayoutMinHeight : nil)
 			.background(configuration.background)
 			.clipped()
 			.task(id: loadIdentity) {
@@ -186,8 +190,7 @@ struct AsciiMediaView: View {
 				.aspectRatio(frame.displayAspectRatio, contentMode: .fit)
 		case .fill:
 			AsciiMediaCanvas(frame: frame, configuration: configuration)
-				.aspectRatio(frame.displayAspectRatio, contentMode: .fit)
-				.frame(maxWidth: .infinity)
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
 				.clipped()
 		}
 	}
@@ -362,6 +365,11 @@ private struct AsciiMediaConfiguration {
 	/// Used when aspect ratio is unknown but the source is video (avoids a tall `minHeight` placeholder).
 	var fallbackVideoAspectRatio: CGFloat = 16.0 / 9.0
 
+	/// Minimum height for `.fill` when the parent has not yet proposed a bounded height.
+	var fillLayoutMinHeight: CGFloat {
+		max(88, min(placeholderHeight * 0.25, 160))
+	}
+
 	var sanitizedCharacters: String {
 		let characters = characters.filter { character in
 			!character.isNewline && !character.unicodeScalars.contains { CharacterSet.controlCharacters.contains($0) }
@@ -487,7 +495,14 @@ private struct AsciiMediaStatusView: View {
 
 	var body: some View {
 		Group {
-			if let ratio = effectiveAspectRatio {
+			if configuration.scaleMode == .fill {
+				Color.clear
+					.frame(maxWidth: .infinity, maxHeight: .infinity)
+					.frame(minHeight: configuration.fillLayoutMinHeight)
+					.overlay(alignment: .topLeading) {
+						statusContent.padding(12)
+					}
+			} else if let ratio = effectiveAspectRatio {
 				Color.clear
 					.aspectRatio(ratio, contentMode: .fit)
 					.frame(maxWidth: .infinity)

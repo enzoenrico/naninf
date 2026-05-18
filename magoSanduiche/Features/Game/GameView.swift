@@ -60,6 +60,9 @@ struct GameSessionView: View {
 
 	@AppStorage("hasSeenGameTips") private var hasSeenGameTips = false
 
+	/// Dice strip + bordered action panel + primary contextual button (worst-case session chrome).
+	private static let gameActionColumnMinHeight: CGFloat = 220
+
 	#if DEBUG
 		@State private var showAIToolsDebug = false
 	#endif
@@ -107,11 +110,27 @@ struct GameSessionView: View {
 				.zIndex(2)
 
 				VStack(spacing: 12) {
-					sceneImage(coordinator: coordinator, vm: vm, shouldShowTips: shouldShowTips)
-					actionPanel(coordinator: coordinator, vm: vm, shouldShowTips: shouldShowTips)
-					actionButton(coordinator: coordinator, vm: vm, shouldShowTips: shouldShowTips)
+					if coordinator.isImageCollapsed {
+						sceneImage(coordinator: coordinator, vm: vm, shouldShowTips: shouldShowTips)
+							.fixedSize(horizontal: false, vertical: true)
+					} else {
+						sceneImage(coordinator: coordinator, vm: vm, shouldShowTips: shouldShowTips)
+							// .frame(maxHeight: .infinity, alignment: .top)
+              .frame(alignment: .top)
+							.layoutPriority(1)
+					}
+
+					VStack(spacing: 12) {
+						actionPanel(coordinator: coordinator, vm: vm, shouldShowTips: shouldShowTips)
+						actionButton(coordinator: coordinator, vm: vm, shouldShowTips: shouldShowTips)
+					}
+					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+					.layoutPriority(coordinator.isImageCollapsed ? 1 : 0)
+					.frame(minHeight: Self.gameActionColumnMinHeight)
 				}
+				.frame(maxHeight: .infinity)
 			}
+			.frame(maxHeight: .infinity)
 		}
 		.animation(
 			TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: inlineResponseStatus?.id
@@ -172,6 +191,7 @@ struct GameSessionView: View {
 			)
 			.popoverTipIf(imageSectionTip, arrowEdge: .top, when: shouldShowTips)
 			.terminalPanelTransition(edge: .top)
+			.accessibilityAddTraits(.isButton)
 			.onTapGesture {
 				coordinator.toggleImage(reduceMotion: reduceMotion)
 			}
@@ -187,8 +207,7 @@ struct GameSessionView: View {
 			terminalPanel(coordinator: coordinator, vm: vm)
 		}
 		.popoverTipIf(actionAreaTip, arrowEdge: .top, when: shouldShowTips)
-		.frame(maxWidth: .infinity)
-		.layoutPriority(1)
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
 	}
 
 	private func terminalPanel(coordinator: AppCoordinator, vm: GameViewModel) -> some View {
@@ -216,6 +235,7 @@ struct GameSessionView: View {
 			}
 
 			terminalTranscript(vm: vm, coordinator: coordinator)
+				.layoutPriority(1)
 
 			if coordinator.isContextualInputVisible {
 				if vm.contextAction == .write, !vm.suggestedOptions.isEmpty {
@@ -243,6 +263,7 @@ struct GameSessionView: View {
 			}
 		}
 		.padding(12)
+		.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 	}
 
 	@ViewBuilder
@@ -267,7 +288,7 @@ struct GameSessionView: View {
 			.frame(maxWidth: .infinity, alignment: .leading)
 		}
 		.defaultScrollAnchor(.bottom)
-		.frame(maxWidth: .infinity)
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.clipped()
 		.padding(.horizontal, 4)
 	}

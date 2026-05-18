@@ -21,6 +21,13 @@ struct PlayerHomeView: View {
 	private let menu = HomeMenuItem.menu
 	private var tagline: String { String(localized: "nan_home_tagline") }
 
+	/// Four menu rows at 48pt min height plus 10pt inter-row spacing (DESIGN.md touch targets).
+	private static let homeMenuMinHeight: CGFloat = {
+		let rowCount = CGFloat(HomeMenuItem.menu.count)
+		let rowSpacing = CGFloat(max(0, HomeMenuItem.menu.count - 1)) * 10
+		return rowCount * 48 + rowSpacing
+	}()
+
 	private var focusedMenuKey: String {
 		menu.first(where: { $0.id == focusedItemID })?.key ?? "P"
 	}
@@ -28,16 +35,20 @@ struct PlayerHomeView: View {
 	var body: some View {
 		AppLayout(
 			background: .gradient,
-			contentPadding: EdgeInsets(top: 10, leading: 0, bottom: 0, trailing: 0)
+			contentPadding: EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0)
 		) {
 			CRTReveal {
 				VStack(spacing: 18) {
 					HomeHeroBanner(tagline: tagline)
 						.padding(.horizontal, 20)
-					Spacer()
+						.frame(maxHeight: .infinity)
+						.layoutPriority(1)
+
 					menuList
-					Spacer(minLength: 0)
+						.layoutPriority(0)
+						.frame(minHeight: Self.homeMenuMinHeight)
 				}
+				.frame(maxHeight: .infinity)
 			}
 		}
 		.safeAreaInset(edge: .top, spacing: 0) {

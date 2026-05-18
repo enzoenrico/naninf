@@ -21,8 +21,9 @@ struct ActionStack<Content: View>: View {
 		VStack(alignment: .center, spacing: 10) {
 			content()
 				.drawBorder(title, lineWidth: 2)
-				.frame(width: .infinity, height: .infinity)
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
 		}
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.enableInjection()
 	}
 
