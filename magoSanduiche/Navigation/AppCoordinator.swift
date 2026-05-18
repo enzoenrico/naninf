@@ -14,10 +14,23 @@ final class AppCoordinator {
 	var hasCompletedInitialText = false
 	var showActionButton = false
 
+	/// Keeps in-flight `fetchNarrative` work alive after `GameView` is popped so the DM turn can finish and persist.
+	private(set) var pendingNarrativeFetch: Task<Void, Never>?
+
 	/// When set, the next `GameView` appearance resumes this run from SwiftData.
 	private var pendingResumeRunID: UUID?
 
 	private var isUpdatingPresentationState = false
+
+	/// Register the narrative task so navigation away from the game does not drop the async fetch.
+	func replacePendingNarrativeFetch(_ task: Task<Void, Never>) {
+		pendingNarrativeFetch = task
+	}
+
+	/// Call when narrative fetch completes (success, failure, or cancellation).
+	func clearPendingNarrativeFetch() {
+		pendingNarrativeFetch = nil
+	}
 
 	func beginFreshGame() {
 		pendingResumeRunID = nil

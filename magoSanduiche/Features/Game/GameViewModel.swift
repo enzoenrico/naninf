@@ -10,6 +10,10 @@ import Foundation
 import SwiftData
 import SwiftUI
 
+#if canImport(UIKit)
+	import UIKit
+#endif
+
 @Observable
 @MainActor
 final class GameViewModel {
@@ -219,9 +223,20 @@ final class GameViewModel {
 				"mana": mana,
 			])
 
-		Task {
+		// Detached from SwiftUI so leaving `GameView` does not cancel the fetch; coordinator keeps a strong ref.
+		let narrativeTask = Task.detached(priority: .userInitiated) { @MainActor [self] in
+			#if canImport(UIKit)
+				var backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "dm_narrative") {}
+				defer {
+					if backgroundTaskID != .invalid {
+						UIApplication.shared.endBackgroundTask(backgroundTaskID)
+						backgroundTaskID = .invalid
+					}
+				}
+			#endif
 			await fetchNarrative(for: trimmed, turnID: turnID, startedAt: startedAt)
 		}
+		coordinator?.replacePendingNarrativeFetch(narrativeTask)
 
 		return true
 	}
@@ -342,6 +357,7 @@ final class GameViewModel {
 	private func fetchNarrative(for prompt: String, turnID: String, startedAt: Date) async {
 		loading = true
 		defer {
+			coordinator?.clearPendingNarrativeFetch()
 			loading = false
 			persistRun()
 			onCompletedPlayerAction?()
