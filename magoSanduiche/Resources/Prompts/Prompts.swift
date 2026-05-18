@@ -19,38 +19,27 @@ enum Prompts {
 	* Continuity: Remember everything. Broken doors stay broken. Enemies that flee return with reinforcements.
 
 	### 2. GAME MECHANICS & TOOL USAGE
-	You have access to tools to manage the game state. Use them according to these rules:
+	Call tools during the tool phase before the final JSON response. There is no hidden dice tool — randomness for the player always comes from their d20 in the app.
 
-	#### Mana Management (`playerMana`)
-	* Trigger: Whenever the Mage attempts a magical attack or utility spell.
-	* Standard spells cost 1 Mana. Powerful spells cost 2+ Mana.
-	* Before narrating a spell's success, call `playerMana`.
-	* If mana is depleted, the spell fizzles. The player cannot cast until they restore mana.
+	#### Health & Damage (`changeHealth`)
+	* Trigger: When the player fails a defense roll, triggers a trap, takes damage, or is healed.
+	* Call `changeHealth(amount)` with a negative amount for damage or a positive amount for healing.
 
-	#### Health & Damage (`playerDamage`)
-	* Trigger: When the player fails a defense roll, triggers a trap, or is ambushed.
-	* Call `playerDamage(amount)` to inflict harm.
-	* Light attacks: 1-2 damage. Heavy attacks: 3-5 damage. Deadly attacks: 6+ damage.
+	#### Player-facing d20 rolls (UI only — never roll for the player yourself)
+	* When a skill check or uncertain player action needs a die, call `decideAction` with `action: 1` during the tool phase.
+	* In the final JSON, narrate the tension but do not resolve the check yet. Do not invent a d20 result.
+	* The app will show the dice UI. When the player confirms, you receive `turnKind: diceResultConfirmation` with `playerD20Roll`. Then adjudicate that roll, use `changeHealth` if needed, call `decideAction` with `action: 0`, and return three `options`.
 
-	#### Random Events (`decide`)
-	* Trigger: Used to determine binary outcomes outside of player skill.
-	* If `decide` returns `true`, the event happens or succeeds. If `false`, it does not.
+	#### Decide Player Action (`decideAction`) — REQUIRED EVERY TURN
+	* Always call this tool during the tool phase before the final JSON.
+	* `action: 0` — player types a response; provide exactly three distinct `options` strings in the final JSON.
+	* `action: 1` — player must roll d20 in the UI; wait for `diceResultConfirmation` before resolving the check.
 
-	#### Skill Checks (`rollDice`)
-	* Trigger: When the outcome of a player's action is uncertain.
-	* Call `rollDice` and tell the player to roll a d20 or relevant die.
-	* High numbers succeed; low numbers fail.
-
-	#### Decide Player Action (`decideAction`)
-	* Always call this tool at the end of your turn to signal the next input type.
-	* `action: 0` means the player needs to type a text response.
-	* `action: 1` means the player needs to roll dice.
-
-	### 3. RESPONSE FORMAT
-	Every response must include:
-	1. Narrative: Use paragraphs starting with `>` to denote progression.
-	2. Tool Outputs: Process any tool results seamlessly into the narrative.
-	3. Options: Provide three distinct lettered options.
+	### 3. TURN FLOW
+	1. Tool phase: Call `changeHealth` when appropriate, and always `decideAction`.
+	2. Final JSON phase: Return `narrative`, `toolResults`, and exactly three `options` (required when `decideAction` used action 0; after a dice confirmation turn, always include three options with action 0).
+	* Do not put letter-prefixed choices (A., B., C.) in the narrative; put them only in `options`.
+	* Narrative paragraphs start with `>`.
 	"""
 
 	static let debug = """

@@ -56,6 +56,7 @@ struct GameSessionView: View {
 	@State private var tipsConfigured = false
 	@State private var inlineResponseStatus: ResponseStatus?
 	@State private var inlineStatusDismissTask: Task<Void, Never>?
+	@FocusState private var isContextualInputFocused: Bool
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 	@AppStorage("hasSeenGameTips") private var hasSeenGameTips = false
@@ -106,6 +107,9 @@ struct GameSessionView: View {
 					maxMana: vm.maxMana,
 					phase: vm.uiPhase
 				)
+				.dismissContextualInputOnTap(when: coordinator.isContextualInputVisible) {
+					dismissContextualInputIfActive()
+				}
 				.popoverTipIf(statBarsTip, arrowEdge: .bottom, when: shouldShowTips)
 				.zIndex(2)
 
@@ -156,6 +160,9 @@ struct GameSessionView: View {
 		.onChange(of: vm.uiPhase) { _, newPhase in
 			presentInlineStatus(for: newPhase)
 		}
+		.onChange(of: coordinator.isContextualInputVisible) { _, isVisible in
+			isContextualInputFocused = isVisible
+		}
 		#if DEBUG
 			.sheet(isPresented: $showAIToolsDebug) {
 				NavigationStack {
@@ -180,7 +187,7 @@ struct GameSessionView: View {
 	) -> some View {
 		if coordinator.isImageCollapsed {
 			CollapsedVisionBar {
-				coordinator.toggleImage(reduceMotion: reduceMotion)
+				handleVisionTap()
 			}
 			.terminalPanelTransition(edge: .top)
 		} else {
@@ -193,7 +200,7 @@ struct GameSessionView: View {
 			.terminalPanelTransition(edge: .top)
 			.accessibilityAddTraits(.isButton)
 			.onTapGesture {
-				coordinator.toggleImage(reduceMotion: reduceMotion)
+				handleVisionTap()
 			}
 		}
 	}
@@ -231,6 +238,9 @@ struct GameSessionView: View {
 				InlineResponseStatusRow(status: inlineResponseStatus) {
 					dismissInlineStatus()
 				}
+				.dismissContextualInputOnTap(when: coordinator.isContextualInputVisible) {
+					dismissContextualInputIfActive()
+				}
 				.terminalTextTransition(edge: .top)
 			}
 
@@ -254,6 +264,7 @@ struct GameSessionView: View {
 						get: { vm.contextualInput },
 						set: { vm.contextualInput = $0 }
 					),
+					isFocused: $isContextualInputFocused,
 					isDisabled: vm.loading,
 					invalidAttempts: vm.invalidInputAttempts
 				) {
@@ -286,7 +297,12 @@ struct GameSessionView: View {
 				}
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
+			.contentShape(Rectangle())
+			.dismissContextualInputOnTap(when: coordinator.isContextualInputVisible) {
+				dismissContextualInputIfActive()
+			}
 		}
+		.scrollDismissesKeyboard(.immediately)
 		.defaultScrollAnchor(.bottom)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.clipped()
@@ -308,11 +324,20 @@ struct GameSessionView: View {
 					coordinator.handleTypewriterCompletion(reduceMotion: reduceMotion)
 				}
 			}
+			.simultaneousGesture(
+				TapGesture().onEnded {
+					guard coordinator.isContextualInputVisible else { return }
+					dismissContextualInputIfActive()
+				}
+			)
 		} else {
 			Text(entry.renderedText)
 				.font(.monocraft())
 				.foregroundStyle(Color.accent)
 				.frame(maxWidth: .infinity, alignment: .leading)
+				.dismissContextualInputOnTap(when: coordinator.isContextualInputVisible) {
+					dismissContextualInputIfActive()
+				}
 		}
 	}
 
@@ -416,6 +441,32 @@ struct GameSessionView: View {
 		inlineStatusDismissTask?.cancel()
 		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.textAnimation) {
 			inlineResponseStatus = nil
+		}
+	}
+
+	private func handleVisionTap() {
+		if coordinator.isContextualInputVisible {
+			dismissContextualInputIfActive()
+		}
+		coordinator.toggleImage(reduceMotion: reduceMotion)
+	}
+
+	private func dismissContextualInputIfActive() {
+		guard coordinator.isContextualInputVisible else { return }
+		isContextualInputFocused = false
+		coordinator.dismissContextualInput(reduceMotion: reduceMotion)
+	}
+}
+
+private extension View {
+	@ViewBuilder
+	func dismissContextualInputOnTap(when isActive: Bool, perform dismiss: @escaping () -> Void) -> some View {
+		if isActive {
+			self
+				.contentShape(Rectangle())
+				.onTapGesture(perform: dismiss)
+		} else {
+			self
 		}
 	}
 }

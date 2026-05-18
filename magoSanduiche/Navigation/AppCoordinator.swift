@@ -113,6 +113,14 @@ final class AppCoordinator {
 		}
 	}
 
+	func dismissContextualInput(reduceMotion: Bool = false) {
+		guard isContextualInputVisible else { return }
+		AppAnalytics.capture("game_text_input_dismissed")
+		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
+			isContextualInputVisible = false
+		}
+	}
+
 	func showDicePrompt() {
 		AppAnalytics.capture("game_dice_prompt_opened")
 		updatePresentationState {

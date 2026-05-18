@@ -1348,6 +1348,38 @@
         }
       }
     },
+    "nan_dice_player_confirmed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmed d20 roll: %lld"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmei o d20: %lld"
+          }
+        }
+      }
+    },
+    "nan_dice_roll_revealed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rolled %lld"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rolou %lld"
+          }
+        }
+      }
+    },
     "nan_dice_panel_title" : {
       "localizations" : {
         "en" : {
@@ -1408,6 +1440,70 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "O mestre da masmorra permanece em silêncio."
+          }
+        }
+      }
+    },
+    "nan_dm_fallback_option_caution" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proceed with caution"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avançar com cautela"
+          }
+        }
+      }
+    },
+    "nan_dm_fallback_option_explore" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explore the surroundings"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explorar os arredores"
+          }
+        }
+      }
+    },
+    "nan_dm_fallback_option_generic" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consider another approach (%lld)"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Considerar outra abordagem (%lld)"
+          }
+        }
+      }
+    },
+    "nan_dm_fallback_option_observe" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Study the scene carefully"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Observar a cena com atenção"
           }
         }
       }

@@ -52,29 +52,60 @@ final class OpenAIService {
 		model: Model = .gpt4_o,
 		analyticsContext: AIAnalyticsContext? = nil
 	) async throws -> AITurnResult<T> {
-		let fullPrompt = "\(prompt)\n\n\(schemaInstruction(for: type))"
-		conversationHistory.append(.init(role: .user, content: fullPrompt)!)
+		conversationHistory.append(.init(role: .user, content: prompt)!)
 
-		let turn = try await runAgentLoop(
-			tools: tools,
-			toolDefinitions: tools.map(\.openAIToolDefinition),
-			responseFormat: .jsonObject,
-			model: model,
-			analyticsContext: analyticsContext
-		)
+		let toolDefinitions = tools.map(\.openAIToolDefinition)
+		var toolEffects: [GameToolEffect] = []
 
-		guard let jsonData = turn.output.data(using: .utf8) else {
-			throw OpenAIServiceError.decodingFailed("Failed to convert response to data")
-		}
-
-		do {
-			let output = try JSONDecoder().decode(T.self, from: jsonData)
-			return AITurnResult(output: output, toolEffects: turn.toolEffects)
-		} catch {
-			throw OpenAIServiceError.decodingFailed(
-				"\(error.localizedDescription)\nRaw content: \(turn.output)"
+		if !tools.isEmpty {
+			toolEffects = try await runToolCallingPhase(
+				tools: tools,
+				toolDefinitions: toolDefinitions,
+				model: model,
+				analyticsContext: analyticsContext
 			)
 		}
+
+		conversationHistory.append(.init(role: .system, content: structuredFinalInstruction(for: type))!)
+
+		var lastRawContent = ""
+		let maxDecodeAttempts = 2
+
+		for decodeAttempt in 0..<maxDecodeAttempts {
+			let finalTurn = try await runAgentLoop(
+				tools: [],
+				toolDefinitions: [],
+				responseFormat: .jsonObject,
+				model: model,
+				analyticsContext: analyticsContext,
+				options: AgentLoopOptions(phase: .structuredOutput, acceptContentAsFinal: true)
+			)
+			lastRawContent = finalTurn.output
+
+			guard let jsonData = lastRawContent.data(using: .utf8) else {
+				throw OpenAIServiceError.decodingFailed("Failed to convert response to data")
+			}
+
+			do {
+				let output = try JSONDecoder().decode(T.self, from: jsonData)
+				return AITurnResult(output: output, toolEffects: toolEffects)
+			} catch {
+				if decodeAttempt + 1 >= maxDecodeAttempts {
+					throw OpenAIServiceError.decodingFailed(
+						"\(error.localizedDescription)\nRaw content: \(lastRawContent)"
+					)
+				}
+				conversationHistory.append(
+					.init(
+						role: .system,
+						content:
+							"Your previous response was invalid or incomplete. \(schemaInstruction(for: type))"
+					)!
+				)
+			}
+		}
+
+		throw OpenAIServiceError.decodingFailed("Failed to decode structured output after retries")
 	}
 
 	func generate(
@@ -90,7 +121,8 @@ final class OpenAIService {
 			toolDefinitions: tools.map(\.openAIToolDefinition),
 			responseFormat: nil,
 			model: model,
-			analyticsContext: analyticsContext
+			analyticsContext: analyticsContext,
+			options: AgentLoopOptions(phase: .toolCalling, acceptContentAsFinal: true)
 		)
 	}
 
@@ -98,6 +130,13 @@ final class OpenAIService {
 		conversationHistory = []
 		guard !instructions.isEmpty else { return }
 		conversationHistory.append(.init(role: .system, content: instructions)!)
+	}
+
+	private func structuredFinalInstruction<T: StructuredOutput>(for type: T.Type) -> String {
+		"""
+		Produce the final turn as JSON now. Do not call any tools.
+		\(schemaInstruction(for: type))
+		"""
 	}
 
 	private func schemaInstruction<T: StructuredOutput>(for type: T.Type) -> String {
@@ -109,6 +148,194 @@ final class OpenAIService {
 			CRITICAL: Match the types exactly - strings must be plain text strings, arrays must be arrays of strings.
 			Return ONLY the JSON object with actual data values, NOT the schema definition.
 			"""
+	}
+
+	private static let decideActionNudge = """
+		You must call the decideAction tool before the final JSON response. \
+		Use action 0 for text input with suggestions, or action 1 when the player must roll dice.
+		"""
+
+	private func hasRequestAction(in effects: [GameToolEffect]) -> Bool {
+		effects.contains {
+			if case .requestAction = $0 { return true }
+			return false
+		}
+	}
+
+	private func runToolCallingPhase(
+		tools: [AnyModelTool],
+		toolDefinitions: [ChatQuery.ChatCompletionToolParam],
+		model: Model,
+		analyticsContext: AIAnalyticsContext?
+	) async throws -> [GameToolEffect] {
+		#if DEBUG
+			if Self.isDebugStubBypassingNetwork {
+				return try await runDebugStubToolPhase(
+					tools: tools,
+					analyticsContext: analyticsContext
+				)
+			}
+		#endif
+
+		let traceID = analyticsContext?.turnID ?? UUID().uuidString
+		let sessionID = analyticsContext?.sessionID
+		let turnStartedAt = Date()
+		var accumulatedUsage = TokenUsageAccumulator()
+		var accumulatedToolEffects: [GameToolEffect] = []
+		var decideActionNudges = 0
+		let maxDecideActionNudges = 1
+
+		for iteration in 0..<maxIterations {
+			let requestPayload = jsonObject(from: conversationHistory)
+			let spanID = UUID().uuidString
+			let requestStartedAt = Date()
+			let toolChoice: ChatQuery.ChatCompletionFunctionCallOptionParam? =
+				!hasRequestAction(in: accumulatedToolEffects) && decideActionNudges > 0
+				? .function(DecideActionTool.name)
+				: nil
+
+			let query = ChatQuery(
+				messages: conversationHistory,
+				model: model,
+				responseFormat: nil,
+				toolChoice: toolChoice,
+				tools: toolDefinitions.isEmpty ? nil : toolDefinitions
+			)
+
+			let result: ChatResult
+			do {
+				result = try await client.chats(query: query)
+			} catch {
+				AppAnalytics.captureAIError(
+					traceID: traceID,
+					sessionID: sessionID,
+					spanID: spanID,
+					spanName: "chat_completion",
+					model: model,
+					input: requestPayload,
+					latency: Date().timeIntervalSince(requestStartedAt),
+					error: error,
+					properties: analyticsProperties(
+						sessionID: sessionID,
+						traceID: traceID,
+						spanID: spanID,
+						iteration: iteration,
+						responseFormat: nil,
+						phase: .toolCalling,
+						extra: ["tool_definition_count": toolDefinitions.count]
+					)
+				)
+				captureAITurnFailed(
+					traceID: traceID,
+					sessionID: sessionID,
+					startedAt: turnStartedAt,
+					accumulatedUsage: accumulatedUsage,
+					error: error
+				)
+				throw error
+			}
+
+			accumulatedUsage.add(result.usage)
+			guard let message = result.choices.first?.message else {
+				let error = OpenAIServiceError.noResponseContent
+				captureSuccessfulAIGeneration(
+					result: result,
+					input: requestPayload,
+					traceID: traceID,
+					sessionID: sessionID,
+					spanID: spanID,
+					iteration: iteration,
+					responseFormat: nil,
+					phase: .toolCalling,
+					latency: Date().timeIntervalSince(requestStartedAt)
+				)
+				captureAITurnFailed(
+					traceID: traceID,
+					sessionID: sessionID,
+					startedAt: turnStartedAt,
+					accumulatedUsage: accumulatedUsage,
+					error: error
+				)
+				throw OpenAIServiceError.noResponseContent
+			}
+
+			captureSuccessfulAIGeneration(
+				result: result,
+				input: requestPayload,
+				traceID: traceID,
+				sessionID: sessionID,
+				spanID: spanID,
+				iteration: iteration,
+				responseFormat: nil,
+				phase: .toolCalling,
+				latency: Date().timeIntervalSince(requestStartedAt)
+			)
+
+			if let toolCalls = message.toolCalls, !toolCalls.isEmpty {
+				let processedToolCalls = await processAssistantToolCalls(
+					assistantText: message.content,
+					toolCalls: toolCalls,
+					tools: tools,
+					sessionID: sessionID,
+					traceID: traceID,
+					spanID: spanID,
+					iteration: iteration,
+					responseFormat: nil
+				)
+				accumulatedToolEffects.append(contentsOf: processedToolCalls.effects)
+
+				if hasRequestAction(in: accumulatedToolEffects) {
+					captureAITurnCompleted(
+						traceID: traceID,
+						sessionID: sessionID,
+						startedAt: turnStartedAt,
+						accumulatedUsage: accumulatedUsage,
+						iterationCount: iteration + 1
+					)
+					return accumulatedToolEffects
+				}
+				continue
+			}
+
+			if hasRequestAction(in: accumulatedToolEffects) {
+				captureAITurnCompleted(
+					traceID: traceID,
+					sessionID: sessionID,
+					startedAt: turnStartedAt,
+					accumulatedUsage: accumulatedUsage,
+					iterationCount: iteration + 1
+				)
+				return accumulatedToolEffects
+			}
+
+			if decideActionNudges < maxDecideActionNudges {
+				if let content = message.content, !content.isEmpty {
+					conversationHistory.append(.init(role: .assistant, content: content)!)
+				}
+				conversationHistory.append(.init(role: .system, content: Self.decideActionNudge)!)
+				decideActionNudges += 1
+				continue
+			}
+
+			captureAITurnCompleted(
+				traceID: traceID,
+				sessionID: sessionID,
+				startedAt: turnStartedAt,
+				accumulatedUsage: accumulatedUsage,
+				iterationCount: iteration + 1
+			)
+			return accumulatedToolEffects
+		}
+
+		let error = OpenAIServiceError.maxIterationsReached
+		captureAITurnFailed(
+			traceID: traceID,
+			sessionID: sessionID,
+			startedAt: turnStartedAt,
+			accumulatedUsage: accumulatedUsage,
+			error: error
+		)
+		throw error
 	}
 
 	private func schemaFieldDescriptions<T: StructuredOutput>(for type: T.Type) -> [String] {
@@ -152,27 +379,28 @@ final class OpenAIService {
 		toolDefinitions: [ChatQuery.ChatCompletionToolParam],
 		responseFormat: ChatQuery.ResponseFormat?,
 		model: Model,
-		analyticsContext: AIAnalyticsContext?
+		analyticsContext: AIAnalyticsContext?,
+		options: AgentLoopOptions = AgentLoopOptions()
 	) async throws -> AITurnResult<String> {
 		let traceID = analyticsContext?.turnID ?? UUID().uuidString
 		let sessionID = analyticsContext?.sessionID
 		let turnStartedAt = Date()
 		var accumulatedUsage = TokenUsageAccumulator()
 		var accumulatedToolEffects: [GameToolEffect] = []
+		let iterationLimit = options.maxIterations ?? maxIterations
 
 		#if DEBUG
-			if Self.isDebugStubBypassingNetwork {
-				return try await runDebugStubTurn(
-					tools: tools,
-					responseFormat: responseFormat,
+			if Self.isDebugStubBypassingNetwork, options.phase == .structuredOutput {
+				return try await runDebugStubStructuredPhase(
 					traceID: traceID,
 					sessionID: sessionID,
-					turnStartedAt: turnStartedAt
+					turnStartedAt: turnStartedAt,
+					toolEffects: []
 				)
 			}
 		#endif
 
-		for iteration in 0..<maxIterations {
+		for iteration in 0..<iterationLimit {
 			let requestPayload = jsonObject(from: conversationHistory)
 			let spanID = UUID().uuidString
 			let requestStartedAt = Date()
@@ -202,6 +430,7 @@ final class OpenAIService {
 						spanID: spanID,
 						iteration: iteration,
 						responseFormat: responseFormat,
+						phase: options.phase,
 						extra: ["tool_definition_count": toolDefinitions.count]
 					)
 				)
@@ -226,6 +455,7 @@ final class OpenAIService {
 					spanID: spanID,
 					iteration: iteration,
 					responseFormat: responseFormat,
+					phase: options.phase,
 					latency: Date().timeIntervalSince(requestStartedAt)
 				)
 				captureAITurnFailed(
@@ -246,6 +476,7 @@ final class OpenAIService {
 				spanID: spanID,
 				iteration: iteration,
 				responseFormat: responseFormat,
+				phase: options.phase,
 				latency: Date().timeIntervalSince(requestStartedAt)
 			)
 
@@ -261,7 +492,14 @@ final class OpenAIService {
 					responseFormat: responseFormat
 				)
 				accumulatedToolEffects.append(contentsOf: processedToolCalls.effects)
+				continue
+			}
 
+			if !options.acceptContentAsFinal {
+				if let content = message.content, !content.isEmpty {
+					conversationHistory.append(.init(role: .assistant, content: content)!)
+				}
+				conversationHistory.append(.init(role: .system, content: Self.decideActionNudge)!)
 				continue
 			}
 
@@ -341,6 +579,7 @@ final class OpenAIService {
 					spanID: spanID,
 					iteration: iteration,
 					responseFormat: responseFormat,
+					phase: .toolCalling,
 					extra: [
 						"tool_name": toolName,
 						"tool_call_id": toolCall.id,
@@ -375,6 +614,7 @@ final class OpenAIService {
 		spanID: String,
 		iteration: Int,
 		responseFormat: ChatQuery.ResponseFormat?,
+		phase: AgentPhase,
 		latency: TimeInterval
 	) {
 		let toolCallCount = result.choices.reduce(0) { count, choice in
@@ -410,6 +650,7 @@ final class OpenAIService {
 				spanID: spanID,
 				iteration: iteration,
 				responseFormat: responseFormat,
+				phase: phase,
 				extra: extra
 			)
 		)
@@ -478,6 +719,7 @@ final class OpenAIService {
 		spanID: String,
 		iteration: Int,
 		responseFormat: ChatQuery.ResponseFormat?,
+		phase: AgentPhase,
 		extra: [String: Any] = [:]
 	) -> [String: Any] {
 		var properties: [String: Any] = [
@@ -486,6 +728,7 @@ final class OpenAIService {
 			"span_id": spanID,
 			"iteration": iteration + 1,
 			"response_format": responseFormat == nil ? "text" : "json_object",
+			"agent_phase": phase.rawValue,
 		]
 		if let sessionID {
 			properties["game_session_id"] = sessionID
@@ -514,6 +757,17 @@ final class OpenAIService {
 			)!
 		)
 	}
+}
+
+private enum AgentPhase: String {
+	case toolCalling = "tools"
+	case structuredOutput = "structured"
+}
+
+private struct AgentLoopOptions {
+	var phase: AgentPhase = .toolCalling
+	var acceptContentAsFinal: Bool = true
+	var maxIterations: Int?
 }
 
 private struct ProcessedToolCalls {
@@ -588,64 +842,68 @@ extension OpenAIService {
 
 #if DEBUG
 	extension OpenAIService {
-		fileprivate func runDebugStubTurn(
+		fileprivate func runDebugStubToolPhase(
 			tools: [AnyModelTool],
-			responseFormat: ChatQuery.ResponseFormat?,
+			analyticsContext: AIAnalyticsContext?
+		) async throws -> [GameToolEffect] {
+			let traceID = analyticsContext?.turnID ?? UUID().uuidString
+			let sessionID = analyticsContext?.sessionID
+			let turnStartedAt = Date()
+			let spanID = "debug_stub_tools"
+
+			guard !tools.isEmpty else { return [] }
+
+			let syntheticToolCalls = tools.enumerated().map { index, toolType in
+				ChatQuery.ChatCompletionMessageParam.AssistantMessageParam.ToolCallParam(
+					id: "debug_stub_tool_\(index)",
+					function: .init(
+						arguments: toolType.parameters.jsonString(
+							argumentValues: toolType.parameters.defaultArgumentValues()
+						),
+						name: toolType.name
+					)
+				)
+			}
+			let processedToolCalls = await processAssistantToolCalls(
+				assistantText: nil,
+				toolCalls: syntheticToolCalls,
+				tools: tools,
+				sessionID: sessionID,
+				traceID: traceID,
+				spanID: spanID,
+				iteration: 0,
+				responseFormat: nil
+			)
+			captureAITurnCompleted(
+				traceID: traceID,
+				sessionID: sessionID,
+				startedAt: turnStartedAt,
+				accumulatedUsage: TokenUsageAccumulator(),
+				iterationCount: 1
+			)
+			return processedToolCalls.effects
+		}
+
+		fileprivate func runDebugStubStructuredPhase(
 			traceID: String,
 			sessionID: String?,
-			turnStartedAt: Date
+			turnStartedAt: Date,
+			toolEffects: [GameToolEffect]
 		) async throws -> AITurnResult<String> {
-			let accumulatedUsage = TokenUsageAccumulator()
-			let spanID = "debug_stub"
-			var summaries: [String] = []
-			var effects: [GameToolEffect] = []
-
-			if !tools.isEmpty {
-				let syntheticToolCalls = tools.enumerated().map { index, toolType in
-					ChatQuery.ChatCompletionMessageParam.AssistantMessageParam.ToolCallParam(
-						id: "debug_stub_tool_\(index)",
-						function: .init(
-							arguments: toolType.parameters.jsonString(argumentValues: toolType.parameters.defaultArgumentValues()),
-							name: toolType.name
-						)
-					)
-				}
-				let processedToolCalls = await processAssistantToolCalls(
-					assistantText: nil,
-					toolCalls: syntheticToolCalls,
-					tools: tools,
-					sessionID: sessionID,
-					traceID: traceID,
-					spanID: spanID,
-					iteration: 0,
-					responseFormat: responseFormat
-				)
-				summaries = processedToolCalls.summaries
-				effects = processedToolCalls.effects
-			}
-
-			let finalContent: String
-			if responseFormat != nil {
-				finalContent = Self.debugStubStructuredJSON(
-					userPromptSnippet: latestUserPromptText(),
-					toolSummaries: summaries
-				)
-			} else {
-				finalContent =
-					summaries.isEmpty
-					? "[DEBUG STUB] Network bypass (no tools configured)."
-					: "[DEBUG STUB] " + summaries.joined(separator: " | ")
-			}
-
+			let summaries = toolEffects.map(\.description)
+			let finalContent = Self.debugStubStructuredJSON(
+				userPromptSnippet: latestUserPromptText(),
+				toolSummaries: summaries
+			)
 			conversationHistory.append(.init(role: .assistant, content: finalContent)!)
 			captureAITurnCompleted(
 				traceID: traceID,
 				sessionID: sessionID,
 				startedAt: turnStartedAt,
-				accumulatedUsage: accumulatedUsage,
-				iterationCount: tools.isEmpty ? 1 : 2
+				accumulatedUsage: TokenUsageAccumulator(),
+				iterationCount: 1
 			)
-			return AITurnResult(output: finalContent, toolEffects: effects)
+			return AITurnResult(output: finalContent, toolEffects: toolEffects)
 		}
 
 		private static func debugStubStructuredJSON(

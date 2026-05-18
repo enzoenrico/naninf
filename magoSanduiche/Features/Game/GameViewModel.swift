@@ -30,6 +30,8 @@ final class GameViewModel {
 	private(set) var persistedRunID: UUID?
 	/// Plain transcript for loaded runs; cleared on the next player submission.
 	var suppressTerminalAnimations = false
+	/// DM requested a roll; dice chrome is shown after the latest narrative typewriter finishes.
+	private(set) var shouldShowDicePromptAfterNarrative = false
 
 	var loading = false
 	var selectedImage: CGImage?
@@ -41,7 +43,7 @@ final class GameViewModel {
 	var maxMana = 18
 	var diceValue = 20
 	var diceRevealStage = DiceRevealStage.idle
-	/// After reveal animation; transcript and stat effects apply only after `commitDiceRollOutcome()`.
+	/// After reveal animation; DM turn is sent only after `commitDiceRollOutcome()`.
 	var pendingDiceRoll: Int?
 	var diceResultText = String(localized: "nan_dice_idle_cold")
 	var invalidInputAttempts = 0
@@ -204,44 +206,23 @@ final class GameViewModel {
 		}
 		guard !loading else { return false }
 
-		suppressTerminalAnimations = false
-		suggestedOptions = []
-		loading = true
-		uiPhase = .awaitingDungeonMaster
-		terminalEntries.append(TerminalEntry(kind: .player, text: trimmed))
-		contextualInput = ""
-		let turnID = UUID().uuidString
-		let startedAt = Date()
-		AppAnalytics.capture(
-			"player_turn_submitted",
-			properties: [
-				"game_session_id": gameSessionID,
-				"turn_id": turnID,
-				"prompt_length": trimmed.count,
-				"terminal_entry_count": terminalEntries.count,
-				"health": health,
-				"mana": mana,
-			])
-
-		// Detached from SwiftUI so leaving `GameView` does not cancel the fetch; coordinator keeps a strong ref.
-		let narrativeTask = Task.detached(priority: .userInitiated) { @MainActor [self] in
-			#if canImport(UIKit)
-				var backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "dm_narrative") {}
-				defer {
-					if backgroundTaskID != .invalid {
-						UIApplication.shared.endBackgroundTask(backgroundTaskID)
-						backgroundTaskID = .invalid
-					}
-				}
-			#endif
-			await fetchNarrative(for: trimmed, turnID: turnID, startedAt: startedAt)
-		}
-		coordinator?.replacePendingNarrativeFetch(narrativeTask)
-
+		let context = dungeonMasterTurnContext(
+			kind: .playerText,
+			playerMessage: trimmed,
+			diceRoll: nil,
+			diceOutcomeSummary: nil
+		)
+		beginDungeonMasterTurn(
+			displayText: trimmed,
+			context: context,
+			analyticsEvent: "player_turn_submitted",
+			extraAnalytics: ["prompt_length": trimmed.count]
+		)
 		return true
 	}
 
 	func markNarrativeFinished() {
+		revealDeferredDicePromptIfNeeded()
 		guard !loading else { return }
 		switch uiPhase {
 		case .reading, .result:
@@ -327,34 +308,107 @@ final class GameViewModel {
 
 	func commitDiceRollOutcome() {
 		guard let roll = pendingDiceRoll else { return }
+		guard !loading else { return }
 		pendingDiceRoll = nil
 
-		let healthBeforeRoll = health
-		let manaBeforeRoll = mana
-		resolveDiceRoll(roll)
+		diceResultText = String(format: String(localized: "nan_dice_roll_revealed"), roll)
 		AppAnalytics.capture(
 			"dice_roll_completed",
 			properties: [
 				"game_session_id": gameSessionID,
 				"roll": roll,
 				"outcome": diceOutcomeName(for: roll),
-				"health_before": healthBeforeRoll,
-				"health_after": health,
-				"health_delta": health - healthBeforeRoll,
-				"mana_before": manaBeforeRoll,
-				"mana_after": mana,
-				"mana_delta": mana - manaBeforeRoll,
+				"health": health,
+				"mana": mana,
 			])
-		contextAction = .write
+
 		coordinator?.finishDicePrompt()
-		uiPhase = .result
 
-		onCompletedPlayerAction?()
-
-		persistRun()
+		let context = dungeonMasterTurnContext(
+			kind: .diceResultConfirmation,
+			playerMessage: "",
+			diceRoll: roll,
+			diceOutcomeSummary: nil
+		)
+		beginDungeonMasterTurn(
+			displayText: String(format: String(localized: "nan_dice_player_confirmed"), roll),
+			context: context,
+			analyticsEvent: "dice_result_submitted",
+			extraAnalytics: ["roll": roll, "outcome": diceOutcomeName(for: roll)]
+		)
 	}
 
-	private func fetchNarrative(for prompt: String, turnID: String, startedAt: Date) async {
+	private func dungeonMasterTurnContext(
+		kind: DungeonMasterTurnKind,
+		playerMessage: String,
+		diceRoll: Int?,
+		diceOutcomeSummary: String?
+	) -> DungeonMasterTurnContext {
+		DungeonMasterTurnContext(
+			kind: kind,
+			playerMessage: playerMessage,
+			health: health,
+			maxHealth: maxHealth,
+			mana: mana,
+			maxMana: maxMana,
+			latestDungeonMasterExcerpt: latestDungeonMasterExcerpt(),
+			diceRoll: diceRoll,
+			diceOutcomeSummary: diceOutcomeSummary
+		)
+	}
+
+	private func latestDungeonMasterExcerpt() -> String? {
+		for entry in terminalEntries.reversed() where entry.kind == .dungeonMaster {
+			let trimmed = entry.text.trimmingCharacters(in: .whitespacesAndNewlines)
+			return trimmed.isEmpty ? nil : trimmed
+		}
+		return nil
+	}
+
+	private func beginDungeonMasterTurn(
+		displayText: String,
+		context: DungeonMasterTurnContext,
+		analyticsEvent: String,
+		extraAnalytics: [String: Any] = [:]
+	) {
+		suppressTerminalAnimations = false
+		suggestedOptions = []
+		loading = true
+		uiPhase = .awaitingDungeonMaster
+		terminalEntries.append(TerminalEntry(kind: .player, text: displayText))
+		contextualInput = ""
+
+		let turnID = UUID().uuidString
+		let startedAt = Date()
+		var properties: [String: Any] = [
+			"game_session_id": gameSessionID,
+			"turn_id": turnID,
+			"turn_kind": context.kind.rawValue,
+			"terminal_entry_count": terminalEntries.count,
+			"health": health,
+			"mana": mana,
+		]
+		for (key, value) in extraAnalytics {
+			properties[key] = value
+		}
+		AppAnalytics.capture(analyticsEvent, properties: properties)
+
+		let narrativeTask = Task.detached(priority: .userInitiated) { @MainActor [self] in
+			#if canImport(UIKit)
+				var backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "dm_narrative") {}
+				defer {
+					if backgroundTaskID != .invalid {
+						UIApplication.shared.endBackgroundTask(backgroundTaskID)
+						backgroundTaskID = .invalid
+					}
+				}
+			#endif
+			await fetchNarrative(context: context, turnID: turnID, startedAt: startedAt)
+		}
+		coordinator?.replacePendingNarrativeFetch(narrativeTask)
+	}
+
+	private func fetchNarrative(context: DungeonMasterTurnContext, turnID: String, startedAt: Date) async {
 		loading = true
 		defer {
 			coordinator?.clearPendingNarrativeFetch()
@@ -366,7 +420,7 @@ final class GameViewModel {
 		do {
 			guard
 				let turn = try await dungeonMaster?.generate(
-					prompt,
+					context: context,
 					analyticsContext: AIAnalyticsContext(sessionID: gameSessionID, turnID: turnID)
 				)
 			else {
@@ -382,18 +436,20 @@ final class GameViewModel {
 			}
 
 			let result = turn.output
-			suggestedOptions = result.options
+			let normalizedOptions = result.options
 				.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
 				.filter { !$0.isEmpty }
 			terminalEntries.append(TerminalEntry(kind: .dungeonMaster, text: result.narrative))
 			suppressTerminalAnimations = false
 			uiPhase = .result
 			applyToolEffects(turn.toolEffects)
+			suggestedOptions = normalizedOptions
 			AppAnalytics.capture(
 				"dm_turn_succeeded",
 				properties: [
 					"game_session_id": gameSessionID,
 					"turn_id": turnID,
+					"turn_kind": context.kind.rawValue,
 					"duration": Date().timeIntervalSince(startedAt),
 					"narrative_length": result.narrative.count,
 					"suggested_option_count": suggestedOptions.count,
@@ -405,6 +461,7 @@ final class GameViewModel {
 				properties: [
 					"game_session_id": gameSessionID,
 					"turn_id": turnID,
+					"turn_kind": context.kind.rawValue,
 					"duration": Date().timeIntervalSince(startedAt),
 					"error_type": String(describing: type(of: error)),
 					"error_message": error.localizedDescription,
@@ -418,37 +475,8 @@ final class GameViewModel {
 		uiPhase = .result
 	}
 
-	private func applyDiceMechanics(for roll: Int) {
-		switch roll {
-		case 1...6:
-			health = max(0, health - 2)
-		case 7...14:
-			break
-		default:
-			mana = min(maxMana, mana + 2)
-		}
-	}
-
-	private func diceOutcomeDescription(for roll: Int) -> String {
-		switch roll {
-		case 1...6:
-			String(format: String(localized: "nan_dice_outcome_low"), roll)
-		case 7...14:
-			String(format: String(localized: "nan_dice_outcome_mid"), roll)
-		default:
-			String(format: String(localized: "nan_dice_outcome_high"), roll)
-		}
-	}
-
 	private func updateDiceOutcomePreview(for roll: Int) {
-		diceResultText = diceOutcomeDescription(for: roll)
-	}
-
-	private func resolveDiceRoll(_ roll: Int) {
-		applyDiceMechanics(for: roll)
-		let outcome = diceOutcomeDescription(for: roll)
-		diceResultText = outcome
-		terminalEntries.append(TerminalEntry(kind: .dice, text: outcome))
+		diceResultText = String(format: String(localized: "nan_dice_roll_revealed"), roll)
 	}
 
 	private func diceOutcomeName(for roll: Int) -> String {
@@ -487,9 +515,16 @@ final class GameViewModel {
 		}
 	}
 
+	private func revealDeferredDicePromptIfNeeded() {
+		guard shouldShowDicePromptAfterNarrative else { return }
+		shouldShowDicePromptAfterNarrative = false
+		coordinator?.showDicePrompt()
+	}
+
 	private func applyRequestedAction(_ action: GameAction) {
 		switch action {
 		case .write:
+			shouldShowDicePromptAfterNarrative = false
 			contextAction = .write
 			uiPhase = .composing
 			coordinator?.prepareForTextInput()
@@ -504,7 +539,11 @@ final class GameViewModel {
 			uiPhase = .rollingDice
 			diceRevealStage = .idle
 			pendingDiceRoll = nil
-			coordinator?.showDicePrompt()
+			if suppressTerminalAnimations {
+				coordinator?.showDicePrompt()
+			} else {
+				shouldShowDicePromptAfterNarrative = true
+			}
 			AppAnalytics.capture(
 				"dm_action_requested",
 				properties: [

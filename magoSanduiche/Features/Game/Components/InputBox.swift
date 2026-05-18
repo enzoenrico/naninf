@@ -14,16 +14,17 @@ struct InputBox: View {
 	var isDisabled: Bool
 	var invalidAttempts: Int
 	var onSubmit: () -> Void
-
-	@FocusState private var isFocused: Bool
+	@FocusState.Binding var isFocused: Bool
 
 	init(
 		with bind: Binding<String>,
+		isFocused: FocusState<Bool>.Binding,
 		isDisabled: Bool = false,
 		invalidAttempts: Int = 0,
 		onSubmit: @escaping () -> Void = {}
 	) {
 		self.textbinding = bind
+		self._isFocused = isFocused
 		self.isDisabled = isDisabled
 		self.invalidAttempts = invalidAttempts
 		self.onSubmit = onSubmit

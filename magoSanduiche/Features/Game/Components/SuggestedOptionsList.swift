@@ -26,7 +26,10 @@ struct SuggestedOptionsList: View {
 					text: option,
 					isDisabled: isDisabled,
 					expandedRowIndex: $expandedRowIndex,
-					onSelect: { onSelect(option) }
+					onSelect: {
+						expandedRowIndex = nil
+						onSelect(option)
+					}
 				)
 			}
 		}
@@ -38,13 +41,15 @@ struct SuggestedOptionsList: View {
 
 #if canImport(UIKit)
 	private enum SuggestedOptionLayout {
+		static let rowMinHeight: CGFloat = 44
+		static let collapsedLineLimit = 3
+
 		static func uiFontBody() -> UIFont {
 			let size = UIFont.preferredFont(forTextStyle: .body).pointSize
 			return UIFont(name: "Monocraft", size: size)
 				?? UIFont.monospacedSystemFont(ofSize: size, weight: .regular)
 		}
 
-		/// Whether wrapping this string to `maxWidth` needs more vertical space than `maxLines` lines.
 		static func textExceedsLineLimit(_ text: String, maxWidth: CGFloat, maxLines: Int) -> Bool {
 			guard maxWidth > 4, !text.isEmpty, maxLines > 0 else { return false }
 			let font = uiFontBody()
@@ -66,6 +71,9 @@ struct SuggestedOptionsList: View {
 	}
 #else
 	private enum SuggestedOptionLayout {
+		static let rowMinHeight: CGFloat = 44
+		static let collapsedLineLimit = 3
+
 		static func textExceedsLineLimit(_ text: String, maxWidth: CGFloat, maxLines: Int) -> Bool {
 			_ = (maxWidth, maxLines)
 			return text.count > 140
@@ -89,7 +97,6 @@ private struct SuggestedOptionRow: View {
 	@State private var measuredCardWidth: CGFloat = 0
 
 	private let horizontalPadding: CGFloat = 10
-	private let chevronBlock: CGFloat = 28
 
 	private var foregroundColor: Color {
 		isDisabled ? Color.terminalMutedText : Color.accent
@@ -100,16 +107,19 @@ private struct SuggestedOptionRow: View {
 	}
 
 	private var textColumnMaxWidth: CGFloat {
-		max(1, measuredCardWidth - horizontalPadding * 2 - chevronBlock)
+		max(1, measuredCardWidth - horizontalPadding * 2)
 	}
 
 	private var needsRevealStep: Bool {
 		if measuredCardWidth > 50 {
-			return SuggestedOptionLayout.textExceedsLineLimit(text, maxWidth: textColumnMaxWidth, maxLines: 3)
+			return SuggestedOptionLayout.textExceedsLineLimit(
+				text,
+				maxWidth: textColumnMaxWidth,
+				maxLines: SuggestedOptionLayout.collapsedLineLimit
+			)
 		}
 		let roughLines = 1 + text.filter(\.isNewline).count
-		let longRun = text.count > 140 || roughLines >= 4
-		return longRun
+		return text.count > 140 || roughLines >= 4
 	}
 
 	private var isExpanded: Bool {
@@ -118,20 +128,33 @@ private struct SuggestedOptionRow: View {
 
 	var body: some View {
 		Group {
-			if !needsRevealStep || isExpanded {
+			if needsRevealStep, isExpanded {
 				expandedCard
 			} else {
 				collapsedCard
 			}
 		}
-		.background(
-			GeometryReader { geo in
-				Color.clear
-					.task(id: geo.size.width) {
-						measuredCardWidth = geo.size.width
-					}
-			}
-		)
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.onGeometryChange(for: CGFloat.self, of: \.size.width) { width in
+			measuredCardWidth = width
+		}
+	}
+
+	private func optionLabel(lineLimit: Int?) -> some View {
+		HStack(alignment: .top, spacing: 8) {
+			Text(">")
+				.font(.monocraft(relativeTo: .headline, weight: .semibold))
+				.foregroundStyle(foregroundColor)
+			Text(text)
+				.font(.monocraft(relativeTo: .body))
+				.multilineTextAlignment(.leading)
+				.lineLimit(lineLimit)
+				.truncationMode(.tail)
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.foregroundStyle(foregroundColor)
+		}
+		.padding(.horizontal, horizontalPadding)
+		.padding(.vertical, 12)
 	}
 
 	private var collapsedCard: some View {
@@ -143,22 +166,10 @@ private struct SuggestedOptionRow: View {
 				onSelect()
 			}
 		} label: {
-			HStack(alignment: .top, spacing: 8) {
-				Text(">")
-					.font(.monocraft(relativeTo: .headline, weight: .semibold))
-					.foregroundStyle(foregroundColor)
-				Text(text)
-					.font(.monocraft(relativeTo: .body))
-					.multilineTextAlignment(.leading)
-					.lineLimit(needsRevealStep ? 3 : nil)
-					.truncationMode(.tail)
-					.frame(maxWidth: .infinity, alignment: .leading)
-					.foregroundStyle(foregroundColor)
-			}
-			.padding(.horizontal, horizontalPadding)
-			.padding(.vertical, 12)
-			.frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-			//.background(Color.terminalSurface)
+			optionLabel(
+				lineLimit: needsRevealStep ? SuggestedOptionLayout.collapsedLineLimit : nil
+			)
+			.frame(maxWidth: .infinity, minHeight: SuggestedOptionLayout.rowMinHeight, alignment: .leading)
 			.drawBorder(nil, color: borderColor, lineWidth: 1)
 		}
 		.buttonStyle(SuggestedOptionButtonStyle())
@@ -172,27 +183,31 @@ private struct SuggestedOptionRow: View {
 	private var expandedCard: some View {
 		VStack(alignment: .leading, spacing: 0) {
 			ScrollView {
-				HStack(alignment: .top, spacing: 8) {
-					Text(">")
-						.font(.monocraft(relativeTo: .headline, weight: .semibold))
-						.foregroundStyle(foregroundColor)
-					Text(text)
-						.font(.monocraft(relativeTo: .body))
-						.multilineTextAlignment(.leading)
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.foregroundStyle(foregroundColor)
-				}
-				.padding(.horizontal, horizontalPadding)
-				.padding(.vertical, 12)
+				optionLabel(lineLimit: nil)
 			}
-			.frame(maxHeight: SuggestedOptionLayout.expandedScrollMaxHeight())
+			.frame(
+				minHeight: SuggestedOptionLayout.rowMinHeight,
+				maxHeight: SuggestedOptionLayout.expandedScrollMaxHeight()
+			)
 
 			Rectangle()
 				.fill(Color.accent.opacity(0.35))
 				.frame(height: 1)
 				.accessibilityHidden(true)
+
+			Button {
+				guard !isDisabled else { return }
+				onSelect()
+			} label: {
+				Text(String(localized: "nan_suggested_action_tap_again"))
+					.font(.monocraft(relativeTo: .callout, weight: .semibold))
+					.foregroundStyle(foregroundColor)
+					.frame(maxWidth: .infinity, minHeight: SuggestedOptionLayout.rowMinHeight)
+			}
+			.buttonStyle(SuggestedOptionConfirmButtonStyle())
+			.disabled(isDisabled)
 		}
-		//.background(Color.terminalSurface)
+		.frame(maxWidth: .infinity, alignment: .leading)
 		.drawBorder(nil, color: borderColor, lineWidth: 1)
 		.accessibilityElement(children: .contain)
 		.accessibilityLabel(text)
@@ -233,11 +248,6 @@ private struct SuggestedOptionConfirmButtonStyle: ButtonStyle {
 
 	func makeBody(configuration: Configuration) -> some View {
 		configuration.label
-			//.background(
-			//	configuration.isPressed && !reduceMotion
-			//		? Color.terminalActiveSurface.opacity(0.55)
-			//		: Color.terminalSurface.opacity(0.001)
-			//)
 			.opacity(configuration.isPressed ? 0.92 : 1)
 			.scaleEffect(configuration.isPressed && !reduceMotion ? TerminalMotion.pressScale : 1)
 			.animation(
@@ -251,8 +261,8 @@ private struct SuggestedOptionConfirmButtonStyle: ButtonStyle {
 	#Preview {
 		SuggestedOptionsList(
 			options: [
-				"A. Raise a magical barrier to block the strike.",
-				"B. Dive to the side and try to kick its legs.",
+				"Cast a defensive spell to prepare for an attack and hold your ground while the shadows close in.",
+				"Advance cautiously toward the shadowy figure to confront it.",
 			],
 			isDisabled: false,
 			onSelect: { _ in }
