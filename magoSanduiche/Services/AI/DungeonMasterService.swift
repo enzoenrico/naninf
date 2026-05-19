@@ -76,6 +76,11 @@ protocol DungeonMasterModelClient: AnyObject {
 	) async throws -> AITurnResult<PromptOutput>
 
 	func clearHistory()
+
+	func generateSceneImage(
+		prompt: String,
+		analyticsContext: AIAnalyticsContext?
+	) async throws -> URL
 }
 
 extension OpenAIService: DungeonMasterModelClient {
@@ -157,6 +162,40 @@ final class DungeonMasterService {
 
 	func clearHistory() {
 		service.clearHistory()
+	}
+
+	func generateSceneMedia(
+		visualPrompt: String,
+		analyticsContext: AIAnalyticsContext? = nil
+	) async throws -> SceneMediaResource {
+		let trimmed = visualPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+		guard !trimmed.isEmpty else { throw SceneMediaError.emptyPrompt }
+
+		var properties: [String: Any] = [
+			"prompt_length": trimmed.count,
+		]
+		if let sessionID = analyticsContext?.sessionID {
+			properties["game_session_id"] = sessionID
+		}
+		if let turnID = analyticsContext?.turnID {
+			properties["turn_id"] = turnID
+		}
+		AppAnalytics.capture("vision_scene_generate_started", properties: properties)
+
+		do {
+			let url = try await service.generateSceneImage(
+				prompt: trimmed,
+				analyticsContext: analyticsContext
+			)
+			properties["url_host"] = url.host ?? ""
+			AppAnalytics.capture("vision_scene_generate_succeeded", properties: properties)
+			return SceneMediaResource(url: url, kind: .image)
+		} catch {
+			properties["error_type"] = String(describing: type(of: error))
+			properties["error_message"] = error.localizedDescription
+			AppAnalytics.capture("vision_scene_generate_failed", properties: properties)
+			throw error
+		}
 	}
 
 	private func validateTurn(

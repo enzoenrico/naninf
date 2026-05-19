@@ -11,9 +11,11 @@ struct PromptOutput: StructuredOutput, Sendable {
 	var narrative: String
 	var toolResults: String
 	var options: [String]
+	/// Dense scene description for image generation; omit or leave empty when nothing can be visualized.
+	var visualPrompt: String?
 
 	enum CodingKeys: String, CodingKey {
-		case narrative, toolResults, options
+		case narrative, toolResults, options, visualPrompt
 	}
 
 	init(from decoder: Decoder) throws {
@@ -21,12 +23,19 @@ struct PromptOutput: StructuredOutput, Sendable {
 		narrative = try container.decode(String.self, forKey: .narrative)
 		options = try container.decode([String].self, forKey: .options)
 		toolResults = try Self.decodeToolResults(from: container)
+		visualPrompt = try container.decodeIfPresent(String.self, forKey: .visualPrompt)
 	}
 
-	init(narrative: String, toolResults: String, options: [String]) {
+	init(
+		narrative: String,
+		toolResults: String,
+		options: [String],
+		visualPrompt: String? = nil
+	) {
 		self.narrative = narrative
 		self.toolResults = toolResults
 		self.options = options
+		self.visualPrompt = visualPrompt
 	}
 
 	nonisolated static var schemaName: String { "dungeonMasterOutput" }
@@ -49,6 +58,11 @@ struct PromptOutput: StructuredOutput, Sendable {
 					"description":
 						"Three distinct options representing different approaches and paths the mage can follow.",
 					"items": ["type": "string"],
+				],
+				"visualPrompt": [
+					"type": "string",
+					"description":
+						"One dense sentence describing the visible scene for image generation (subject, setting, mood, composition). Omit or use an empty string when the scene cannot be visualized.",
 				],
 			],
 			"required": ["narrative", "toolResults", "options"],

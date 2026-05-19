@@ -40,6 +40,10 @@ enum Prompts {
 	2. Final JSON phase: Return `narrative`, `toolResults`, and exactly three `options` (required when `decideAction` used action 0; after a dice confirmation turn, always include three options with action 0).
 	* Do not put letter-prefixed choices (A., B., C.) in the narrative; put them only in `options`.
 	* Narrative paragraphs start with `>`.
+
+	### 4. VISION (`visualPrompt`)
+	* After the opening, populate `visualPrompt` on most turns with one vivid sentence of what the mage sees right now.
+	* Omit `visualPrompt` or leave it empty only when the scene cannot be pictured (pure dialogue, blackout, abstract magic with no visible setting).
 	"""
 
 	static let debug = """

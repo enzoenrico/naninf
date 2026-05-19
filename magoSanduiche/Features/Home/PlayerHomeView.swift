@@ -17,9 +17,9 @@ struct PlayerHomeView: View {
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 	@State private var focusedItemID: String = HomeMenuItem.menu.first?.id ?? "play"
+	@State private var tagline = SandwichOracle.defaultTagline
 
 	private let menu = HomeMenuItem.menu
-	private var tagline: String { String(localized: "nan_home_tagline") }
 
 	/// Four menu rows at 48pt min height plus 10pt inter-row spacing (DESIGN.md touch targets).
 	private static let homeMenuMinHeight: CGFloat = {
@@ -39,7 +39,7 @@ struct PlayerHomeView: View {
 		) {
 			CRTReveal {
 				VStack(spacing: 18) {
-					HomeHeroBanner(tagline: tagline)
+					HomeHeroBanner(tagline: tagline, onOracleTap: consultOracle)
 						.padding(.horizontal, 20)
 						.frame(maxHeight: .infinity)
 						.layoutPriority(1)
@@ -140,6 +140,14 @@ struct PlayerHomeView: View {
 				coordinator.beginFreshGame()
 			}
 			coordinator.navigate(to: item.route)
+		}
+	}
+
+	private func consultOracle() {
+		triggerSelectionHaptic()
+		let next = SandwichOracle.randomLine(excluding: tagline)
+		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
+			tagline = next
 		}
 	}
 

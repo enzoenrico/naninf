@@ -45,6 +45,39 @@ final class OpenAIService {
 		resetConversationHistory()
 	}
 
+	func generateSceneImage(
+		prompt: String,
+		analyticsContext: AIAnalyticsContext? = nil
+	) async throws -> URL {
+		let trimmed = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
+		guard !trimmed.isEmpty else { throw SceneMediaError.emptyPrompt }
+
+		#if DEBUG
+			if Self.isDebugStubBypassingNetwork {
+				return URL(string: "https://picsum.photos/seed/magoSanduiche-debug/1024/1024")!
+			}
+		#endif
+
+		let query = ImagesQuery(
+			prompt: trimmed,
+			model: .dall_e_3,
+			n: 1,
+			responseFormat: .url,
+			size: ._1024
+		)
+		let result = try await client.images(query: query)
+		guard let urlString = result.data.first?.url?.trimmingCharacters(in: .whitespacesAndNewlines),
+			!urlString.isEmpty
+		else {
+			throw SceneMediaError.noImageURL
+		}
+		guard let url = URL(string: urlString), url.scheme == "https" else {
+			throw SceneMediaError.invalidImageURL
+		}
+		_ = analyticsContext
+		return url
+	}
+
 	func generate<T: StructuredOutput>(
 		_ prompt: String,
 		returning type: T.Type,
@@ -925,7 +958,9 @@ extension OpenAIService {
 					"Look for another path",
 					"Talk to the glowing runes",
 					"Rest here a moment",
-				]
+				],
+				visualPrompt:
+					"A hooded mage in a torchlit stone corridor, damp moss on the walls, gritty fantasy illustration."
 			)
 			let data = (try? JSONEncoder().encode(output)).flatMap { String(data: $0, encoding: .utf8) }
 			return data ?? #"{"narrative":"[DEBUG STUB] encode failed","toolResults":"","options":[]}"#

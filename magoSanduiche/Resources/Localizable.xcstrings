@@ -1637,6 +1637,166 @@
         }
       }
     },
+    "nan_oracle_01" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> THE BREAD REMEMBERS. IT ALWAYS DID._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> O PÃO LEMBRA. ELE SEMPRE LEMBROU._"
+          }
+        }
+      }
+    },
+    "nan_oracle_02" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> FROZEN MAYO AT MIDNIGHT GRANTS +2 LUCK._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> MAIONESE GELADA À MEIA-NOITE: +2 SORTE._"
+          }
+        }
+      }
+    },
+    "nan_oracle_03" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> DO NOT TRUST CHEESE THAT BLINKS FIRST._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> NÃO CONFIE NO QUEIJO QUE PISCA PRIMEIRO._"
+          }
+        }
+      }
+    },
+    "nan_oracle_04" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> THE SANDWICH CHOOSES THE MAGE. WARNED._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> O SANDUÍCHE ESCOLHE O MAGO. AVISADO._"
+          }
+        }
+      }
+    },
+    "nan_oracle_05" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> D20 LANDED CREST UP: CURSED LUNCH._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> D20 DE MANHÃ VIRADO: ALMOÇO AMALDIÇOADO._"
+          }
+        }
+      }
+    },
+    "nan_oracle_06" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> BUTTER NEVER LIES. OR LIES TWICE._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> A MANTEIGA NUNCA MENTE. OU MENTE DUAS._"
+          }
+        }
+      }
+    },
+    "nan_oracle_07" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> RARE BACON IS FATE; BURNT BACON IS OMEN._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> BACON AO PONTO É DESTINO; QUEIMADO É AVISO._"
+          }
+        }
+      }
+    },
+    "nan_oracle_08" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> WHEN THE PICKLE WHISTLES, ROLL PERCEPTION._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> QUANDO O PICKLE ASSOBIAR, ROLE PERCEPÇÃO._"
+          }
+        }
+      }
+    },
+    "nan_oracle_a11y_hint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows a random sandwich prophecy in the tagline below."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra uma profecia aleatória do sanduíche na legenda abaixo."
+          }
+        }
+      }
+    },
+    "nan_oracle_a11y_label" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sandwich oracle"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oráculo do sanduíche"
+          }
+        }
+      }
+    },
     "nan_inline_status_a11y_dm" : {
       "localizations" : {
         "en" : {
@@ -4898,6 +5058,102 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "> Feed da cena"
+          }
+        }
+      }
+    },
+    "nan_vision_unavailable_alert_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vision unavailable"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visão indisponível"
+          }
+        }
+      }
+    },
+    "nan_vision_unavailable_alert_message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No scene image is available for this turn. Continue the story and try again on the next omen."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nenhuma imagem de cena está disponível neste turno. Continue a história e tente de novo no próximo presságio."
+          }
+        }
+      }
+    },
+    "nan_vision_unavailable_alert_ok" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "nan_vision_error_empty_prompt" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scene prompt is empty."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O prompt de cena está vazio."
+          }
+        }
+      }
+    },
+    "nan_vision_error_no_url" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image service returned no URL."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O serviço de imagem não retornou URL."
+          }
+        }
+      }
+    },
+    "nan_vision_error_invalid_url" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image URL is invalid."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A URL da imagem é inválida."
           }
         }
       }

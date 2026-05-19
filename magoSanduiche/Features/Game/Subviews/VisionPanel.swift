@@ -13,40 +13,54 @@ import SwiftUI
 #endif
 
 struct VisionPanel: View {
-	let isCollapsed: Bool
-	let isLoading: Bool
+	let displayMode: VisionDisplayMode
+	let isStoryLoading: Bool
+	let isVisionLoading: Bool
 	let phase: GameUIPhase
+
+	private var showsLoadingOverlay: Bool {
+		isVisionLoading || isStoryLoading
+	}
 
 	var body: some View {
 		ZStack(alignment: .topLeading) {
-			AsciiMediaView(catalogVideoNamed: "mageOpening")
-				.asciiScaleMode(.fill)
+			mediaContent
 				.frame(maxWidth: .infinity, maxHeight: .infinity)
-				.opacity(isLoading ? 0.55 : 1)
+				.opacity(showsLoadingOverlay ? 0.55 : 1)
 
-			Text(
-				phase == .awaitingDungeonMaster
-					? String(localized: "nan_vision_overlay_loading") : String(localized: "nan_vision_overlay_idle")
-			)
-			.font(.monocraft(relativeTo: .caption2))
-			.foregroundStyle(Color.accent)
-			.padding(10)
-
-			if isLoading {
+			if showsLoadingOverlay {
 				VisionLoadingOverlay()
 					.padding(10)
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
 			}
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-		.drawBorder(String(localized: "nan_vision_panel_title"), color: .terminalMana, lineWidth: 1)
+		.drawBorder(nil, color: .terminalMana, lineWidth: 1, animate: true, glowPreset: .chrome)
 		.clipped()
 		.accessibilityLabel(
-			isLoading
+			showsLoadingOverlay
 				? String(localized: "nan_vision_a11y_loading")
 				: String(localized: "nan_vision_a11y_ready")
 		)
 		.accessibilityHint(String(localized: "nan_vision_a11y_hint_collapse"))
+	}
+
+	@ViewBuilder
+	private var mediaContent: some View {
+		switch displayMode {
+		case .introStatic:
+			AsciiMediaView(catalogVideoNamed: "mageOpening")
+				.asciiScaleMode(.fill)
+		case .remote(let resource):
+			switch resource.kind {
+			case .image:
+				AsciiMediaView(imageURL: resource.url, isRemote: true)
+					.asciiScaleMode(.fill)
+			case .video:
+				AsciiMediaView(videoURL: resource.url, isRemote: true)
+					.asciiScaleMode(.fill)
+			}
+		}
 	}
 }
 

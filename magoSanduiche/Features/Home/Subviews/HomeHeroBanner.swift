@@ -9,24 +9,38 @@ import SwiftUI
 
 struct HomeHeroBanner: View {
 	let tagline: String
+	var onOracleTap: (() -> Void)? = nil
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: Spacing.sm) {
-			AsciiMediaView(catalogVideoNamed: "mageOpening")
-				.asciiScaleMode(.fill)
-				.asciiColumns(228)
-				.asciiFontSize(8)
-				.frame(maxWidth: .infinity, maxHeight: .infinity)
-				.layoutPriority(1)
+			Button {
+				onOracleTap?()
+			} label: {
+				AsciiMediaView(catalogVideoNamed: "mageOpening")
+					.asciiScaleMode(.fill)
+					.asciiColumns(228)
+					.asciiFontSize(8)
+					.frame(maxWidth: .infinity, maxHeight: .infinity)
+			}
+			.buttonStyle(.plain)
+			.disabled(onOracleTap == nil)
+			.accessibilityLabel(String(localized: "nan_oracle_a11y_label"))
+			.accessibilityHint(
+				onOracleTap == nil
+					? ""
+					: String(localized: "nan_oracle_a11y_hint")
+			)
+			.layoutPriority(1)
 
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
 				TypeWriterView(tagline, embedsScrollView: false, lineLimit: 2)
 					.fixedSize(horizontal: false, vertical: true)
+					.id(tagline)
 			}
 			.padding(Spacing.xl)
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.drawBorder(String(localized: "nan_home_hero_border_title"), color: .accent, lineWidth: 1, animate: true)
+		.drawBorder(nil, color: .accent, lineWidth: 1, animate: true)
 		.enableInjection()
 	}
 

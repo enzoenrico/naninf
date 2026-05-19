@@ -56,6 +56,7 @@ struct GameSessionView: View {
 	@State private var tipsConfigured = false
 	@State private var inlineResponseStatus: ResponseStatus?
 	@State private var inlineStatusDismissTask: Task<Void, Never>?
+	@State private var showVisionUnavailableAlert = false
 	@FocusState private var isContextualInputFocused: Bool
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -150,6 +151,14 @@ struct GameSessionView: View {
 		.animation(
 			TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: coordinator.isImageCollapsed
 		)
+		.alert(
+			String(localized: "nan_vision_unavailable_alert_title"),
+			isPresented: $showVisionUnavailableAlert
+		) {
+			Button(String(localized: "nan_vision_unavailable_alert_ok"), role: .cancel) {}
+		} message: {
+			Text(String(localized: "nan_vision_unavailable_alert_message"))
+		}
 		.tipViewStyle(AsciiTipStyle())
 		.task {
 			vm.attachCoordinator(coordinator)
@@ -192,8 +201,9 @@ struct GameSessionView: View {
 			.terminalPanelTransition(edge: .top)
 		} else {
 			VisionPanel(
-				isCollapsed: coordinator.isImageCollapsed,
-				isLoading: vm.loading,
+				displayMode: vm.visionDisplayMode,
+				isStoryLoading: vm.loading,
+				isVisionLoading: vm.visionMediaLoading,
 				phase: vm.uiPhase
 			)
 			.popoverTipIf(imageSectionTip, arrowEdge: .top, when: shouldShowTips)
@@ -445,6 +455,11 @@ struct GameSessionView: View {
 	}
 
 	private func handleVisionTap() {
+		guard coordinator.hasCompletedInitialText else { return }
+		if vm.hasSubmittedPlayerTurn, !vm.canOpenVisionTerminal {
+			showVisionUnavailableAlert = true
+			return
+		}
 		if coordinator.isContextualInputVisible {
 			dismissContextualInputIfActive()
 		}

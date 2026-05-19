@@ -63,6 +63,18 @@ final class FakeDungeonMasterModelClient: DungeonMasterModelClient {
 	}
 
 	func clearHistory() {}
+
+	var generateSceneImageHandler:
+		(String, AIAnalyticsContext?) async throws -> URL = { _, _ in
+			URL(string: "https://example.com/scene.png")!
+		}
+
+	func generateSceneImage(
+		prompt: String,
+		analyticsContext: AIAnalyticsContext?
+	) async throws -> URL {
+		try await generateSceneImageHandler(prompt, analyticsContext)
+	}
 }
 
 struct DungeonMasterServiceValidationTests {

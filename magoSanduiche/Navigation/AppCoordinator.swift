@@ -51,7 +51,7 @@ final class AppCoordinator {
 		updatePresentationState {
 			hasCompletedInitialText = true
 			showActionButton = true
-			isImageCollapsed = false
+			isImageCollapsed =  true
 			isContextualInputVisible = false
 			isDicePromptVisible = false
 		}
@@ -126,7 +126,7 @@ final class AppCoordinator {
 		updatePresentationState {
 			isContextualInputVisible = false
 			isDicePromptVisible = true
-			isImageCollapsed = false
+			// isImageCollapsed = false
 		}
 	}
 
@@ -152,7 +152,7 @@ final class AppCoordinator {
 	func handleTypewriterCompletion(reduceMotion: Bool = false) {
 		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 			hasCompletedInitialText = true
-			isImageCollapsed = false
+			isImageCollapsed = true 
 			showActionButton = true
 		}
 	}
@@ -166,6 +166,13 @@ final class AppCoordinator {
 				properties: [
 					"is_collapsed": isImageCollapsed
 				])
+		}
+	}
+
+	func collapseVisionIfExpanded(reduceMotion: Bool = false) {
+		guard !isImageCollapsed else { return }
+		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
+			isImageCollapsed = true
 		}
 	}
 

@@ -72,4 +72,12 @@ enum DiceOutcomeTier: Equatable {
 			self = .high
 		}
 	}
+
+	var analyticsName: String {
+		switch self {
+		case .low: "low"
+		case .mid: "mid"
+		case .high: "high"
+		}
+	}
 }

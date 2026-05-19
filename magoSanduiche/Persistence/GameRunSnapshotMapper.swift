@@ -6,7 +6,30 @@
 import Foundation
 import SwiftData
 
+struct GameRunSnapshotFields {
+	let transcriptBlob: Data
+	let suggestedOptionsBlob: Data
+	let displayTitle: String
+	let health: Int
+	let mana: Int
+	let maxHealth: Int
+	let maxMana: Int
+	let diceValue: Int
+	let pendingDiceRoll: Int?
+	let diceRevealStageRaw: String
+	let diceResultText: String
+	let invalidInputAttempts: Int
+	let contextualInput: String
+	let contextActionRaw: String
+	let uiPhaseRaw: String
+	let suppressTerminalAnimations: Bool
+}
+
 enum GameRunSnapshotMapper {
+	static let defaultTerminalEntries: [TerminalEntry] = [
+		TerminalEntry(kind: .dungeonMaster, text: Introduction.intro),
+	]
+
 	static let jsonEncoder: JSONEncoder = {
 		let e = JSONEncoder()
 		e.outputFormatting = [.sortedKeys]
@@ -35,6 +58,78 @@ enum GameRunSnapshotMapper {
 
 	static func decodeTranscript(from data: Data) throws -> [PersistedTerminalLine] {
 		try jsonDecoder.decode([PersistedTerminalLine].self, from: data)
+	}
+
+	static func terminalEntries(from transcriptBlob: Data) -> [TerminalEntry] {
+		do {
+			let lines = try decodeTranscript(from: transcriptBlob)
+			guard !lines.isEmpty else { return defaultTerminalEntries }
+			return lines.map {
+				TerminalEntry(id: $0.id, kind: $0.kind.terminalKind, text: $0.text)
+			}
+		} catch {
+			return defaultTerminalEntries
+		}
+	}
+
+	static func apply(
+		_ fields: GameRunSnapshotFields,
+		to run: StoredGameRun,
+		updatedAt: Date,
+		analyticsSessionID: String
+	) {
+		run.updatedAt = updatedAt
+		run.displayTitle = fields.displayTitle
+		run.transcriptBlob = fields.transcriptBlob
+		run.health = fields.health
+		run.mana = fields.mana
+		run.maxHealth = fields.maxHealth
+		run.maxMana = fields.maxMana
+		run.diceValue = fields.diceValue
+		run.pendingDiceRoll = fields.pendingDiceRoll
+		run.diceRevealStageRaw = fields.diceRevealStageRaw
+		run.diceResultText = fields.diceResultText
+		run.invalidInputAttempts = fields.invalidInputAttempts
+		run.contextualInput = fields.contextualInput
+		run.contextActionRaw = fields.contextActionRaw
+		run.uiPhaseRaw = fields.uiPhaseRaw
+		run.suggestedOptionsBlob = fields.suggestedOptionsBlob
+		run.suppressTerminalAnimations = fields.suppressTerminalAnimations
+		run.schemaVersion = GameRunPersistSchema.currentVersion
+		run.analyticsSessionID = analyticsSessionID
+	}
+
+	static func makeStoredGameRun(
+		id: UUID,
+		createdAt: Date,
+		updatedAt: Date,
+		fields: GameRunSnapshotFields,
+		analyticsSessionID: String
+	) -> StoredGameRun {
+		StoredGameRun(
+			id: id,
+			createdAt: createdAt,
+			updatedAt: updatedAt,
+			displayTitle: fields.displayTitle,
+			transcriptBlob: fields.transcriptBlob,
+			health: fields.health,
+			mana: fields.mana,
+			maxHealth: fields.maxHealth,
+			maxMana: fields.maxMana,
+			diceValue: fields.diceValue,
+			pendingDiceRoll: fields.pendingDiceRoll,
+			diceRevealStageRaw: fields.diceRevealStageRaw,
+			diceResultText: fields.diceResultText,
+			invalidInputAttempts: fields.invalidInputAttempts,
+			contextualInput: fields.contextualInput,
+			contextActionRaw: fields.contextActionRaw,
+			uiPhaseRaw: fields.uiPhaseRaw,
+			suggestedOptionsBlob: fields.suggestedOptionsBlob,
+			suppressTerminalAnimations: fields.suppressTerminalAnimations,
+			isEphemeralTutorial: false,
+			schemaVersion: GameRunPersistSchema.currentVersion,
+			analyticsSessionID: analyticsSessionID
+		)
 	}
 
 	static func displayTitle(entries: [TerminalEntry], fallback: Date = Date()) -> String {
