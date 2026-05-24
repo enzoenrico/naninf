@@ -182,7 +182,7 @@ private struct OnboardingProgressView: View {
 			GeometryReader { geometry in
 				ZStack(alignment: .leading) {
 					Rectangle()
-						.fill(Color.terminalSurface)
+						// .fill(Color.terminalSurface)
 					Rectangle()
 						.fill(Color.accent)
 						.frame(width: geometry.size.width * progress)
@@ -297,7 +297,7 @@ private struct OptionCard: View {
 					.foregroundStyle(isSelected ? Color.terminalWarning : Color.terminalMutedText)
 			}
 			.padding(12)
-			.background(isSelected ? Color.terminalActiveSurface : Color.terminalSurface)
+			// .background(isSelected ? Color.terminalActiveSurface : Color.terminalSurface)
 			.drawBorder(nil, color: isSelected ? .terminalWarning : .accentBorderIdle, lineWidth: isSelected ? 2 : 1)
 		}
 		.buttonStyle(TerminalSubtleButtonStyle())
@@ -346,7 +346,7 @@ private struct SocialProofScreen: View {
 				}
 				.padding(14)
 				.frame(maxWidth: .infinity, alignment: .leading)
-				.background(Color.terminalSurface)
+				// .background(Color.terminalSurface)
 				.drawBorder(nil, color: .accentBorderIdle, lineWidth: 1)
 			}
 		}
@@ -387,7 +387,7 @@ private struct PersonalizedSolutionScreen: View {
 				}
 				.padding(12)
 				.frame(maxWidth: .infinity, alignment: .leading)
-				.background(Color.terminalSurface)
+				// .background(Color.terminalSurface)
 				.drawBorder(nil, color: .terminalMana.opacity(0.75), lineWidth: 1)
 			}
 		}
@@ -451,7 +451,7 @@ private struct ProcessingOnboardingScreen: View {
 				Spacer()
 			}
 			.padding(14)
-			.background(Color.terminalSurface)
+			// .background(Color.terminalSurface)
 			.drawBorder(nil, color: .terminalWarning, lineWidth: 1)
 		}
 		.frame(maxWidth: .infinity)
@@ -498,7 +498,7 @@ private struct DemoOnboardingScreen: View {
 			}
 			.padding(14)
 			.frame(maxWidth: .infinity, alignment: .leading)
-			.background(Color.terminalSurface)
+			// .background(Color.terminalSurface)
 			.drawBorder(String(localized: "nan_onboarding_demo_mode_border"), color: .terminalMana, lineWidth: 1)
 
 			Button {
@@ -612,7 +612,7 @@ private struct DemoGameCover: View {
 			}
 			.padding(.horizontal, 16)
 			.padding(.vertical, 12)
-			.background(Color.terminalSurface)
+			// .background(Color.terminalSurface)
 			.drawBorder(nil, color: .terminalMana, lineWidth: 1)
 
 			GameSessionView(
@@ -650,7 +650,7 @@ private struct PaywallOnboardingScreen: View {
 			}
 			.padding(14)
 			.frame(maxWidth: .infinity, alignment: .leading)
-			.background(Color.terminalSurface)
+			// .background(Color.terminalSurface)
 			.drawBorder(String(localized: "nan_onboarding_paywall_included_border"), color: .accent, lineWidth: 1)
 
 			VStack(spacing: 8) {
@@ -672,7 +672,7 @@ private struct PaywallOnboardingScreen: View {
 			}
 			.padding(14)
 			.frame(maxWidth: .infinity)
-			.background(Color.terminalSurface)
+			// .background(Color.terminalSurface)
 			.drawBorder(String(localized: "nan_onboarding_paywall_trial_border"), color: .terminalWarning, lineWidth: 1)
 		}
 	}

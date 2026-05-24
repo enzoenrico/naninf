@@ -1,0 +1,52 @@
+[PostHog] New session id created 019E5B9F-9B50-7B65-AEFC-D8C92E66227B (sessionStart)
+[PostHog] Integration PostHogScreenViewIntegration installed
+[PostHog] Integration PostHogAppLifeCycleIntegration installed
+[PostHog] Integration PostHogSurveyIntegration installed
+[PostHog] Integration PostHogRageClickIntegration installed
+[PostHog] Queued event '$set'. Depth: 1
+[PostHog] Remote config called successfully.
+[PostHog] hasFeatureFlags is false, clearing flags and skipping loading flags
+IOSurfaceClientSetSurfaceNotify failed e00002c7
+[PostHog] Sending batch of 1 events to PostHog
+[PostHog] Queued event '$screen'. Depth: 2
+[PostHog] Queued event 'Application Opened'. Depth: 3
+[PostHog] Events sent successfully.
+[PostHog] Completed!
+2026-05-24 17:14:10.849 magoSanduiche[29125:20990758] InjectionClient/Could not connect: Connection refused
+💉 Unable to connect to InjectionIII app, falling back to standalone HotReloading.
+💉 Standalone InjectionIII available for sources under ["/Users/enzoenrico"]
+[PostHog] Queued event '$screen'. Depth: 3
+[PostHog] Queued event '$screen'. Depth: 4
+[PostHog] Queued event 'onboarding_step_viewed'. Depth: 5
+[PostHog] Queued event 'onboarding_primary_tapped'. Depth: 6
+[PostHog] Queued event 'onboarding_step_viewed'. Depth: 7
+[PostHog] Queued event 'onboarding_option_selected'. Depth: 8
+[PostHog] Queued event 'onboarding_primary_tapped'. Depth: 9
+[PostHog] Queued event 'onboarding_step_viewed'. Depth: 10
+[PostHog] Queued event 'onboarding_option_selected'. Depth: 11
+[PostHog] Queued event 'onboarding_option_selected'. Depth: 12
+[PostHog] Queued event 'onboarding_primary_tapped'. Depth: 13
+[PostHog] Queued event 'onboarding_step_viewed'. Depth: 14
+[PostHog] Queued event 'onboarding_primary_tapped'. Depth: 15
+[PostHog] Queued event 'onboarding_step_viewed'. Depth: 16
+[PostHog] Queued event 'onboarding_primary_tapped'. Depth: 17
+[PostHog] Queued event 'onboarding_step_viewed'. Depth: 18
+[PostHog] Queued event 'onboarding_option_selected'. Depth: 19
+[PostHog] Queued event 'onboarding_option_selected'. Depth: 20
+[PostHog] Sending batch of 20 events to PostHog
+[PostHog] Events sent successfully.
+[PostHog] Completed!
+[PostHog] Queued event 'onboarding_option_selected'. Depth: 1
+[PostHog] Queued event 'onboarding_primary_tapped'. Depth: 2
+[PostHog] Queued event 'onboarding_step_viewed'. Depth: 3
+[PostHog] Queued event 'game_session_started'. Depth: 4
+[PostHog] Queued event 'onboarding_demo_auto_presented'. Depth: 5
+[PostHog] Queued event 'onboarding_step_viewed'. Depth: 6
+[PostHog] Queued event '$screen'. Depth: 7
+[PostHog] Sending batch of 7 events to PostHog
+[PostHog] Events sent successfully.
+[PostHog] Completed!
+[PostHog] Queued event 'onboarding_demo_closed'. Depth: 1
+[PostHog] Sending batch of 1 events to PostHog
+[PostHog] Events sent successfully.
+[PostHog] Completed!
