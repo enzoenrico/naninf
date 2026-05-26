@@ -17,7 +17,7 @@ enum OnboardingStep: Int, CaseIterable {
 	case preferences
 	case processing
 	case demo
-	case paywall
+	case signIn
 }
 
 enum OnboardingOptionKind {
@@ -156,16 +156,16 @@ extension OnboardingOption {
 
 extension OnboardingTestimonial {
 	static let placeholders: [OnboardingTestimonial] = [
-		.init(
-			player: "M.",
-			persona: String(localized: "nan_onboarding_testimonial_m_persona"),
-			quote: String(localized: "nan_onboarding_testimonial_m_quote")
-		),
-		.init(
-			player: "R.",
-			persona: String(localized: "nan_onboarding_testimonial_r_persona"),
-			quote: String(localized: "nan_onboarding_testimonial_r_quote")
-		),
+		// .init(
+		// 	player: "M.",
+		// 	persona: String(localized: "nan_onboarding_testimonial_m_persona"),
+		// 	quote: String(localized: "nan_onboarding_testimonial_m_quote")
+		// ),
+		// .init(
+		// 	player: "R.",
+		// 	persona: String(localized: "nan_onboarding_testimonial_r_persona"),
+		// 	quote: String(localized: "nan_onboarding_testimonial_r_quote")
+		// ),
 		.init(
 			player: "L.",
 			persona: String(localized: "nan_onboarding_testimonial_l_persona"),

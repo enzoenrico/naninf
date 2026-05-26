@@ -4,7 +4,7 @@
 
 ### Onboarding Completion
 
-The point where a player has answered the onboarding questions, finished the demo/paywall sequence, and the app has persisted their onboarding responses locally. Onboarding completion does not grant player home access by itself.
+The point where a player has answered the onboarding questions, finished the demo and sign-in sequence, and the app has persisted their onboarding responses locally. Onboarding completion does not grant player home access by itself.
 
 ### Authenticated Session
 

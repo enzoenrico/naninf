@@ -52,6 +52,10 @@ final class GameViewModel {
     var suggestedOptions: [String] = []
     var onCompletedPlayerAction: (() -> Void)?
     var terminalEntries: [TerminalEntry] = GameRunSnapshotMapper.defaultTerminalEntries
+    /// Terminal lines whose typewriter animation has finished (in-memory, current session).
+    private(set) var revealedTerminalEntryIDs: Set<UUID> = []
+    /// Characters already revealed per entry; survives view recreation while the input panel toggles.
+    private(set) var typewriterProgressByEntryID: [UUID: Int] = [:]
 
     var canOpenVisionTerminal: Bool {
         if !hasSubmittedPlayerTurn { return true }
@@ -216,6 +220,19 @@ final class GameViewModel {
         }
     }
 
+    func isTerminalEntryRevealed(_ entryID: UUID) -> Bool {
+        revealedTerminalEntryIDs.contains(entryID)
+    }
+
+    func updateTypewriterProgress(entryID: UUID, revealedCount: Int) {
+        typewriterProgressByEntryID[entryID] = revealedCount
+    }
+
+    func markTerminalEntryRevealed(_ entryID: UUID) {
+        revealedTerminalEntryIDs.insert(entryID)
+        typewriterProgressByEntryID.removeValue(forKey: entryID)
+    }
+
     func registerEmptyInput() {
         invalidInputAttempts += 1
         uiPhase = .composing
@@ -342,6 +359,14 @@ final class GameViewModel {
         return nil
     }
 
+    private func pruneTypewriterProgress() {
+        guard let latestID = terminalEntries.last?.id else {
+            typewriterProgressByEntryID.removeAll()
+            return
+        }
+        typewriterProgressByEntryID = typewriterProgressByEntryID.filter { $0.key == latestID }
+    }
+
     private func beginDungeonMasterTurn(
         displayText: String,
         context: DungeonMasterTurnContext,
@@ -411,6 +436,7 @@ final class GameViewModel {
 
             let result = turn.output
             terminalEntries.append(TerminalEntry(kind: .dungeonMaster, text: result.narrative))
+            pruneTypewriterProgress()
             suppressTerminalAnimations = false
             uiPhase = .result
             applyToolEffects(turn.toolEffects)
@@ -447,6 +473,7 @@ final class GameViewModel {
 
     private func appendSystemMessage(_ text: String) {
         terminalEntries.append(TerminalEntry(kind: .system, text: text))
+        pruneTypewriterProgress()
         uiPhase = .result
     }
 

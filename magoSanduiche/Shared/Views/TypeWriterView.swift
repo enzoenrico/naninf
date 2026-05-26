@@ -13,6 +13,8 @@ struct TypeWriterView: View {
 	var embedsScrollView: Bool
 	var lineLimit: Int?
 	var content: [Character]
+	var initialRevealedCount: Int
+	var onProgress: ((Int) -> Void)?
 	var onFinished: (() -> Void)?
 
 	@State private var temp: [Character]
@@ -23,11 +25,15 @@ struct TypeWriterView: View {
 		_ content: String,
 		embedsScrollView: Bool = false,
 		lineLimit: Int? = nil,
+		initialRevealedCount: Int = 0,
+		onProgress: ((Int) -> Void)? = nil,
 		onFinished: (() -> Void)? = nil
 	) {
 		self.embedsScrollView = embedsScrollView
 		self.lineLimit = lineLimit
 		self.content = content.map { $0 }
+		self.initialRevealedCount = min(max(0, initialRevealedCount), self.content.count)
+		self.onProgress = onProgress
 		self.onFinished = onFinished
 		_temp = State(initialValue: Array(repeating: " ", count: self.content.count))
 	}
@@ -100,8 +106,22 @@ struct TypeWriterView: View {
 	}
 
 	private func buildContent() async {
+		let resumeFrom = min(max(0, initialRevealedCount), content.count)
+
+		if resumeFrom >= content.count {
+			finishImmediately()
+			return
+		}
+
 		hasFinishedTyping = false
-		temp = Array(repeating: " ", count: content.count)
+		if resumeFrom == 0 {
+			temp = Array(repeating: " ", count: content.count)
+		} else {
+			temp = Array(repeating: " ", count: content.count)
+			for index in 0 ..< resumeFrom {
+				temp[index] = content[index]
+			}
+		}
 
 		guard !reduceMotion else {
 			finishImmediately()
@@ -110,18 +130,21 @@ struct TypeWriterView: View {
 
 		guard !content.isEmpty else {
 			hasFinishedTyping = true
+			onProgress?(0)
 			onFinished?()
 			return
 		}
 
-		for index in content.indices {
+		for index in resumeFrom ..< content.count {
 			guard !hasFinishedTyping else { return }
 			temp[index] = content[index]
 			await swapLetter(at: index, target: 2)
 			try? await Task.sleep(for: TerminalMotion.typewriterStepDelay)
+			onProgress?(index + 1)
 		}
 
 		hasFinishedTyping = true
+		onProgress?(content.count)
 		onFinished?()
 	}
 
@@ -130,6 +153,7 @@ struct TypeWriterView: View {
 		temp = content
 		hasFinishedTyping = true
 		cursorVisible = false
+		onProgress?(content.count)
 		onFinished?()
 	}
 

@@ -39,8 +39,8 @@ final class OnboardingViewModel {
 			String(localized: "nan_onboarding_button_binding")
 		case .demo:
 			String(localized: "nan_onboarding_button_play_demo")
-		case .paywall:
-			String(localized: "nan_onboarding_button_start_trial")
+		case .signIn:
+			String(localized: "nan_onboarding_button_enter_dungeon")
 		}
 	}
 
@@ -49,7 +49,7 @@ final class OnboardingViewModel {
 	}
 
 	var isOnFinalPage: Bool {
-		currentStep == .paywall
+		currentStep == .signIn
 	}
 
 	var progressText: String {
@@ -84,8 +84,10 @@ final class OnboardingViewModel {
 			false
 		case .demo:
 			false
-		case .welcome, .socialProof, .solution, .paywall:
+		case .welcome, .socialProof, .solution:
 			true
+		case .signIn:
+			false
 		}
 	}
 
@@ -161,6 +163,13 @@ final class OnboardingViewModel {
 
 		currentIndex += 1
 	}
+
+	#if DEBUG
+		func skipDemoForDebug() {
+			guard currentStep == .demo else { return }
+			completedDemoActions = demoActionTarget
+		}
+	#endif
 
 	private func toggle(_ id: String, in set: inout Set<String>) {
 		if set.contains(id) {

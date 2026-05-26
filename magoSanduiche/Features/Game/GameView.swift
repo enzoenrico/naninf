@@ -293,6 +293,7 @@ struct GameSessionView: View {
 			VStack(alignment: .leading, spacing: 16) {
 				ForEach(vm.terminalEntries) { entry in
 					terminalEntryView(entry: entry, vm: vm, coordinator: coordinator)
+						.id(entry.id)
 				}
 
 				if coordinator.isDicePromptVisible {
@@ -326,14 +327,24 @@ struct GameSessionView: View {
 			!vm.suppressTerminalAnimations
 			&& isLatest
 			&& (entry.kind == .dungeonMaster || entry.kind == .system)
+			&& !vm.isTerminalEntryRevealed(entry.id)
 
 		if useTypewriter {
-			TypeWriterView(entry.renderedText, embedsScrollView: false) {
-				vm.markNarrativeFinished()
-				if !coordinator.hasCompletedInitialText {
-					coordinator.handleTypewriterCompletion(reduceMotion: reduceMotion)
+			TypeWriterView(
+				entry.renderedText,
+				embedsScrollView: false,
+				initialRevealedCount: vm.typewriterProgressByEntryID[entry.id] ?? 0,
+				onProgress: { revealedCount in
+					vm.updateTypewriterProgress(entryID: entry.id, revealedCount: revealedCount)
+				},
+				onFinished: {
+					vm.markTerminalEntryRevealed(entry.id)
+					vm.markNarrativeFinished()
+					if !coordinator.hasCompletedInitialText {
+						coordinator.handleTypewriterCompletion(reduceMotion: reduceMotion)
+					}
 				}
-			}
+			)
 			.simultaneousGesture(
 				TapGesture().onEnded {
 					guard coordinator.isContextualInputVisible else { return }

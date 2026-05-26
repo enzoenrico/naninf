@@ -10,278 +10,6 @@
     "  " : {
 
     },
-    "nan_auth_body_binding" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Binding your player profile to the cloud gate..."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vinculando seu perfil de jogador ao portal na nuvem..."
-          }
-        }
-      }
-    },
-    "nan_auth_body_checking" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Looking for a saved Supabase session before opening the hub."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Procurando uma sessão Supabase salva antes de abrir o hub."
-          }
-        }
-      }
-    },
-    "nan_auth_body_ready" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose a fast sign-in method to bind this run to your account."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escolha um login rápido para vincular esta jornada à sua conta."
-          }
-        }
-      }
-    },
-    "nan_auth_config_missing" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auth is waiting for Supabase and Google client values in the app configuration."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A autenticação aguarda os valores de cliente do Supabase e Google na configuração do app."
-          }
-        }
-      }
-    },
-    "nan_auth_footnote" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "// tokens stay in Keychain; only your public login state is mirrored locally"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "// tokens ficam no Keychain; só o estado público do login é espelhado localmente"
-          }
-        }
-      }
-    },
-    "nan_auth_hero_border_title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ACCOUNT_GATE"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PORTAL_DE_CONTA"
-          }
-        }
-      }
-    },
-    "nan_auth_hero_headline" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bind your spellbook"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vincule seu grimório"
-          }
-        }
-      }
-    },
-    "nan_auth_hero_kicker" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> Onboarding complete. Account binding required before entering the hub."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> Onboarding completo. Vincule uma conta antes de entrar no hub."
-          }
-        }
-      }
-    },
-    "nan_auth_sign_in_google" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign in with Google"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entrar com Google"
-          }
-        }
-      }
-    },
-    "nan_auth_status_binding" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> BINDING ACCOUNT"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> VINCULANDO CONTA"
-          }
-        }
-      }
-    },
-    "nan_auth_status_checking" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> CHECKING SESSION"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> VERIFICANDO SESSAO"
-          }
-        }
-      }
-    },
-    "nan_auth_status_config" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> CONFIG REQUIRED"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> CONFIGURACAO NECESSARIA"
-          }
-        }
-      }
-    },
-    "nan_auth_status_error" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> AUTH ERROR"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> ERRO DE AUTH"
-          }
-        }
-      }
-    },
-    "nan_auth_status_panel" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SESSION_STATUS"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "STATUS_DA_SESSAO"
-          }
-        }
-      }
-    },
-    "nan_auth_status_ready" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> READY TO BIND"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> PRONTO PARA VINCULAR"
-          }
-        }
-      }
-    },
-    "nan_auth_subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use Apple or Google for quick signup. Supabase creates or restores your account behind the gate."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use Apple ou Google para cadastro rápido. O Supabase cria ou restaura sua conta por trás do portal."
-          }
-        }
-      }
-    },
-    "nan_auth_title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quick signup keeps the dungeon ready across launches."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cadastro rápido mantém a masmorra pronta entre aberturas."
-          }
-        }
-      }
-    },
     "[" : {
 
     },
@@ -370,22 +98,6 @@
         }
       }
     },
-    "nan_a11y_confirm_dice" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "RECORD DICE ROLL IN TRANSCRIPT"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "REGISTRAR ROLAGEM NO TRANSCRITO"
-          }
-        }
-      }
-    },
     "nan_a11y_action_send_command" : {
       "localizations" : {
         "en" : {
@@ -462,6 +174,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ESCREVENDO A HISTÓRIA"
+          }
+        }
+      }
+    },
+    "nan_a11y_confirm_dice" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RECORD DICE ROLL IN TRANSCRIPT"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "REGISTRAR ROLAGEM NO TRANSCRITO"
           }
         }
       }
@@ -786,22 +514,6 @@
         }
       }
     },
-    "nan_action_roll_d20" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> ROLL D20"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> ROLAR D20"
-          }
-        }
-      }
-    },
     "nan_action_confirm_dice" : {
       "localizations" : {
         "en" : {
@@ -814,6 +526,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "> REGISTRAR ROLAGEM"
+          }
+        }
+      }
+    },
+    "nan_action_roll_d20" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ROLL D20"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ROLAR D20"
           }
         }
       }
@@ -862,6 +590,278 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "> ESCREVER COMANDO"
+          }
+        }
+      }
+    },
+    "nan_auth_body_binding" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Binding your player profile to the cloud gate..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinculando seu perfil de jogador ao portal na nuvem..."
+          }
+        }
+      }
+    },
+    "nan_auth_body_checking" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looking for a saved Supabase session before opening the hub."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Procurando uma sessão Supabase salva antes de abrir o hub."
+          }
+        }
+      }
+    },
+    "nan_auth_body_ready" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a fast sign-in method to bind this run to your account."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha um login rápido para vincular esta jornada à sua conta."
+          }
+        }
+      }
+    },
+    "nan_auth_config_missing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auth is waiting for Supabase and Google client values in the app configuration."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A autenticação aguarda os valores de cliente do Supabase e Google na configuração do app."
+          }
+        }
+      }
+    },
+    "nan_auth_footnote" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "// tokens stay in Keychain; only your public login state is mirrored locally"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "// tokens ficam no Keychain; só o estado público do login é espelhado localmente"
+          }
+        }
+      }
+    },
+    "nan_auth_hero_border_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ACCOUNT_GATE"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PORTAL_DE_CONTA"
+          }
+        }
+      }
+    },
+    "nan_auth_hero_headline" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bind your spellbook"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vincule seu grimório"
+          }
+        }
+      }
+    },
+    "nan_auth_hero_kicker" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Onboarding complete. Account binding required before entering the hub."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Onboarding completo. Vincule uma conta antes de entrar no hub."
+          }
+        }
+      }
+    },
+    "nan_auth_sign_in_google" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in with Google"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrar com Google"
+          }
+        }
+      }
+    },
+    "nan_auth_status_binding" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> BINDING ACCOUNT"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> VINCULANDO CONTA"
+          }
+        }
+      }
+    },
+    "nan_auth_status_checking" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> CHECKING SESSION"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> VERIFICANDO SESSAO"
+          }
+        }
+      }
+    },
+    "nan_auth_status_config" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> CONFIG REQUIRED"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> CONFIGURACAO NECESSARIA"
+          }
+        }
+      }
+    },
+    "nan_auth_status_error" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> AUTH ERROR"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ERRO DE AUTH"
+          }
+        }
+      }
+    },
+    "nan_auth_status_panel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SESSION_STATUS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "STATUS_DA_SESSAO"
+          }
+        }
+      }
+    },
+    "nan_auth_status_ready" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> READY TO BIND"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> PRONTO PARA VINCULAR"
+          }
+        }
+      }
+    },
+    "nan_auth_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Apple or Google for quick signup. Supabase creates or restores your account behind the gate."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Apple ou Google para cadastro rápido. O Supabase cria ou restaura sua conta por trás do portal."
+          }
+        }
+      }
+    },
+    "nan_auth_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick signup keeps the dungeon ready across launches."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cadastro rápido mantém a masmorra pronta entre aberturas."
           }
         }
       }
@@ -1252,6 +1252,38 @@
         }
       }
     },
+    "nan_debug_onboarding_skip_demo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> SKIP DEMO"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> PULAR DEMO"
+          }
+        }
+      }
+    },
+    "nan_debug_onboarding_skip_demo_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug skip demo"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug: pular demo"
+          }
+        }
+      }
+    },
     "nan_dice_flavor_idle" : {
       "localizations" : {
         "en" : {
@@ -1348,6 +1380,22 @@
         }
       }
     },
+    "nan_dice_panel_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> D20"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> D20"
+          }
+        }
+      }
+    },
     "nan_dice_player_confirmed" : {
       "localizations" : {
         "en" : {
@@ -1380,22 +1428,6 @@
         }
       }
     },
-    "nan_dice_panel_title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> D20"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> D20"
-          }
-        }
-      }
-    },
     "nan_dice_rolling" : {
       "localizations" : {
         "en" : {
@@ -1424,22 +1456,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "O mestre da masmorra não pôde responder desta vez."
-          }
-        }
-      }
-    },
-    "nan_dm_silent" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The dungeon master remains silent."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O mestre da masmorra permanece em silêncio."
           }
         }
       }
@@ -1504,6 +1520,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Observar a cena com atenção"
+          }
+        }
+      }
+    },
+    "nan_dm_silent" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The dungeon master remains silent."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O mestre da masmorra permanece em silêncio."
           }
         }
       }
@@ -1633,166 +1665,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "> UMA MASMORRA DE SANDUÍCHES DUVIDOSOS_"
-          }
-        }
-      }
-    },
-    "nan_oracle_01" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> THE BREAD REMEMBERS. IT ALWAYS DID._"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> O PÃO LEMBRA. ELE SEMPRE LEMBROU._"
-          }
-        }
-      }
-    },
-    "nan_oracle_02" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> FROZEN MAYO AT MIDNIGHT GRANTS +2 LUCK._"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> MAIONESE GELADA À MEIA-NOITE: +2 SORTE._"
-          }
-        }
-      }
-    },
-    "nan_oracle_03" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> DO NOT TRUST CHEESE THAT BLINKS FIRST._"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> NÃO CONFIE NO QUEIJO QUE PISCA PRIMEIRO._"
-          }
-        }
-      }
-    },
-    "nan_oracle_04" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> THE SANDWICH CHOOSES THE MAGE. WARNED._"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> O SANDUÍCHE ESCOLHE O MAGO. AVISADO._"
-          }
-        }
-      }
-    },
-    "nan_oracle_05" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> D20 LANDED CREST UP: CURSED LUNCH._"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> D20 DE MANHÃ VIRADO: ALMOÇO AMALDIÇOADO._"
-          }
-        }
-      }
-    },
-    "nan_oracle_06" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> BUTTER NEVER LIES. OR LIES TWICE._"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> A MANTEIGA NUNCA MENTE. OU MENTE DUAS._"
-          }
-        }
-      }
-    },
-    "nan_oracle_07" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> RARE BACON IS FATE; BURNT BACON IS OMEN._"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> BACON AO PONTO É DESTINO; QUEIMADO É AVISO._"
-          }
-        }
-      }
-    },
-    "nan_oracle_08" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> WHEN THE PICKLE WHISTLES, ROLL PERCEPTION._"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> QUANDO O PICKLE ASSOBIAR, ROLE PERCEPÇÃO._"
-          }
-        }
-      }
-    },
-    "nan_oracle_a11y_hint" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shows a random sandwich prophecy in the tagline below."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostra uma profecia aleatória do sanduíche na legenda abaixo."
-          }
-        }
-      }
-    },
-    "nan_oracle_a11y_label" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sandwich oracle"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Oráculo do sanduíche"
           }
         }
       }
@@ -2053,38 +1925,6 @@
         }
       }
     },
-    "nan_load_subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Resume any run below. Swipe to delete a save from this device."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retome qualquer run abaixo. Deslize para apagar um save deste aparelho."
-          }
-        }
-      }
-    },
-    "nan_load_title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Load a previous run"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Carregar uma run anterior"
-          }
-        }
-      }
-    },
     "nan_load_resume_a11y" : {
       "localizations" : {
         "en" : {
@@ -2129,6 +1969,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Run — %@"
+          }
+        }
+      }
+    },
+    "nan_load_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume any run below. Swipe to delete a save from this device."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retome qualquer run abaixo. Deslize para apagar um save deste aparelho."
+          }
+        }
+      }
+    },
+    "nan_load_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load a previous run"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carregar uma run anterior"
           }
         }
       }
@@ -2309,6 +2181,22 @@
         }
       }
     },
+    "nan_onboarding_button_enter_dungeon" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ENTER THE DUNGEON"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> ENTRAR NA MASMORRA"
+          }
+        }
+      }
+    },
     "nan_onboarding_button_open_gate" : {
       "localizations" : {
         "en" : {
@@ -2394,7 +2282,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "> The demo opens as a full-screen dungeon session."
+            "value" : "> Tap below when ready—the demo opens as a full-screen dungeon session."
           }
         },
         "pt-BR" : {
@@ -2485,6 +2373,102 @@
         }
       }
     },
+    "nan_onboarding_demo_login_border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Save run"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Salvar run"
+          }
+        }
+      }
+    },
+    "nan_onboarding_demo_login_footnote" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your demo progress is tied to your account so you can pick up where you left off."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O progresso da demo fica na sua conta para você continuar de onde parou."
+          }
+        }
+      }
+    },
+    "nan_onboarding_demo_login_status_binding" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Binding your adventurer sigil..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinculando seu sigilo de aventureiro..."
+          }
+        }
+      }
+    },
+    "nan_onboarding_demo_login_status_checking" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking for an existing sigil..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verificando sigilo existente..."
+          }
+        }
+      }
+    },
+    "nan_onboarding_demo_login_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in with Apple or Google to save this run and unlock the full dungeon."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entre com Apple ou Google para salvar esta run e desbloquear a masmorra completa."
+          }
+        }
+      }
+    },
+    "nan_onboarding_demo_login_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep your demo going."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue sua demo."
+          }
+        }
+      }
+    },
     "nan_onboarding_demo_mode_border" : {
       "localizations" : {
         "en" : {
@@ -2506,13 +2490,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This is the same Dungeon Master interaction used in the full game. Complete %lld actions to keep the adventure."
+            "value" : "let’s get you started with a one shot adventure, do whatever you please! combat, stealth, absurdity, the dungeon is your’s to enjoy!"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "É a mesma interação com o Mestre da Masmorra do jogo completo. Complete %lld ações para manter a aventura."
+            "value" : "jogue uma one shot para experimentar e faça o que quiser! seja combate, stealth, seja criativo! a dungeon é sua para aproveitar!"
           }
         }
       }
@@ -2522,13 +2506,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Play your first turns."
+            "value" : "See what the Dungeon Master does."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jogue suas primeiras jogadas."
+            "value" : "Veja o que o Mestre da Masmorra faz."
           }
         }
       }
@@ -2613,6 +2597,22 @@
         }
       }
     },
+    "nan_onboarding_kicker_demo_login" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> DEMO COMPLETE"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> DEMO CONCLUÍDA"
+          }
+        }
+      }
+    },
     "nan_onboarding_kicker_flavor" : {
       "localizations" : {
         "en" : {
@@ -2673,6 +2673,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "> RELATÓRIOS DE CAMPO"
+          }
+        }
+      }
+    },
+    "nan_onboarding_kicker_sign_in" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> BIND YOUR SIGIL"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> VINCULE SEU SIGILO"
           }
         }
       }
@@ -3573,6 +3589,134 @@
         }
       }
     },
+    "nan_onboarding_sign_in_bound" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sigil bound. Tap below to enter the dungeon."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sigilo vinculado. Toque abaixo para entrar na masmorra."
+          }
+        }
+      }
+    },
+    "nan_onboarding_sign_in_bound_border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Ready"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Pronto"
+          }
+        }
+      }
+    },
+    "nan_onboarding_sign_in_panel_border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Sign in"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> Entrar"
+          }
+        }
+      }
+    },
+    "nan_onboarding_sign_in_status_binding" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Binding your adventurer sigil..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinculando seu sigilo de aventureiro..."
+          }
+        }
+      }
+    },
+    "nan_onboarding_sign_in_status_checking" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking for an existing sigil..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verificando sigilo existente..."
+          }
+        }
+      }
+    },
+    "nan_onboarding_sign_in_status_ready" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Apple or Google to bind your account before entering."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Apple ou Google para vincular sua conta antes de entrar."
+          }
+        }
+      }
+    },
+    "nan_onboarding_sign_in_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your demo is saved to your account. Sign in if you have not already, then step into the full game."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sua demo fica na sua conta. Entre se ainda não vinculou, depois siga para o jogo completo."
+          }
+        }
+      }
+    },
+    "nan_onboarding_sign_in_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One sigil to enter."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um sigilo para entrar."
+          }
+        }
+      }
+    },
     "nan_onboarding_social_subtitle" : {
       "localizations" : {
         "en" : {
@@ -3786,12 +3930,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The d20 moments made tiny choices feel dramatic."
+            "value" : "This is exactly the kind of game I always wanted as a kid. Thanks so much for letting us make our own stories!\nIn case anyone is wondering, this is a game where you are given story prompts and events, and you write your response in a chat box. This response can be anything. ANYTHING. So if you are looking for a story with an alchemical creation of magic, a bonding moment with some ghouls, and the Fabled Hazard Suit of Durin, this is the perfect game. \nThanks so much for making this!"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Os momentos de d20 fizeram escolhas miúdas parecerem dramáticas."
           }
         }
@@ -3905,6 +4049,166 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sua masmorra de bolso está esperando."
+          }
+        }
+      }
+    },
+    "nan_oracle_01" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> THE BREAD REMEMBERS. IT ALWAYS DID._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> O PÃO LEMBRA. ELE SEMPRE LEMBROU._"
+          }
+        }
+      }
+    },
+    "nan_oracle_02" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> FROZEN MAYO AT MIDNIGHT GRANTS +2 LUCK._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> MAIONESE GELADA À MEIA-NOITE: +2 SORTE._"
+          }
+        }
+      }
+    },
+    "nan_oracle_03" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> DO NOT TRUST CHEESE THAT BLINKS FIRST._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> NÃO CONFIE NO QUEIJO QUE PISCA PRIMEIRO._"
+          }
+        }
+      }
+    },
+    "nan_oracle_04" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> THE SANDWICH CHOOSES THE MAGE. WARNED._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> O SANDUÍCHE ESCOLHE O MAGO. AVISADO._"
+          }
+        }
+      }
+    },
+    "nan_oracle_05" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> D20 LANDED CREST UP: CURSED LUNCH._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> D20 DE MANHÃ VIRADO: ALMOÇO AMALDIÇOADO._"
+          }
+        }
+      }
+    },
+    "nan_oracle_06" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> BUTTER NEVER LIES. OR LIES TWICE._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> A MANTEIGA NUNCA MENTE. OU MENTE DUAS._"
+          }
+        }
+      }
+    },
+    "nan_oracle_07" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> RARE BACON IS FATE; BURNT BACON IS OMEN._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> BACON AO PONTO É DESTINO; QUEIMADO É AVISO._"
+          }
+        }
+      }
+    },
+    "nan_oracle_08" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> WHEN THE PICKLE WHISTLES, ROLL PERCEPTION._"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> QUANDO O PICKLE ASSOBIAR, ROLE PERCEPÇÃO._"
+          }
+        }
+      }
+    },
+    "nan_oracle_a11y_hint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows a random sandwich prophecy in the tagline below."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra uma profecia aleatória do sanduíche na legenda abaixo."
+          }
+        }
+      }
+    },
+    "nan_oracle_a11y_label" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sandwich oracle"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oráculo do sanduíche"
           }
         }
       }
@@ -4133,38 +4437,6 @@
         }
       }
     },
-    "nan_profile_key_account" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ACCOUNT"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CONTA"
-          }
-        }
-      }
-    },
-    "nan_profile_key_provider" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PROVIDER"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PROVEDOR"
-          }
-        }
-      }
-    },
     "nan_profile_counter_loading" : {
       "localizations" : {
         "en" : {
@@ -4209,6 +4481,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "> PROFILE.SYS"
+          }
+        }
+      }
+    },
+    "nan_profile_key_account" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ACCOUNT"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CONTA"
           }
         }
       }
@@ -4309,6 +4597,22 @@
         }
       }
     },
+    "nan_profile_key_provider" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PROVIDER"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PROVEDOR"
+          }
+        }
+      }
+    },
     "nan_profile_key_runs_started" : {
       "localizations" : {
         "en" : {
@@ -4405,6 +4709,22 @@
         }
       }
     },
+    "nan_profile_section_traits" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TRAITS.LOG"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TRAITS.LOG"
+          }
+        }
+      }
+    },
     "nan_profile_sign_out" : {
       "localizations" : {
         "en" : {
@@ -4433,22 +4753,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sai da conta e retorna ao portal de conta."
-          }
-        }
-      }
-    },
-    "nan_profile_section_traits" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "TRAITS.LOG"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "TRAITS.LOG"
           }
         }
       }
@@ -4982,6 +5286,54 @@
         }
       }
     },
+    "nan_vision_error_empty_prompt" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scene prompt is empty."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O prompt de cena está vazio."
+          }
+        }
+      }
+    },
+    "nan_vision_error_invalid_url" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image URL is invalid."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A URL da imagem é inválida."
+          }
+        }
+      }
+    },
+    "nan_vision_error_no_url" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image service returned no URL."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O serviço de imagem não retornou URL."
+          }
+        }
+      }
+    },
     "nan_vision_loading_ram" : {
       "localizations" : {
         "en" : {
@@ -5062,22 +5414,6 @@
         }
       }
     },
-    "nan_vision_unavailable_alert_title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vision unavailable"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Visão indisponível"
-          }
-        }
-      }
-    },
     "nan_vision_unavailable_alert_message" : {
       "localizations" : {
         "en" : {
@@ -5110,50 +5446,18 @@
         }
       }
     },
-    "nan_vision_error_empty_prompt" : {
+    "nan_vision_unavailable_alert_title" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scene prompt is empty."
+            "value" : "Vision unavailable"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O prompt de cena está vazio."
-          }
-        }
-      }
-    },
-    "nan_vision_error_no_url" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Image service returned no URL."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O serviço de imagem não retornou URL."
-          }
-        }
-      }
-    },
-    "nan_vision_error_invalid_url" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Image URL is invalid."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A URL da imagem é inválida."
+            "value" : "Visão indisponível"
           }
         }
       }

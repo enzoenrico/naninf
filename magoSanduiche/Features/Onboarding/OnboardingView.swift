@@ -10,6 +10,7 @@ import SwiftUI
 
 struct OnboardingView: View {
 	@Environment(AppCoordinator.self) private var coordinator
+	@Environment(AuthSessionStore.self) private var authSessionStore
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 	@AppStorage("hasUnlockedFullGame") private var hasUnlockedFullGame = false
@@ -44,8 +45,8 @@ struct OnboardingView: View {
 							.padding(.vertical, 14)
 					}
 					.buttonStyle(OnboardingPrimaryButtonStyle())
-					.disabled(!vm.canContinue)
-					.opacity(vm.canContinue ? 1 : 0.45)
+					.disabled(!canPressPrimary)
+					.opacity(canPressPrimary ? 1 : 0.45)
 					.padding(.horizontal, 24)
 					.terminalPanelTransition(edge: .bottom)
 				}
@@ -61,15 +62,26 @@ struct OnboardingView: View {
 		@ObserveInjection var forceRedraw
 	#endif
 
+	private var canPressPrimary: Bool {
+		switch vm.currentStep {
+		case .signIn:
+			authSessionStore.isAuthenticated
+		default:
+			vm.canContinue
+		}
+	}
+
 	private func handlePrimaryAction() {
 		AppAnalytics.capture(
 			"onboarding_primary_tapped",
 			properties: onboardingProperties.merging([
-				"can_continue": vm.canContinue,
+				"can_continue": canPressPrimary,
 				"is_final_page": vm.isOnFinalPage,
+				"is_authenticated": authSessionStore.isAuthenticated,
 			]) { _, new in new })
 
 		if vm.isOnFinalPage {
+			guard authSessionStore.isAuthenticated else { return }
 			vm.persistResponsesOnUnlock()
 			AppAnalytics.capture("onboarding_unlocked", properties: onboardingProperties)
 			TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
@@ -143,8 +155,8 @@ struct OnboardingView: View {
 			ProcessingOnboardingScreen()
 		case .demo:
 			DemoOnboardingScreen(vm: vm)
-		case .paywall:
-			PaywallOnboardingScreen()
+		case .signIn:
+			SignInOnboardingScreen()
 		}
 	}
 
@@ -458,14 +470,21 @@ private struct ProcessingOnboardingScreen: View {
 	}
 }
 
+private enum OnboardingDemoFlow: Identifiable {
+	case game
+	case auth
+
+	var id: Self { self }
+}
+
 private struct DemoOnboardingScreen: View {
+	@Environment(AuthSessionStore.self) private var authSessionStore
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 	let vm: OnboardingViewModel
 	@State private var gameVM = GameViewModel(persistRunsToLibrary: false)
 	@State private var demoCoordinator = AppCoordinator()
-	@State private var isDemoPresented = false
-	@State private var hasAutoPresentedDemo = false
+	@State private var activeDemoFlow: OnboardingDemoFlow?
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 16) {
@@ -509,7 +528,7 @@ private struct DemoOnboardingScreen: View {
 						"demo_action_target": vm.demoActionTarget,
 						"is_resume": vm.completedDemoActions > 0,
 					])
-				isDemoPresented = true
+				activeDemoFlow = .game
 			} label: {
 				Text(
 					String(
@@ -524,55 +543,70 @@ private struct DemoOnboardingScreen: View {
 				.padding(.vertical, 14)
 			}
 			.buttonStyle(OnboardingPrimaryButtonStyle())
+
+			#if DEBUG
+				Button(action: skipDemoAsCompleted) {
+					Text("nan_debug_onboarding_skip_demo")
+						.font(.monocraft(relativeTo: .caption, weight: .semibold))
+						.foregroundStyle(Color.terminalWarning)
+						.frame(maxWidth: .infinity, alignment: .trailing)
+				}
+				.buttonStyle(.plain)
+				.accessibilityLabel(String(localized: "nan_debug_onboarding_skip_demo_a11y"))
+			#endif
 		}
-		.onAppear {
-			guard vm.completedDemoActions < vm.demoActionTarget else { return }
-			guard !hasAutoPresentedDemo else { return }
-			hasAutoPresentedDemo = true
-			AppAnalytics.capture(
-				"onboarding_demo_auto_presented",
-				properties: [
-					"completed_demo_actions": vm.completedDemoActions,
-					"demo_action_target": vm.demoActionTarget,
-				])
-			isDemoPresented = true
-		}
-		.fullScreenCover(isPresented: $isDemoPresented) {
-			DemoGameCover(
-				vm: vm,
-				gameVM: gameVM,
-				demoCoordinator: demoCoordinator,
-				onCompletedPlayerAction: handleCompletedPlayerAction
-			) {
-				AppAnalytics.capture(
-					"onboarding_demo_closed",
-					properties: [
-						"completed_demo_actions": vm.completedDemoActions,
-						"demo_action_target": vm.demoActionTarget,
-					])
-				isDemoPresented = false
+		.fullScreenCover(item: $activeDemoFlow) { flow in
+			switch flow {
+			case .game:
+				DemoGameCover(
+					vm: vm,
+					gameVM: gameVM,
+					demoCoordinator: demoCoordinator,
+					onCompletedPlayerAction: handleCompletedPlayerAction,
+					onDemoNeedsLogin: { activeDemoFlow = .auth },
+					onSkipDemoForDebug: skipDemoAsCompleted
+				) {
+					AppAnalytics.capture(
+						"onboarding_demo_closed",
+						properties: [
+							"completed_demo_actions": vm.completedDemoActions,
+							"demo_action_target": vm.demoActionTarget,
+						])
+					activeDemoFlow = nil
+				}
+			case .auth:
+				AuthView()
+					.onChange(of: authSessionStore.isAuthenticated) { _, isAuthenticated in
+						guard isAuthenticated else { return }
+						AppAnalytics.capture("onboarding_demo_login_completed")
+						handleDemoFinishedAndSignedIn()
+					}
 			}
 		}
 	}
 
-	private func handleCompletedPlayerAction() {
-		let shouldShowPaywall = vm.recordCompletedDemoAction()
+	private func handleCompletedPlayerAction() -> Bool {
+		let didCompleteDemo = vm.recordCompletedDemoAction()
 		AppAnalytics.capture(
 			"onboarding_demo_action_completed",
 			properties: [
 				"completed_demo_actions": vm.completedDemoActions,
 				"demo_action_target": vm.demoActionTarget,
-				"did_complete_demo": shouldShowPaywall,
+				"did_complete_demo": didCompleteDemo,
 			])
-		guard shouldShowPaywall else { return }
+		if didCompleteDemo {
+			AppAnalytics.capture(
+				"onboarding_demo_completed",
+				properties: [
+					"completed_demo_actions": vm.completedDemoActions,
+					"demo_action_target": vm.demoActionTarget,
+				])
+		}
+		return didCompleteDemo
+	}
 
-		AppAnalytics.capture(
-			"onboarding_demo_completed",
-			properties: [
-				"completed_demo_actions": vm.completedDemoActions,
-				"demo_action_target": vm.demoActionTarget,
-			])
-		isDemoPresented = false
+	private func handleDemoFinishedAndSignedIn() {
+		activeDemoFlow = nil
 		Task { @MainActor in
 			try? await Task.sleep(for: .milliseconds(250))
 			TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
@@ -580,13 +614,33 @@ private struct DemoOnboardingScreen: View {
 			}
 		}
 	}
+
+	private func skipDemoAsCompleted() {
+		#if DEBUG
+			vm.skipDemoForDebug()
+			AppAnalytics.capture(
+				"onboarding_demo_completed",
+				properties: [
+					"completed_demo_actions": vm.completedDemoActions,
+					"demo_action_target": vm.demoActionTarget,
+					"debug_skip": true,
+				])
+			if authSessionStore.isAuthenticated {
+				handleDemoFinishedAndSignedIn()
+			} else {
+				activeDemoFlow = .auth
+			}
+		#endif
+	}
 }
 
 private struct DemoGameCover: View {
 	let vm: OnboardingViewModel
 	let gameVM: GameViewModel
 	let demoCoordinator: AppCoordinator
-	let onCompletedPlayerAction: () -> Void
+	let onCompletedPlayerAction: () -> Bool
+	let onDemoNeedsLogin: () -> Void
+	let onSkipDemoForDebug: () -> Void
 	let onClose: () -> Void
 
 	var body: some View {
@@ -609,87 +663,110 @@ private struct DemoGameCover: View {
 						.foregroundStyle(Color.terminalMana)
 				}
 				.buttonStyle(TerminalSubtleButtonStyle())
+
+				#if DEBUG
+					Button(action: onSkipDemoForDebug) {
+						Text("nan_debug_onboarding_skip_demo")
+							.font(.monocraft(relativeTo: .caption, weight: .semibold))
+							.foregroundStyle(Color.terminalWarning)
+					}
+					.buttonStyle(.plain)
+					.accessibilityLabel(String(localized: "nan_debug_onboarding_skip_demo_a11y"))
+				#endif
 			}
 			.padding(.horizontal, 16)
 			.padding(.vertical, 12)
-			// .background(Color.terminalSurface)
 			.drawBorder(nil, color: .terminalMana, lineWidth: 1)
 
 			GameSessionView(
 				vm: gameVM,
 				coordinator: demoCoordinator,
 				showsTips: false,
-				onCompletedPlayerAction: onCompletedPlayerAction
+				onCompletedPlayerAction: {
+					let didCompleteDemo = onCompletedPlayerAction()
+					if didCompleteDemo {
+						onDemoNeedsLogin()
+					}
+				}
 			)
 		}
 		.background(Color.background.ignoresSafeArea())
 	}
 }
 
-private struct PaywallOnboardingScreen: View {
+private struct SignInOnboardingScreen: View {
+	@Environment(AuthSessionStore.self) private var authSessionStore
+
 	var body: some View {
-		VStack(spacing: 16) {
-			Image(.bread)
+		VStack(alignment: .leading, spacing: 16) {
+			Image(.ink)
 				.resizable()
 				.interpolation(.none)
 				.scaledToFit()
-				.frame(height: 108)
-				.foregroundStyle(Color.terminalWarning)
-				.shadow(color: Color.terminalWarning.opacity(0.24), radius: 12)
+				.frame(height: 96)
+				.foregroundStyle(Color.terminalMana)
 
 			OnboardingHeader(
-				kicker: String(localized: "nan_onboarding_kicker_paywall"),
-				title: String(localized: "nan_onboarding_paywall_title"),
-				subtitle: String(localized: "nan_onboarding_paywall_subtitle")
+				kicker: String(localized: "nan_onboarding_kicker_sign_in"),
+				title: String(localized: "nan_onboarding_sign_in_title"),
+				subtitle: String(localized: "nan_onboarding_sign_in_subtitle")
 			)
 
-			VStack(alignment: .leading, spacing: 12) {
-				PaywallBullet(text: String(localized: "nan_onboarding_paywall_bullet_turns"))
-				PaywallBullet(text: String(localized: "nan_onboarding_paywall_bullet_reactive"))
-				PaywallBullet(text: String(localized: "nan_onboarding_paywall_bullet_content"))
-			}
-			.padding(14)
-			.frame(maxWidth: .infinity, alignment: .leading)
-			// .background(Color.terminalSurface)
-			.drawBorder(String(localized: "nan_onboarding_paywall_included_border"), color: .accent, lineWidth: 1)
-
-			VStack(spacing: 8) {
-				Text(String(localized: "nan_onboarding_paywall_price"))
-					.font(.monocraft(relativeTo: .headline, weight: .bold))
-					.foregroundStyle(Color.terminalWarning)
-				Text(String(localized: "nan_onboarding_paywall_disclaimer"))
-					.font(.monocraft(relativeTo: .caption))
-					.multilineTextAlignment(.center)
-					.foregroundStyle(Color.terminalMutedText)
-				Button {
-					AppAnalytics.capture("onboarding_paywall_restore_tapped")
-				} label: {
-					Text(String(localized: "nan_onboarding_paywall_restore"))
-						.font(.monocraft(relativeTo: .caption, weight: .semibold))
-						.foregroundStyle(Color.terminalMana)
+			if authSessionStore.isAuthenticated {
+				HStack(spacing: 10) {
+					Text("[x]")
+						.font(.monocraft(relativeTo: .caption, weight: .bold))
+						.foregroundStyle(Color.terminalWarning)
+					Text(String(localized: "nan_onboarding_sign_in_bound"))
+						.font(.monocraft(relativeTo: .callout, weight: .semibold))
+						.foregroundStyle(Color.accent)
 				}
-				.buttonStyle(TerminalSubtleButtonStyle())
+				.padding(14)
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.drawBorder(String(localized: "nan_onboarding_sign_in_bound_border"), color: .terminalWarning, lineWidth: 1)
+			} else {
+				VStack(alignment: .leading, spacing: 12) {
+					if let statusBody = signInStatusBody {
+						Text(statusBody)
+							.font(.monocraft(relativeTo: .caption))
+							.foregroundStyle(signInStatusColor)
+					}
+					PlayerSignInPanel()
+				}
+				.padding(14)
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.drawBorder(String(localized: "nan_onboarding_sign_in_panel_border"), color: .terminalMana, lineWidth: 1)
 			}
-			.padding(14)
-			.frame(maxWidth: .infinity)
-			// .background(Color.terminalSurface)
-			.drawBorder(String(localized: "nan_onboarding_paywall_trial_border"), color: .terminalWarning, lineWidth: 1)
+		}
+		.task {
+			await authSessionStore.start()
 		}
 	}
-}
 
-private struct PaywallBullet: View {
-	let text: String
-
-	var body: some View {
-		HStack(alignment: .top, spacing: 10) {
-			Text("[x]")
-				.font(.monocraft(relativeTo: .caption, weight: .bold))
-				.foregroundStyle(Color.terminalWarning)
-			Text(text)
-				.font(.monocraft(relativeTo: .callout))
-				.foregroundStyle(Color.accent)
+	private var signInStatusBody: String? {
+		if let configurationMessage = authSessionStore.configurationMessage {
+			return configurationMessage
 		}
+		if let errorMessage = authSessionStore.errorMessage {
+			return errorMessage
+		}
+		if authSessionStore.isLoadingSession {
+			return String(localized: "nan_onboarding_sign_in_status_checking")
+		}
+		if authSessionStore.isAuthenticating {
+			return String(localized: "nan_onboarding_sign_in_status_binding")
+		}
+		return String(localized: "nan_onboarding_sign_in_status_ready")
+	}
+
+	private var signInStatusColor: Color {
+		if authSessionStore.configurationMessage != nil || authSessionStore.errorMessage != nil {
+			return .terminalDanger
+		}
+		if authSessionStore.isLoadingSession || authSessionStore.isAuthenticating {
+			return .terminalWarning
+		}
+		return .terminalMutedText
 	}
 }
 
