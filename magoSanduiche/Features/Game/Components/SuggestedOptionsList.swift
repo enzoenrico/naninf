@@ -190,25 +190,26 @@ private struct SuggestedOptionRow: View {
 				maxHeight: SuggestedOptionLayout.expandedScrollMaxHeight()
 			)
 
-			Rectangle()
-				.fill(Color.accent.opacity(0.35))
-				.frame(height: 1)
-				.accessibilityHidden(true)
+			// Rectangle()
+			// 	.fill(Color.accent.opacity(0.35))
+			// 	.frame(height: 1)
+			// 	.accessibilityHidden(true)
 
-			Button {
-				guard !isDisabled else { return }
-				onSelect()
-			} label: {
-				Text(String(localized: "nan_suggested_action_tap_again"))
-					.font(.monocraft(relativeTo: .callout, weight: .semibold))
-					.foregroundStyle(foregroundColor)
-					.frame(maxWidth: .infinity, minHeight: SuggestedOptionLayout.rowMinHeight)
-			}
-			.buttonStyle(SuggestedOptionConfirmButtonStyle())
-			.disabled(isDisabled)
+			// Button {
+			// 	guard !isDisabled else { return }
+			// 	onSelect()
+			// } label: {
+			// 	Text(String(localized: "nan_suggested_action_tap_again"))
+			// 		.font(.monocraft(relativeTo: .callout, weight: .semibold))
+			// 		.foregroundStyle(foregroundColor)
+			// 		.frame(maxWidth: .infinity, minHeight: SuggestedOptionLayout.rowMinHeight)
+			// }
+			// .buttonStyle(SuggestedOptionConfirmButtonStyle())
+			// .disabled(isDisabled)
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.drawBorder(nil, color: borderColor, lineWidth: 1)
+    .animation(.bouncy())
 		.accessibilityElement(children: .contain)
 		.accessibilityLabel(text)
 	}
