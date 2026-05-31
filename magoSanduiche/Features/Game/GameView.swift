@@ -257,7 +257,6 @@ struct GameSessionView: View {
 			terminalTranscript(vm: vm, coordinator: coordinator)
 				.layoutPriority(1)
 
-			if coordinator.isContextualInputVisible {
 				if vm.contextAction == .write, !vm.suggestedOptions.isEmpty {
 					SuggestedOptionsList(
 						options: vm.suggestedOptions,
@@ -269,6 +268,7 @@ struct GameSessionView: View {
 					.terminalPanelTransition(edge: .bottom)
 				}
 
+			if coordinator.isContextualInputVisible {
 				InputBox(
 					with: Binding(
 						get: { vm.contextualInput },

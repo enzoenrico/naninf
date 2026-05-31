@@ -16,6 +16,7 @@ struct SuggestedOptionsList: View {
 	let isDisabled: Bool
 	let onSelect: (String) -> Void
 
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@State private var expandedRowIndex: Int?
 
 	var body: some View {
@@ -33,6 +34,10 @@ struct SuggestedOptionsList: View {
 				)
 			}
 		}
+		.animation(
+			TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation),
+			value: expandedRowIndex
+		)
 		.accessibilityElement(children: .contain)
 	}
 }
@@ -42,6 +47,8 @@ struct SuggestedOptionsList: View {
 #if canImport(UIKit)
 	private enum SuggestedOptionLayout {
 		static let rowMinHeight: CGFloat = 44
+		/// Target height when a long option expands (larger than collapsed).
+		static let expandedRowMinHeight: CGFloat = 128
 		static let collapsedLineLimit = 3
 
 		static func uiFontBody() -> UIFont {
@@ -66,12 +73,14 @@ struct SuggestedOptionsList: View {
 		}
 
 		static func expandedScrollMaxHeight() -> CGFloat {
-			min(220, max(120, UIScreen.main.bounds.height * 0.28))
+			min(260, max(expandedRowMinHeight + 24, UIScreen.main.bounds.height * 0.32))
 		}
 	}
 #else
 	private enum SuggestedOptionLayout {
 		static let rowMinHeight: CGFloat = 44
+		/// Target height when a long option expands (larger than collapsed).
+		static let expandedRowMinHeight: CGFloat = 128
 		static let collapsedLineLimit = 3
 
 		static func textExceedsLineLimit(_ text: String, maxWidth: CGFloat, maxLines: Int) -> Bool {
@@ -80,7 +89,7 @@ struct SuggestedOptionsList: View {
 		}
 
 		static func expandedScrollMaxHeight() -> CGFloat {
-			160
+			180
 		}
 	}
 #endif
@@ -94,6 +103,7 @@ private struct SuggestedOptionRow: View {
 	@Binding var expandedRowIndex: Int?
 	let onSelect: () -> Void
 
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@State private var measuredCardWidth: CGFloat = 0
 
 	private let horizontalPadding: CGFloat = 10
@@ -127,17 +137,15 @@ private struct SuggestedOptionRow: View {
 	}
 
 	var body: some View {
-		Group {
-			if needsRevealStep, isExpanded {
-				expandedCard
-			} else {
-				collapsedCard
+		card
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.animation(
+				TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation),
+				value: isExpanded
+			)
+			.onGeometryChange(for: CGFloat.self, of: \.size.width) { width in
+				measuredCardWidth = width
 			}
-		}
-		.frame(maxWidth: .infinity, alignment: .leading)
-		.onGeometryChange(for: CGFloat.self, of: \.size.width) { width in
-			measuredCardWidth = width
-		}
 	}
 
 	private func optionLabel(lineLimit: Int?) -> some View {
@@ -157,61 +165,63 @@ private struct SuggestedOptionRow: View {
 		.padding(.vertical, 12)
 	}
 
-	private var collapsedCard: some View {
+	private var card: some View {
 		Button {
-			guard !isDisabled else { return }
-			if needsRevealStep {
-				expandedRowIndex = index
-			} else {
-				onSelect()
-			}
+			handleTap()
 		} label: {
-			optionLabel(
-				lineLimit: needsRevealStep ? SuggestedOptionLayout.collapsedLineLimit : nil
-			)
-			.frame(maxWidth: .infinity, minHeight: SuggestedOptionLayout.rowMinHeight, alignment: .leading)
-			.drawBorder(nil, color: borderColor, lineWidth: 1)
+			cardContent
 		}
 		.buttonStyle(SuggestedOptionButtonStyle())
 		.disabled(isDisabled)
 		.accessibilityLabel(text)
 		.optionalAccessibilityHint(
-			needsRevealStep ? String(localized: "nan_suggested_action_expand_a11y_hint") : nil
+			needsRevealStep && !isExpanded
+				? String(localized: "nan_suggested_action_expand_a11y_hint")
+				: nil
 		)
+		.accessibilityElement(children: isExpanded ? .contain : .ignore)
 	}
 
-	private var expandedCard: some View {
-		VStack(alignment: .leading, spacing: 0) {
-			ScrollView {
-				optionLabel(lineLimit: nil)
+	private var cardContent: some View {
+		Group {
+			if needsRevealStep, isExpanded {
+				ScrollView(.vertical, showsIndicators: true) {
+					optionLabel(lineLimit: nil)
+				}
+				.transition(
+					TerminalMotion.panelTransition(reduceMotion: reduceMotion, edge: .bottom)
+				)
+			} else {
+				optionLabel(
+					lineLimit: needsRevealStep ? SuggestedOptionLayout.collapsedLineLimit : nil
+				)
+				.transition(
+					TerminalMotion.panelTransition(reduceMotion: reduceMotion, edge: .bottom)
+				)
 			}
-			.frame(
-				minHeight: SuggestedOptionLayout.rowMinHeight,
-				maxHeight: SuggestedOptionLayout.expandedScrollMaxHeight()
-			)
-
-			// Rectangle()
-			// 	.fill(Color.accent.opacity(0.35))
-			// 	.frame(height: 1)
-			// 	.accessibilityHidden(true)
-
-			// Button {
-			// 	guard !isDisabled else { return }
-			// 	onSelect()
-			// } label: {
-			// 	Text(String(localized: "nan_suggested_action_tap_again"))
-			// 		.font(.monocraft(relativeTo: .callout, weight: .semibold))
-			// 		.foregroundStyle(foregroundColor)
-			// 		.frame(maxWidth: .infinity, minHeight: SuggestedOptionLayout.rowMinHeight)
-			// }
-			// .buttonStyle(SuggestedOptionConfirmButtonStyle())
-			// .disabled(isDisabled)
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
+		.frame(
+			minHeight: isExpanded
+				? SuggestedOptionLayout.expandedRowMinHeight
+				: SuggestedOptionLayout.rowMinHeight,
+			maxHeight: isExpanded ? SuggestedOptionLayout.expandedScrollMaxHeight() : nil,
+			alignment: .leading
+		)
+		.clipped()
 		.drawBorder(nil, color: borderColor, lineWidth: 1)
-    .animation(.bouncy())
-		.accessibilityElement(children: .contain)
-		.accessibilityLabel(text)
+	}
+
+	private func handleTap() {
+		guard !isDisabled else { return }
+		if needsRevealStep {
+			guard !isExpanded else { return }
+			TerminalMotion.perform(reduceMotion: reduceMotion) {
+				expandedRowIndex = index
+			}
+		} else {
+			onSelect()
+		}
 	}
 }
 

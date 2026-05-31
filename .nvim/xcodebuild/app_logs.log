@@ -1,47 +1,77 @@
-[PostHog] New session id created 019E6643-8204-7C1E-8A92-244CA2D84824 (sessionStart)
+[PostHog] New session id created 019E7BE6-4F6A-7272-A7C9-96DBFEFE1FCB (sessionStart)
 [PostHog] Integration PostHogScreenViewIntegration installed
 [PostHog] Integration PostHogAppLifeCycleIntegration installed
 [PostHog] Integration PostHogSurveyIntegration installed
 [PostHog] Integration PostHogRageClickIntegration installed
 [PostHog] Queued event '$set'. Depth: 1
 IOSurfaceClientSetSurfaceNotify failed e00002c7
+[PostHog] Remote config called successfully.
+[PostHog] hasFeatureFlags is false, clearing flags and skipping loading flags
 [PostHog] Sending batch of 1 events to PostHog
 [PostHog] Queued event '$screen'. Depth: 2
 [PostHog] Queued event 'Application Opened'. Depth: 3
-[PostHog] Remote config called successfully.
-[PostHog] hasFeatureFlags is false, clearing flags and skipping loading flags
 [PostHog] Events sent successfully.
 [PostHog] Completed!
-2026-05-26 18:49:24.791 magoSanduiche[26417:22363013] InjectionClient/Could not connect: Connection refused
 💉 Unable to connect to InjectionIII app, falling back to standalone HotReloading.
 💉 Standalone InjectionIII available for sources under ["/Users/enzoenrico"]
 [PostHog] Queued event '$screen'. Depth: 3
 [PostHog] Queued event '$screen'. Depth: 4
-[PostHog] Queued event 'onboarding_step_viewed'. Depth: 5
-[PostHog] Queued event 'onboarding_primary_tapped'. Depth: 6
-[PostHog] Queued event 'onboarding_step_viewed'. Depth: 7
-[PostHog] Queued event 'onboarding_option_selected'. Depth: 8
-[PostHog] Queued event 'onboarding_primary_tapped'. Depth: 9
-[PostHog] Queued event 'onboarding_step_viewed'. Depth: 10
-[PostHog] Queued event 'onboarding_option_selected'. Depth: 11
-[PostHog] Queued event 'onboarding_primary_tapped'. Depth: 12
-[PostHog] Queued event 'onboarding_step_viewed'. Depth: 13
-[PostHog] Sending batch of 13 events to PostHog
+[PostHog] Sending batch of 4 events to PostHog
 [PostHog] Events sent successfully.
 [PostHog] Completed!
-[PostHog] Queued event 'onboarding_primary_tapped'. Depth: 1
-[PostHog] Queued event 'onboarding_step_viewed'. Depth: 2
-[PostHog] Queued event 'onboarding_primary_tapped'. Depth: 3
-[PostHog] Queued event 'onboarding_step_viewed'. Depth: 4
-[PostHog] Queued event 'onboarding_option_selected'. Depth: 5
-[PostHog] Queued event 'onboarding_option_selected'. Depth: 6
-[PostHog] Queued event 'onboarding_option_selected'. Depth: 7
-[PostHog] Queued event 'onboarding_option_selected'. Depth: 8
-[PostHog] Queued event 'onboarding_option_selected'. Depth: 9
-[PostHog] Queued event 'onboarding_primary_tapped'. Depth: 10
-[PostHog] Queued event 'onboarding_step_viewed'. Depth: 11
-[PostHog] Queued event 'game_session_started'. Depth: 12
-[PostHog] Queued event 'onboarding_step_viewed'. Depth: 13
-[PostHog] Sending batch of 13 events to PostHog
+[PostHog] Queued event 'home_menu_item_selected'. Depth: 1
+[PostHog] Queued event 'navigation_route_opened'. Depth: 2
+[PostHog] Queued event '$screen'. Depth: 3
+[PostHog] Queued event 'navigation_route_opened'. Depth: 4
+[PostHog] Queued event 'game_session_started'. Depth: 5
+[PostHog] Queued event 'game_session_started'. Depth: 6
+[PostHog] Queued event '$screen'. Depth: 7
+[PostHog] Sending batch of 7 events to PostHog
 [PostHog] Events sent successfully.
 [PostHog] Completed!
+💉 Using logs: /Users/enzoenrico/Library/Developer/Xcode/DerivedData/magoSanduiche-bkvcqzunzvitagbeqfqzydkzcosz/Logs/Build/17206300-FA46-43A5-B2AC-5F1C84225DD8.xcactivitylog.
+💉 ⚠️ Could not locate compile command for "/Users/enzoenrico/code/academy/published/magoSanduiche/magoSanduiche/Features/Game/Components/SuggestedOptionsList.swift" in /Users/enzoenrico/Library/Developer/Xcode/DerivedData/magoSanduiche-bkvcqzunzvitagbeqfqzydkzcosz/Logs/Build/.
+This could be due to one of the following:
+1. Injection does not work with Whole Module Optimization.
+2. There are restrictions on characters allowed in paths.
+3. File paths in the simulator are case sensitive.
+4. The modified source file is not in the current project.
+5. The source file is an XCTest that has not been run yet.
+6. Xcode has removed the build logs. Edit a file and re-run or try a build clean then rebuild to make logs available or consult: "/Users/enzoenrico/Library/Developer/CoreSimulator/Devices/DF6B5D37-9AAF-404B-A73C-767CB8764774/data/Containers/Data/Application/DFEAB786-0D2F-4C12-BD20-D4A147CBE3F4/tmp/command.sh".
+7. If you're using Xcode 16.3+, Swift compilation details are no longer logged by default.
+ See the note in the project README. You'll need to add a EMIT_FRONTEND_COMMAND_LINES custom build setting to your project to continue using InjectionIII.
+Whatever the problem, if you see this error it may be worth trying the start-over implementation https://github.com/johnno1962/InjectionNext.
+💉 ⚠️ Could not locate compile command for "/Users/enzoenrico/code/academy/published/magoSanduiche/magoSanduiche/Features/Game/Components/SuggestedOptionsList.swift" in /Users/enzoenrico/Library/Developer/Xcode/DerivedData/magoSanduiche-bkvcqzunzvitagbeqfqzydkzcosz/Logs/Build/.
+This could be due to one of the following:
+1. Injection does not work with Whole Module Optimization.
+2. There are restrictions on characters allowed in paths.
+3. File paths in the simulator are case sensitive.
+4. The modified source file is not in the current project.
+5. The source file is an XCTest that has not been run yet.
+6. Xcode has removed the build logs. Edit a file and re-run or try a build clean then rebuild to make logs available or consult: "/Users/enzoenrico/Library/Developer/CoreSimulator/Devices/DF6B5D37-9AAF-404B-A73C-767CB8764774/data/Containers/Data/Application/DFEAB786-0D2F-4C12-BD20-D4A147CBE3F4/tmp/command.sh".
+7. If you're using Xcode 16.3+, Swift compilation details are no longer logged by default.
+ See the note in the project README. You'll need to add a EMIT_FRONTEND_COMMAND_LINES custom build setting to your project to continue using InjectionIII.
+Whatever the problem, if you see this error it may be worth trying the start-over implementation https://github.com/johnno1962/InjectionNext.
+💉 ⚠️ Could not locate compile command for "/Users/enzoenrico/code/academy/published/magoSanduiche/magoSanduiche/Features/Game/Components/SuggestedOptionsList.swift" in /Users/enzoenrico/Library/Developer/Xcode/DerivedData/magoSanduiche-bkvcqzunzvitagbeqfqzydkzcosz/Logs/Build/.
+This could be due to one of the following:
+1. Injection does not work with Whole Module Optimization.
+2. There are restrictions on characters allowed in paths.
+3. File paths in the simulator are case sensitive.
+4. The modified source file is not in the current project.
+5. The source file is an XCTest that has not been run yet.
+6. Xcode has removed the build logs. Edit a file and re-run or try a build clean then rebuild to make logs available or consult: "/Users/enzoenrico/Library/Developer/CoreSimulator/Devices/DF6B5D37-9AAF-404B-A73C-767CB8764774/data/Containers/Data/Application/DFEAB786-0D2F-4C12-BD20-D4A147CBE3F4/tmp/command.sh".
+7. If you're using Xcode 16.3+, Swift compilation details are no longer logged by default.
+ See the note in the project README. You'll need to add a EMIT_FRONTEND_COMMAND_LINES custom build setting to your project to continue using InjectionIII.
+Whatever the problem, if you see this error it may be worth trying the start-over implementation https://github.com/johnno1962/InjectionNext.
+💉 ⚠️ Could not locate compile command for "/Users/enzoenrico/code/academy/published/magoSanduiche/magoSanduiche/Features/Game/Components/SuggestedOptionsList.swift" in /Users/enzoenrico/Library/Developer/Xcode/DerivedData/magoSanduiche-bkvcqzunzvitagbeqfqzydkzcosz/Logs/Build/.
+This could be due to one of the following:
+1. Injection does not work with Whole Module Optimization.
+2. There are restrictions on characters allowed in paths.
+3. File paths in the simulator are case sensitive.
+4. The modified source file is not in the current project.
+5. The source file is an XCTest that has not been run yet.
+6. Xcode has removed the build logs. Edit a file and re-run or try a build clean then rebuild to make logs available or consult: "/Users/enzoenrico/Library/Developer/CoreSimulator/Devices/DF6B5D37-9AAF-404B-A73C-767CB8764774/data/Containers/Data/Application/DFEAB786-0D2F-4C12-BD20-D4A147CBE3F4/tmp/command.sh".
+7. If you're using Xcode 16.3+, Swift compilation details are no longer logged by default.
+ See the note in the project README. You'll need to add a EMIT_FRONTEND_COMMAND_LINES custom build setting to your project to continue using InjectionIII.
+Whatever the problem, if you see this error it may be worth trying the start-over implementation https://github.com/johnno1962/InjectionNext.
+com.kyou.naninf: 62559
