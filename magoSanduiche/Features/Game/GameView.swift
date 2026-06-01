@@ -57,6 +57,9 @@ struct GameSessionView: View {
 	@State private var inlineResponseStatus: ResponseStatus?
 	@State private var inlineStatusDismissTask: Task<Void, Never>?
 	@State private var showVisionUnavailableAlert = false
+	@State private var terminalPanelHeight: CGFloat = 0
+	@State private var isSuggestionExpanded = false
+	@State private var areSuggestionsVisible = false
 	@FocusState private var isContextualInputFocused: Bool
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -64,6 +67,12 @@ struct GameSessionView: View {
 
 	/// Dice strip + bordered action panel + primary contextual button (worst-case session chrome).
 	private static let gameActionColumnMinHeight: CGFloat = 220
+	private static let terminalPanelContentPadding: CGFloat = 24
+	private static let terminalPanelSpacing: CGFloat = 12
+	private static let transcriptMinHeightWhenExpanded: CGFloat = 72
+	private static let estimatedInlineStatusHeight: CGFloat = 44
+	private static let estimatedInputBoxHeight: CGFloat = 52
+	private static let suggestionListRowSpacing: CGFloat = 8
 
 	#if DEBUG
 		@State private var showAIToolsDebug = false
@@ -151,6 +160,17 @@ struct GameSessionView: View {
 		.animation(
 			TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: coordinator.isImageCollapsed
 		)
+		.animation(
+			TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation), value: isSuggestionExpanded
+		)
+		.animation(
+			TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation),
+			value: vm.selectedSuggestionIndex
+		)
+		.animation(
+			TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation),
+			value: areSuggestionsVisible
+		)
 		.alert(
 			String(localized: "nan_vision_unavailable_alert_title"),
 			isPresented: $showVisionUnavailableAlert
@@ -228,7 +248,20 @@ struct GameSessionView: View {
 	}
 
 	private func terminalPanel(coordinator: AppCoordinator, vm: GameViewModel) -> some View {
-		VStack(alignment: .leading, spacing: 12) {
+		@Bindable var vm = vm
+
+		let showsSuggestions =
+			areSuggestionsVisible
+			&& vm.contextAction == .write
+			&& !vm.suggestedOptions.isEmpty
+		let maxExpandedRowHeight = suggestionsExpandedRowMaxHeight(
+			panelHeight: terminalPanelHeight,
+			optionsCount: vm.suggestedOptions.count,
+			hasInput: coordinator.isContextualInputVisible,
+			hasInlineStatus: inlineResponseStatus != nil
+		)
+
+		return VStack(alignment: .leading, spacing: Self.terminalPanelSpacing) {
 			#if DEBUG
 				HStack {
 					Spacer(minLength: 0)
@@ -255,18 +288,20 @@ struct GameSessionView: View {
 			}
 
 			terminalTranscript(vm: vm, coordinator: coordinator)
-				.layoutPriority(1)
+				.layoutPriority(isSuggestionExpanded ? 0 : 1)
+				.frame(minHeight: isSuggestionExpanded ? Self.transcriptMinHeightWhenExpanded : 0)
 
-				if vm.contextAction == .write, !vm.suggestedOptions.isEmpty {
-					SuggestedOptionsList(
-						options: vm.suggestedOptions,
-						isDisabled: vm.loading,
-						onSelect: { choice in
-							submitSuggestedAction(choice, vm: vm, coordinator: coordinator)
-						}
-					)
-					.terminalPanelTransition(edge: .bottom)
-				}
+			if showsSuggestions {
+				SuggestedOptionsList(
+					options: vm.suggestedOptions,
+					isDisabled: vm.loading,
+					selectedIndex: $vm.selectedSuggestionIndex,
+					maxExpandedRowHeight: maxExpandedRowHeight,
+					onExpansionChange: { isSuggestionExpanded = $0 }
+				)
+				.layoutPriority(isSuggestionExpanded ? 2 : 0)
+				.terminalPanelTransition(edge: .bottom)
+			}
 
 			if coordinator.isContextualInputVisible {
 				InputBox(
@@ -285,6 +320,57 @@ struct GameSessionView: View {
 		}
 		.padding(12)
 		.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+		.onGeometryChange(for: CGFloat.self, of: \.size.height) { height in
+			terminalPanelHeight = height
+		}
+		.onChange(of: vm.suggestedOptions.count) { _, _ in
+			if vm.contextAction != .write || vm.suggestedOptions.isEmpty {
+				hideSuggestions(vm: vm)
+			} else {
+				areSuggestionsVisible = false
+			}
+		}
+		.onChange(of: vm.contextAction) { _, _ in
+			if vm.contextAction != .write {
+				hideSuggestions(vm: vm)
+			}
+		}
+		.onChange(of: vm.selectedSuggestionIndex) { _, newIndex in
+			if newIndex != nil {
+				dismissContextualInputIfActive()
+			}
+		}
+	}
+
+	private func suggestionsExpandedRowMaxHeight(
+		panelHeight: CGFloat,
+		optionsCount: Int,
+		hasInput: Bool,
+		hasInlineStatus: Bool
+	) -> CGFloat? {
+		guard panelHeight > 0, optionsCount > 0 else { return nil }
+
+		var reserved = Self.terminalPanelContentPadding
+
+		if hasInlineStatus {
+			reserved += Self.estimatedInlineStatusHeight + Self.terminalPanelSpacing
+		}
+
+		reserved += Self.transcriptMinHeightWhenExpanded + Self.terminalPanelSpacing
+
+		let collapsedSiblings = max(0, optionsCount - 1)
+		if collapsedSiblings > 0 {
+			reserved += CGFloat(collapsedSiblings) * SuggestedOptionLayout.rowMinHeight
+			reserved += CGFloat(collapsedSiblings) * Self.suggestionListRowSpacing
+		}
+
+		if hasInput {
+			reserved += Self.terminalPanelSpacing + Self.estimatedInputBoxHeight
+		}
+
+		let remaining = panelHeight - reserved
+		let screenCap = SuggestedOptionLayout.expandedScrollMaxHeight()
+		return min(screenCap, max(SuggestedOptionLayout.rowMinHeight, remaining))
 	}
 
 	@ViewBuilder
@@ -369,18 +455,51 @@ struct GameSessionView: View {
 		shouldShowTips: Bool
 	) -> some View {
 		if coordinator.showActionButton {
-			ContextualButton(
-				type: vm.contextAction,
-				isInputVisible: coordinator.isContextualInputVisible,
-				isLoading: vm.loading,
-				phase: vm.uiPhase,
-				confirmDiceOutcome: vm.pendingDiceRoll != nil
-			) {
-				submitPrimaryAction(vm: vm, coordinator: coordinator)
+			let showsSuggestionsToggle = vm.contextAction == .write && !vm.suggestedOptions.isEmpty
+
+			HStack(alignment: .center, spacing: 8) {
+				ContextualButton(
+					type: vm.contextAction,
+					isInputVisible: coordinator.isContextualInputVisible,
+					isLoading: vm.loading,
+					phase: vm.uiPhase,
+					confirmDiceOutcome: vm.pendingDiceRoll != nil,
+					confirmSelectedSuggestion: areSuggestionsVisible && vm.selectedSuggestionIndex != nil
+				) {
+					submitPrimaryAction(vm: vm, coordinator: coordinator)
+				}
+				.frame(maxWidth: .infinity)
+
+				if showsSuggestionsToggle {
+					SuggestionsToggleButton(
+						isActive: areSuggestionsVisible,
+						isDisabled: vm.loading
+					) {
+						toggleSuggestionsVisibility(vm: vm)
+					}
+				}
 			}
 			.popoverTipIf(actionButtonTip, arrowEdge: .bottom, when: shouldShowTips)
 			.terminalPanelTransition(edge: .bottom)
 		}
+	}
+
+	private func toggleSuggestionsVisibility(vm: GameViewModel) {
+		guard !vm.loading else { return }
+
+		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
+			if areSuggestionsVisible {
+				hideSuggestions(vm: vm)
+			} else {
+				areSuggestionsVisible = true
+			}
+		}
+	}
+
+	private func hideSuggestions(vm: GameViewModel) {
+		areSuggestionsVisible = false
+		isSuggestionExpanded = false
+		vm.selectedSuggestionIndex = nil
 	}
 
 	private func submitPrimaryAction(vm: GameViewModel, coordinator: AppCoordinator) {
@@ -388,9 +507,25 @@ struct GameSessionView: View {
 
 		switch vm.contextAction {
 		case .write:
-			TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
-				coordinator.handleContextualAction(vm.contextAction) {
-					vm.getResponse(for: vm.contextualInput)
+			if areSuggestionsVisible,
+				let selectedIndex = vm.selectedSuggestionIndex,
+				selectedIndex >= 0,
+				selectedIndex < vm.suggestedOptions.count
+			{
+				let choice = vm.suggestedOptions[selectedIndex]
+				TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
+					coordinator.handleContextualAction(.write) {
+						vm.getResponse(for: choice)
+					}
+				}
+			} else {
+				TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
+					coordinator.handleContextualAction(.write) {
+						if coordinator.isContextualInputVisible {
+							return vm.getResponse(for: vm.contextualInput)
+						}
+						return false
+					}
 				}
 			}
 		case .roll:
@@ -406,17 +541,6 @@ struct GameSessionView: View {
 				TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 					coordinator.handleContextualAction(.roll) { false }
 				}
-			}
-		}
-	}
-
-	private func submitSuggestedAction(_ choice: String, vm: GameViewModel, coordinator: AppCoordinator) {
-		guard !vm.loading else { return }
-		guard vm.contextAction == .write else { return }
-
-		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
-			coordinator.handleContextualAction(vm.contextAction) {
-				vm.getResponse(for: choice)
 			}
 		}
 	}
@@ -494,6 +618,39 @@ private extension View {
 		} else {
 			self
 		}
+	}
+}
+
+// MARK: - Suggestions toggle
+
+private struct SuggestionsToggleButton: View {
+	let isActive: Bool
+	let isDisabled: Bool
+	let action: () -> Void
+
+	var body: some View {
+		Button(action: action) {
+			Image(Icons.cards.rawValue)
+				.renderingMode(.template)
+				.foregroundStyle(isActive ? Color.terminalWarning : Color.accent)
+				.frame(width: 28, height: 28)
+				.padding(.horizontal, 12)
+				.padding(.vertical, 14)
+		}
+		.disabled(isDisabled)
+		.buttonStyle(TerminalSubtleButtonStyle())
+		.drawBorder(
+			nil,
+			color: isActive ? .terminalWarning : .accentBorderIdle,
+			lineWidth: isActive ? 2 : 1
+		)
+		.opacity(isDisabled ? 0.78 : 1)
+		.accessibilityLabel(
+			isActive
+				? String(localized: "nan_a11y_toggle_suggestions_hide")
+				: String(localized: "nan_a11y_toggle_suggestions_show")
+		)
+		.accessibilityAddTraits(isActive ? .isSelected : [])
 	}
 }
 

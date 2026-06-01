@@ -530,6 +530,86 @@
         }
       }
     },
+    "nan_action_confirm_suggestion" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> CONFIRM"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> CONFIRMAR"
+          }
+        }
+      }
+    },
+    "nan_a11y_confirm_suggestion" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm selected action"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmar ação selecionada"
+          }
+        }
+      }
+    },
+    "nan_suggested_action_selected_a11y_hint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected. Tap again to deselect."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecionada. Toque de novo para desmarcar."
+          }
+        }
+      }
+    },
+    "nan_a11y_toggle_suggestions_show" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show suggestions"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar sugestões"
+          }
+        }
+      }
+    },
+    "nan_a11y_toggle_suggestions_hide" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide suggestions"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar sugestões"
+          }
+        }
+      }
+    },
     "nan_action_roll_d20" : {
       "localizations" : {
         "en" : {

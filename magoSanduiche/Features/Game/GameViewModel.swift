@@ -50,6 +50,8 @@ final class GameViewModel {
     var contextualInput = ""
     /// Lettered options from the last DM `PromptOutput`, shown as tappable shortcuts above the text field.
     var suggestedOptions: [String] = []
+    /// Index into `suggestedOptions` chosen by the player; confirmed via the primary action button.
+    var selectedSuggestionIndex: Int?
     var onCompletedPlayerAction: (() -> Void)?
     var terminalEntries: [TerminalEntry] = GameRunSnapshotMapper.defaultTerminalEntries
     /// Terminal lines whose typewriter animation has finished (in-memory, current session).
@@ -376,6 +378,7 @@ final class GameViewModel {
         hasSubmittedPlayerTurn = true
         suppressTerminalAnimations = false
         suggestedOptions = []
+        selectedSuggestionIndex = nil
         loading = true
         uiPhase = .awaitingDungeonMaster
         terminalEntries.append(TerminalEntry(kind: .player, text: displayText))
@@ -441,6 +444,7 @@ final class GameViewModel {
             uiPhase = .result
             applyToolEffects(turn.toolEffects)
             suggestedOptions = result.options
+            selectedSuggestionIndex = nil
             AppAnalytics.capture(
                 "dm_turn_succeeded",
                 properties: sessionAnalyticsProperties.merging([

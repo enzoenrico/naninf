@@ -15,6 +15,8 @@ struct ContextualButton: View {
 	var phase: GameUIPhase = .ready
 	/// When true with `.roll`, primary action commits the pending outcome instead of rolling again.
 	var confirmDiceOutcome = false
+	/// When true with `.write`, primary action confirms the selected suggestion instead of opening the text field.
+	var confirmSelectedSuggestion = false
 	var action: () -> Void
 
 	var body: some View {
@@ -58,6 +60,9 @@ struct ContextualButton: View {
 		if type == .roll, confirmDiceOutcome {
 			return .ink
 		}
+		if type == .write, confirmSelectedSuggestion {
+			return .ink
+		}
 		return type.buttonImage
 	}
 
@@ -74,6 +79,8 @@ struct ContextualButton: View {
 		} else {
 			if type == .roll, confirmDiceOutcome {
 				String(localized: "nan_action_confirm_dice")
+			} else if type == .write, confirmSelectedSuggestion {
+				String(localized: "nan_action_confirm_suggestion")
 			} else {
 				type.buttonTitle(isInputVisible: isInputVisible)
 			}
@@ -93,9 +100,13 @@ struct ContextualButton: View {
 		} else {
 			switch type {
 			case .write:
-				isInputVisible
-					? String(localized: "nan_a11y_action_send_command")
-					: String(localized: "nan_a11y_action_write_command")
+				if confirmSelectedSuggestion {
+					String(localized: "nan_a11y_confirm_suggestion")
+				} else if isInputVisible {
+					String(localized: "nan_a11y_action_send_command")
+				} else {
+					String(localized: "nan_a11y_action_write_command")
+				}
 			case .roll:
 				confirmDiceOutcome
 					? String(localized: "nan_a11y_confirm_dice")
