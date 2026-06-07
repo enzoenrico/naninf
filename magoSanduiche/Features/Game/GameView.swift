@@ -190,6 +190,7 @@ struct GameSessionView: View {
 			presentInlineStatus(for: newPhase)
 		}
 		.onChange(of: coordinator.isContextualInputVisible) { _, isVisible in
+      // isVisible ? {showsSuggestions = false} :  {nil}
 			isContextualInputFocused = isVisible
 		}
 		#if DEBUG
@@ -220,6 +221,7 @@ struct GameSessionView: View {
 			}
 			.terminalPanelTransition(edge: .top)
 		} else {
+      /// changed the frame's height here
 			VisionPanel(
 				displayMode: vm.visionDisplayMode,
 				isStoryLoading: vm.loading,

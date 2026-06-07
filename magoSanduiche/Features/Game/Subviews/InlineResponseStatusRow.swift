@@ -60,7 +60,7 @@ struct InlineResponseStatusRow: View {
 		}
 		.padding(.horizontal, 10)
 		.padding(.vertical, 8)
-		.background(Color.terminalSurface)
+		// .background(Color.terminalSurface)
 		.drawBorder(nil, color: status.color.opacity(0.8), lineWidth: 1)
 		.contentShape(Rectangle())
 		.gesture(

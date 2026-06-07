@@ -25,7 +25,7 @@ struct VisionPanel: View {
 	var body: some View {
 		ZStack(alignment: .topLeading) {
 			mediaContent
-				.frame(maxWidth: .infinity, maxHeight: .infinity)
+				.frame(maxWidth: .infinity, maxHeight: 200)
 				.opacity(showsLoadingOverlay ? 0.55 : 1)
 
 			if showsLoadingOverlay {

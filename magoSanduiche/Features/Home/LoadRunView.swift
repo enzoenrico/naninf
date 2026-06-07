@@ -83,7 +83,7 @@ struct LoadRunView: View {
 		.padding(.vertical, Spacing.layoutBottom)
 		.padding(.horizontal, Spacing.layoutLeading)
 		.frame(maxWidth: .infinity)
-		.background(Color.terminalSurface)
+		// .background(Color.terminalSurface)
 		.drawBorder(String(localized: "nan_load_panel_border"), color: .terminalWarning, lineWidth: 1)
 	}
 
@@ -121,7 +121,7 @@ struct LoadRunView: View {
 					.contentShape(Rectangle())
 				}
 				.buttonStyle(.plain)
-				.listRowBackground(Color.terminalSurface)
+				// .listRowBackground(Color.terminalSurface)
 				.accessibilityHint(String(localized: "nan_load_resume_a11y"))
 			}
 			.onDelete(perform: deleteRuns)

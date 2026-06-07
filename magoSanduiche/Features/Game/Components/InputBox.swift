@@ -48,9 +48,9 @@ struct InputBox: View {
 		}
 		.padding(.horizontal, 10)
 		.padding(.vertical, 12)
-		.background(isFocused ? Color.terminalActiveSurface : Color.terminalSurface)
+		// .background(isFocused ? Color.terminalActiveSurface : Color.terminalSurface)
 		.drawBorder(
-			isFocused ? String(localized: "nan_input_border_focused") : nil,
+			nil,
 			color: isDisabled ? Color.terminalMutedText : Color.accent,
 			lineWidth: isFocused ? 2 : 1
 		)

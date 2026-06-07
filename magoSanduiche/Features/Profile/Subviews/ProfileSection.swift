@@ -73,7 +73,7 @@ struct ProfileSection<Content: View>: View {
 		}
 		.padding(14)
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.background(Color.terminalSurface)
+		// .background(Color.terminalSurface)
 		.drawBorder("> \(title)", color: accent, lineWidth: 1)
 	}
 }

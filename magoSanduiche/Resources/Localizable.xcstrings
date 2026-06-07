@@ -194,6 +194,54 @@
         }
       }
     },
+    "nan_a11y_confirm_suggestion" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm selected action"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmar ação selecionada"
+          }
+        }
+      }
+    },
+    "nan_a11y_toggle_suggestions_hide" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide suggestions"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar sugestões"
+          }
+        }
+      }
+    },
+    "nan_a11y_toggle_suggestions_show" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show suggestions"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar sugestões"
+          }
+        }
+      }
+    },
     "nan_about_back" : {
       "localizations" : {
         "en" : {
@@ -546,70 +594,6 @@
         }
       }
     },
-    "nan_a11y_confirm_suggestion" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confirm selected action"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confirmar ação selecionada"
-          }
-        }
-      }
-    },
-    "nan_suggested_action_selected_a11y_hint" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selected. Tap again to deselect."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selecionada. Toque de novo para desmarcar."
-          }
-        }
-      }
-    },
-    "nan_a11y_toggle_suggestions_show" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show suggestions"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar sugestões"
-          }
-        }
-      }
-    },
-    "nan_a11y_toggle_suggestions_hide" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hide suggestions"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ocultar sugestões"
-          }
-        }
-      }
-    },
     "nan_action_roll_d20" : {
       "localizations" : {
         "en" : {
@@ -695,13 +679,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Looking for a saved Supabase session before opening the hub."
+            "value" : "Looking for a saved session before opening the hub."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Procurando uma sessão Supabase salva antes de abrir o hub."
+            "value" : "Procurando uma sessão salva antes de abrir o hub."
           }
         }
       }
@@ -775,12 +759,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bind your spellbook"
+            "value" : "Connect your account"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Vincule seu grimório"
           }
         }
@@ -919,13 +903,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use Apple or Google for quick signup. Supabase creates or restores your account behind the gate."
+            "value" : "Use Apple or Google for quick signup."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use Apple ou Google para cadastro rápido. O Supabase cria ou restaura sua conta por trás do portal."
+            "value" : "Use sua conta da Apple ou Google"
           }
         }
       }
@@ -2218,13 +2202,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "> BIND MY DUNGEON"
+            "value" : "> CREATE MY DUNGEON"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "> VINCULAR MINHA MASMORRA"
+            "value" : "> CRIAR MINHA MASMORRA"
           }
         }
       }
@@ -2602,13 +2586,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pick the fantasy mood that makes you want to open the gate."
+            "value" : "Pick the fantasy mood that makes you want for your sessions."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Escolha o clima de fantasia que te faz querer abrir o portal."
+            "value" : "Escolha a vibe que você busca pra suas sessões."
           }
         }
       }
@@ -2618,13 +2602,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "What kind of adventure do you want tonight?"
+            "value" : "What kind of adventure are you looking for?"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Que tipo de aventura você quer hoje à noite?"
+            "value" : "Que tipo de aventura você quer?"
           }
         }
       }
@@ -3466,13 +3450,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "These choices shape the demo omen you will see next."
+            "value" : "Choose what you’re looking for when playing"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Essas escolhas moldam o presságio da demo que você verá em seguida."
+            "value" : "Escolha o que você busca quando joga RPG"
           }
         }
       }
@@ -3803,12 +3787,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Placeholder reviews below. Replace them with real App Store feedback when you have it."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Avaliações de exemplo abaixo. Troque por feedback real da App Store quando tiver."
           }
         }
       }
@@ -5041,6 +5019,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Expande para mostrar a ação completa. Depois confirme abaixo."
+          }
+        }
+      }
+    },
+    "nan_suggested_action_selected_a11y_hint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected. Tap again to deselect."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecionada. Toque de novo para desmarcar."
           }
         }
       }

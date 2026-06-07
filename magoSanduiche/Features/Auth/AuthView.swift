@@ -24,7 +24,6 @@ struct AuthView: View {
 			CRTReveal {
 				VStack(alignment: .leading, spacing: 18) {
 					authHero
-					statusPanel
 					authActions
 					footnote
 				}
@@ -81,30 +80,6 @@ struct AuthView: View {
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.drawBorder(String(localized: "nan_auth_hero_border_title"), color: .accent, lineWidth: 1, animate: true)
-	}
-
-	@ViewBuilder
-	private var statusPanel: some View {
-		VStack(alignment: .leading, spacing: 10) {
-			HStack(spacing: 8) {
-				Text(statusTitle)
-					.font(.monocraft(relativeTo: .caption, weight: .bold))
-					.foregroundStyle(statusColor)
-				if authSessionStore.isLoadingSession || authSessionStore.isAuthenticating {
-					TerminalGlyphLoader(style: .blocks, textStyle: .caption, color: statusColor)
-						.accessibilityHidden(true)
-				}
-				Spacer()
-			}
-
-			Text(statusBody)
-				.font(.monocraft(relativeTo: .callout))
-				.foregroundStyle(Color.terminalMutedText)
-				.fixedSize(horizontal: false, vertical: true)
-		}
-		.padding(14)
-		.background(Color.terminalSurface)
-		.drawBorder(String(localized: "nan_auth_status_panel"), color: statusColor, lineWidth: 1, animate: true)
 	}
 
 	private var authActions: some View {

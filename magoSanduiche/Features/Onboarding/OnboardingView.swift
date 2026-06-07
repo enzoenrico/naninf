@@ -119,7 +119,7 @@ struct OnboardingView: View {
 			WelcomeOnboardingScreen()
 		case .goal:
 			QuestionScreen(
-				kicker: String(localized: "nan_onboarding_kicker_player_intent"),
+				kicker: "",
 				title: String(localized: "nan_onboarding_goal_title"),
 				subtitle: String(localized: "nan_onboarding_goal_subtitle"),
 				options: OnboardingOption.goals,
@@ -194,7 +194,7 @@ private struct OnboardingProgressView: View {
 			GeometryReader { geometry in
 				ZStack(alignment: .leading) {
 					Rectangle()
-						// .fill(Color.terminalSurface)
+                        .fill(Color.clear)
 					Rectangle()
 						.fill(Color.accent)
 						.frame(width: geometry.size.width * progress)
@@ -210,13 +210,18 @@ private struct OnboardingProgressView: View {
 private struct WelcomeOnboardingScreen: View {
 	var body: some View {
 		VStack(spacing: 18) {
-			Image(.bread)
-				.resizable()
-				.interpolation(.none)
-				.scaledToFit()
-				.frame(height: 132)
-				.foregroundStyle(.accent)
-				.shadow(color: Color.accent.opacity(0.32), radius: 14)
+//			Image(.bread)
+//				.resizable()
+//				.interpolation(.none)
+//				.scaledToFit()
+//				.frame(height: 132)
+//				.foregroundStyle(.accent)
+//				.shadow(color: Color.accent.opacity(0.32), radius: 14)
+            
+            AsciiMediaView(image: .bread)
+                .asciiScaleMode(.fit)
+                .frame(height: 200)
+                
 
 			Text("nan_onboarding_welcome_title")
 				.font(.monocraft(relativeTo: .title2, weight: .bold))
@@ -328,9 +333,9 @@ private struct SocialProofScreen: View {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 16) {
 			OnboardingHeader(
-				kicker: String(localized: "nan_onboarding_kicker_reports"),
+				kicker: "",
 				title: String(localized: "nan_onboarding_social_title"),
-				subtitle: String(localized: "nan_onboarding_social_subtitle")
+				subtitle: ""
 			)
 
 			ForEach(OnboardingTestimonial.placeholders) { testimonial in
@@ -511,9 +516,6 @@ private struct DemoOnboardingScreen: View {
 				Text(String(localized: "nan_onboarding_demo_bullet_fullscreen"))
 					.font(.monocraft(relativeTo: .callout))
 					.foregroundStyle(Color.accent)
-				Text(String(localized: "nan_onboarding_demo_bullet_resume"))
-					.font(.monocraft(relativeTo: .caption))
-					.foregroundStyle(Color.terminalMutedText)
 			}
 			.padding(14)
 			.frame(maxWidth: .infinity, alignment: .leading)
@@ -791,4 +793,10 @@ private struct OnboardingHeader: View {
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
 	}
+}
+
+#Preview {
+	OnboardingView()
+		.environment(AppCoordinator())
+		.environment(AuthSessionStore())
 }

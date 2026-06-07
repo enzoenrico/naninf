@@ -26,7 +26,6 @@ struct ProfileView: View {
 		AppLayout(background: .solid, scrollable: true) {
 			VStack(alignment: .leading, spacing: 18) {
 				header
-
 				ProfileSection(title: String(localized: "nan_profile_section_identity"), accent: .accent) {
 					ProfileKeyValueRow(
 						key: String(localized: "nan_profile_key_callsign"),
