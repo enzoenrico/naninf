@@ -18,16 +18,19 @@ struct AuthView: View {
 	var body: some View {
 		AppLayout(
 			background: .gradient,
-			contentPadding: EdgeInsets(top: Spacing.layoutTop, leading: 20, bottom: Spacing.layoutBottom, trailing: 20),
-			scrollable: true
+			contentPadding: EdgeInsets(top: Spacing.layoutTop, leading: 20, bottom: Spacing.layoutBottom, trailing: 20)
 		) {
 			CRTReveal {
 				VStack(alignment: .leading, spacing: 18) {
 					authHero
+						.layoutPriority(1)
+					Spacer(minLength: 0)
 					authActions
 					footnote
 				}
+				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 			}
+			.frame(maxWidth: .infinity, maxHeight: .infinity)
 		}
 		.task {
 			await authSessionStore.start()
@@ -44,7 +47,7 @@ struct AuthView: View {
 				.asciiScaleMode(.fill)
 				.asciiColumns(160)
 				.asciiFontSize(7)
-				.frame(maxWidth: .infinity)
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
 				.padding(.vertical, Spacing.sm)
 
 			VStack(alignment: .leading, spacing: 10) {

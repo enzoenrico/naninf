@@ -1,0 +1,74 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Xcode
+build/
+DerivedData/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM
+*.dSYM.zip
+*.xcuserstate
+*.xcresult
+timeline.xctimeline
+playground.xcworkspace
+
+# Xcode project backups / patches
+*.pbxproj.prepatch
+
+# Swift Package Manager
+.build/
+.swiftpm/configuration/registries.json
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+
+# CocoaPods
+Pods/
+
+# Carthage
+Carthage/Build/
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# Secrets & local config (keep templates/example files tracked)
+.env
+.env.*
+Secrets.xcconfig
+**/Secrets.xcconfig
+Info.local.plist
+
+# xcode-build-server (machine-specific paths)
+buildServer.json
+
+# Neovim xcodebuild plugin artifacts
+.nvim/xcodebuild/
+
+# Cursor debug logs
+.cursor/debug*.log
+
+# Editor / IDE scratch
+*.swp
+*~
+.idea/
+
+# Logs
+*.log
