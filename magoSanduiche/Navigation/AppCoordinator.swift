@@ -57,7 +57,7 @@ final class AppCoordinator {
 		}
 	}
 
-	var isImageCollapsed = true {
+	var isImageCollapsed = false {
 		didSet {
 			guard !isUpdatingPresentationState else { return }
 			guard !isImageCollapsed, isContextualInputVisible else { return }
@@ -152,7 +152,7 @@ final class AppCoordinator {
 	func handleTypewriterCompletion(reduceMotion: Bool = false) {
 		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 			hasCompletedInitialText = true
-			isImageCollapsed = true 
+			isImageCollapsed = false
 			showActionButton = true
 		}
 	}

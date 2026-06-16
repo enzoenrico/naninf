@@ -25,7 +25,7 @@ struct VisionPanel: View {
 	var body: some View {
 		ZStack(alignment: .topLeading) {
 			mediaContent
-				.frame(maxWidth: .infinity, maxHeight: 200)
+				.frame(maxWidth: .infinity)
 				.opacity(showsLoadingOverlay ? 0.55 : 1)
 
 			if showsLoadingOverlay {
@@ -34,7 +34,8 @@ struct VisionPanel: View {
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
 			}
 		}
-		.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+		.frame(maxWidth: .infinity)
+		.fixedSize(horizontal: false, vertical: true)
 		.drawBorder(nil, color: .terminalMana, lineWidth: 1, animate: true, glowPreset: .chrome)
 		.clipped()
 		.accessibilityLabel(
@@ -49,16 +50,16 @@ struct VisionPanel: View {
 	private var mediaContent: some View {
 		switch displayMode {
 		case .introStatic:
-			AsciiMediaView(catalogVideoNamed: "mageOpening")
-				.asciiScaleMode(.fill)
+			AsciiMediaView(catalogVideoNamed: VisionDisplayMode.introPlaceholderCatalogName)
+				.asciiScaleMode(.fit)
 		case .remote(let resource):
 			switch resource.kind {
 			case .image:
 				AsciiMediaView(imageURL: resource.url, isRemote: true)
-					.asciiScaleMode(.fill)
+					.asciiScaleMode(.fit)
 			case .video:
 				AsciiMediaView(videoURL: resource.url, isRemote: true)
-					.asciiScaleMode(.fill)
+					.asciiScaleMode(.fit)
 			}
 		}
 	}

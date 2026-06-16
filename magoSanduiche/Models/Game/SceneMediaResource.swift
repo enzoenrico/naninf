@@ -33,6 +33,9 @@ enum SceneMediaError: Error, LocalizedError {
 }
 
 enum VisionDisplayMode: Equatable {
+	/// Bundled catalog video used as a still frame for the pre-turn vision placeholder.
+	static let introPlaceholderCatalogName = "mageOpening"
+
 	case introStatic
 	case remote(SceneMediaResource)
 }

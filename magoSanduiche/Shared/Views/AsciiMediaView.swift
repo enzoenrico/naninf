@@ -41,6 +41,7 @@ struct AsciiMediaView: View {
 
 		#if canImport(UIKit)
 			case catalogVideo(named: String)
+			case catalogVideoPoster(named: String)
 			case uiImage(UIImage)
 		#endif
 
@@ -59,6 +60,8 @@ struct AsciiMediaView: View {
 			#if canImport(UIKit)
 				case .catalogVideo(let name):
 					"catalog-video:\(name)"
+				case .catalogVideoPoster(let name):
+					"catalog-video-poster:\(name)"
 				case .uiImage(let image):
 					"ui-image:\(ObjectIdentifier(image).hashValue)"
 			#endif
@@ -74,6 +77,8 @@ struct AsciiMediaView: View {
 			#if canImport(UIKit)
 				case .catalogVideo:
 					true
+				case .catalogVideoPoster:
+					false
 				case .uiImage:
 					false
 			#endif
@@ -117,6 +122,10 @@ struct AsciiMediaView: View {
 	#if canImport(UIKit)
 		init(catalogVideoNamed name: String) {
 			self.source = .catalogVideo(named: name)
+		}
+
+		init(catalogVideoPosterNamed name: String) {
+			self.source = .catalogVideoPoster(named: name)
 		}
 	#endif
 
@@ -563,6 +572,9 @@ private enum AsciiMediaLoader {
 			case .catalogVideo(let name):
 				guard let url = try? catalogVideoFileURL(named: name) else { return nil }
 				return await probeVideoDisplayAspectRatio(url: url)
+			case .catalogVideoPoster(let name):
+				guard let url = try? catalogVideoFileURL(named: name) else { return nil }
+				return await probeVideoDisplayAspectRatio(url: url)
 		#endif
 		}
 	}
@@ -586,6 +598,9 @@ private enum AsciiMediaLoader {
 			case .catalogVideo(let name):
 				let url = try catalogVideoFileURL(named: name)
 				images = try await loadVideoFrames(from: url, configuration: configuration)
+			case .catalogVideoPoster(let name):
+				let url = try catalogVideoFileURL(named: name)
+				images = [try await loadVideoPoster(from: url)]
 			case .uiImage(let image):
 				guard let cgImage = image.asciiNormalizedCGImage else {
 					throw AsciiMediaError.imageDecodeFailed
@@ -689,6 +704,22 @@ private enum AsciiMediaLoader {
 			}
 			return image
 		#endif
+	}
+
+	private static func loadVideoPoster(from url: URL) async throws -> CGImage {
+		let asset = AVURLAsset(url: url)
+		let task: Task<CGImage, Error> = Task.detached(priority: .userInitiated) {
+			let generator = AVAssetImageGenerator(asset: asset)
+			generator.appliesPreferredTrackTransform = true
+			let (image, _) = try await generator.image(at: .zero)
+			return image
+		}
+
+		return try await withTaskCancellationHandler {
+			try await task.value
+		} onCancel: {
+			task.cancel()
+		}
 	}
 
 	private static func loadVideoFrames(
