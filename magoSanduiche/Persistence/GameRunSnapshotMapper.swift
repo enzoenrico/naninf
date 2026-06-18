@@ -26,6 +26,42 @@ struct GameRunSnapshotFields {
 }
 
 enum GameRunSnapshotMapper {
+	struct LiveState {
+		let terminalEntries: [TerminalEntry]
+		let suggestedOptions: [String]
+		let health: Int
+		let mana: Int
+		let maxHealth: Int
+		let maxMana: Int
+		let diceValue: Int
+		let pendingDiceRoll: Int?
+		let diceRevealStage: DiceRevealStage
+		let diceResultText: String
+		let invalidInputAttempts: Int
+		let contextualInput: String
+		let contextAction: GameAction
+		let uiPhase: GameUIPhase
+		let suppressTerminalAnimations: Bool
+	}
+
+	struct PlaybackState {
+		let terminalEntries: [TerminalEntry]
+		let health: Int
+		let mana: Int
+		let maxHealth: Int
+		let maxMana: Int
+		let diceValue: Int
+		let pendingDiceRoll: Int?
+		let diceRevealStage: DiceRevealStage
+		let diceResultText: String
+		let invalidInputAttempts: Int
+		let contextualInput: String
+		let contextAction: GameAction
+		let uiPhase: GameUIPhase
+		let suggestedOptions: [String]
+		let suppressTerminalAnimations: Bool
+	}
+
 	static let defaultTerminalEntries: [TerminalEntry] = [
 		TerminalEntry(kind: .dungeonMaster, text: Introduction.intro),
 	]
@@ -207,5 +243,49 @@ enum GameRunSnapshotMapper {
 	static func fetch(id: UUID, context: ModelContext) -> StoredGameRun? {
 		let desc = FetchDescriptor<StoredGameRun>(predicate: #Predicate { $0.id == id })
 		return try? context.fetch(desc).first
+	}
+
+	static func playbackState(from stored: StoredGameRun) -> PlaybackState {
+		PlaybackState(
+			terminalEntries: terminalEntries(from: stored.transcriptBlob),
+			health: stored.health,
+			mana: stored.mana,
+			maxHealth: stored.maxHealth,
+			maxMana: stored.maxMana,
+			diceValue: stored.diceValue,
+			pendingDiceRoll: stored.pendingDiceRoll,
+			diceRevealStage: diceRevealStage(from: stored.diceRevealStageRaw),
+			diceResultText: stored.diceResultText,
+			invalidInputAttempts: stored.invalidInputAttempts,
+			contextualInput: stored.contextualInput,
+			contextAction: contextAction(from: stored.contextActionRaw),
+			uiPhase: uiPhase(from: stored.uiPhaseRaw),
+			suggestedOptions: decodeSuggestedOptions(from: stored.suggestedOptionsBlob),
+			suppressTerminalAnimations: stored.suppressTerminalAnimations
+		)
+	}
+
+	static func snapshotFields(from state: LiveState, createdAt: Date) throws -> GameRunSnapshotFields {
+		let persistedLines = persistedLines(from: state.terminalEntries)
+		let transcriptBlob = try encodeTranscript(persistedLines)
+		let suggestedBlob = try encodeSuggestedOptions(state.suggestedOptions)
+		return GameRunSnapshotFields(
+			transcriptBlob: transcriptBlob,
+			suggestedOptionsBlob: suggestedBlob,
+			displayTitle: displayTitle(entries: state.terminalEntries, fallback: createdAt),
+			health: state.health,
+			mana: state.mana,
+			maxHealth: state.maxHealth,
+			maxMana: state.maxMana,
+			diceValue: state.diceValue,
+			pendingDiceRoll: state.pendingDiceRoll,
+			diceRevealStageRaw: diceRevealStageRaw(state.diceRevealStage),
+			diceResultText: state.diceResultText,
+			invalidInputAttempts: state.invalidInputAttempts,
+			contextualInput: state.contextualInput,
+			contextActionRaw: contextActionRaw(state.contextAction),
+			uiPhaseRaw: uiPhaseRaw(state.uiPhase),
+			suppressTerminalAnimations: state.suppressTerminalAnimations
+		)
 	}
 }

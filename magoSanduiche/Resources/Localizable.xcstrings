@@ -867,6 +867,7 @@
       }
     },
     "nan_auth_status_panel" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1059,6 +1060,7 @@
       }
     },
     "nan_debug_ai_tools_action_dice" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1075,6 +1077,7 @@
       }
     },
     "nan_debug_ai_tools_action_label" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1091,6 +1094,7 @@
       }
     },
     "nan_debug_ai_tools_action_text" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1107,6 +1111,7 @@
       }
     },
     "nan_debug_ai_tools_arguments" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1123,6 +1128,7 @@
       }
     },
     "nan_debug_ai_tools_footnote" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1139,6 +1145,7 @@
       }
     },
     "nan_debug_ai_tools_heading" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1155,6 +1162,7 @@
       }
     },
     "nan_debug_ai_tools_kicker" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1171,6 +1179,7 @@
       }
     },
     "nan_debug_ai_tools_output" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1187,6 +1196,7 @@
       }
     },
     "nan_debug_ai_tools_output_empty" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1203,6 +1213,7 @@
       }
     },
     "nan_debug_ai_tools_pick_tool" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1219,6 +1230,7 @@
       }
     },
     "nan_debug_ai_tools_raw_json" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1235,6 +1247,7 @@
       }
     },
     "nan_debug_ai_tools_run" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1251,6 +1264,7 @@
       }
     },
     "nan_debug_ai_tools_title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1267,6 +1281,7 @@
       }
     },
     "nan_debug_ai_tools_unknown_tool" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1317,6 +1332,7 @@
       }
     },
     "nan_debug_onboarding_skip_demo" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1333,6 +1349,7 @@
       }
     },
     "nan_debug_onboarding_skip_demo_a11y" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1397,6 +1414,7 @@
       }
     },
     "nan_dice_outcome_high" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1413,6 +1431,7 @@
       }
     },
     "nan_dice_outcome_low" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1429,6 +1448,7 @@
       }
     },
     "nan_dice_outcome_mid" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1653,6 +1673,7 @@
       }
     },
     "nan_home_hero_border_title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1846,6 +1867,7 @@
       }
     },
     "nan_input_border_focused" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2310,6 +2332,7 @@
       }
     },
     "nan_onboarding_button_start_trial" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2358,6 +2381,7 @@
       }
     },
     "nan_onboarding_demo_bullet_resume" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2438,6 +2462,7 @@
       }
     },
     "nan_onboarding_demo_login_border" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2454,6 +2479,7 @@
       }
     },
     "nan_onboarding_demo_login_footnote" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2470,6 +2496,7 @@
       }
     },
     "nan_onboarding_demo_login_status_binding" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2486,6 +2513,7 @@
       }
     },
     "nan_onboarding_demo_login_status_checking" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2502,6 +2530,7 @@
       }
     },
     "nan_onboarding_demo_login_subtitle" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2518,6 +2547,7 @@
       }
     },
     "nan_onboarding_demo_login_title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2662,6 +2692,7 @@
       }
     },
     "nan_onboarding_kicker_demo_login" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2694,6 +2725,7 @@
       }
     },
     "nan_onboarding_kicker_paywall" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2710,6 +2742,7 @@
       }
     },
     "nan_onboarding_kicker_player_intent" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2726,6 +2759,7 @@
       }
     },
     "nan_onboarding_kicker_reports" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3286,6 +3320,7 @@
       }
     },
     "nan_onboarding_paywall_bullet_content" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3302,6 +3337,7 @@
       }
     },
     "nan_onboarding_paywall_bullet_reactive" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3318,6 +3354,7 @@
       }
     },
     "nan_onboarding_paywall_bullet_turns" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3334,6 +3371,7 @@
       }
     },
     "nan_onboarding_paywall_disclaimer" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3350,6 +3388,7 @@
       }
     },
     "nan_onboarding_paywall_included_border" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3366,6 +3405,7 @@
       }
     },
     "nan_onboarding_paywall_price" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3382,6 +3422,7 @@
       }
     },
     "nan_onboarding_paywall_restore" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3398,6 +3439,7 @@
       }
     },
     "nan_onboarding_paywall_subtitle" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3414,6 +3456,7 @@
       }
     },
     "nan_onboarding_paywall_title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3430,6 +3473,7 @@
       }
     },
     "nan_onboarding_paywall_trial_border" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3782,6 +3826,7 @@
       }
     },
     "nan_onboarding_social_subtitle" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4000,6 +4045,7 @@
       }
     },
     "nan_onboarding_testimonial_m_persona" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4016,6 +4062,7 @@
       }
     },
     "nan_onboarding_testimonial_m_quote" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4048,6 +4095,7 @@
       }
     },
     "nan_onboarding_testimonial_r_persona" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4064,6 +4112,7 @@
       }
     },
     "nan_onboarding_testimonial_r_quote" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4112,6 +4161,7 @@
       }
     },
     "nan_oracle_01" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4128,6 +4178,7 @@
       }
     },
     "nan_oracle_02" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4144,6 +4195,7 @@
       }
     },
     "nan_oracle_03" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4160,6 +4212,7 @@
       }
     },
     "nan_oracle_04" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4176,6 +4229,7 @@
       }
     },
     "nan_oracle_05" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4192,6 +4246,7 @@
       }
     },
     "nan_oracle_06" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4208,6 +4263,7 @@
       }
     },
     "nan_oracle_07" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4224,6 +4280,7 @@
       }
     },
     "nan_oracle_08" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5441,6 +5498,7 @@
       }
     },
     "nan_vision_overlay_idle" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5457,6 +5515,7 @@
       }
     },
     "nan_vision_overlay_loading" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5473,6 +5532,7 @@
       }
     },
     "nan_vision_panel_title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5493,13 +5553,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No scene image is available for this turn. Continue the story and try again on the next omen."
+            "value" : "Images have yet to be implemented for custom actions, make sure to check in the next update!"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nenhuma imagem de cena está disponível neste turno. Continue a história e tente de novo no próximo presságio."
+            "value" : "Imagens ainda não foram adicionadas a masmorra, fique de olho na próxima atualização!"
           }
         }
       }
@@ -5525,13 +5585,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vision unavailable"
+            "value" : "No images yet..."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Visão indisponível"
+            "value" : "Sem imagens por aqui..."
           }
         }
       }

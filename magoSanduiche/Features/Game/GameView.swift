@@ -516,8 +516,8 @@ struct GameSessionView: View {
             {
                 let choice = vm.suggestedOptions[selectedIndex]
                 TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
-                    coordinator.handleContextualAction(.write) {
-                        vm.getResponse(for: choice)
+                    if vm.getResponse(for: choice) {
+                        coordinator.resetActionPresentation()
                     }
                 }
             } else {
