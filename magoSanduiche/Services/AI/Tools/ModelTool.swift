@@ -136,6 +136,7 @@ struct ToolIntegerParameter: Identifiable, Sendable {
 enum GameToolEffect: Sendable, CustomStringConvertible {
 	case requestAction(GameAction)
 	case changeHealth(Int)
+	case changeMana(Int)
 
 	var description: String {
 		switch self {
@@ -145,6 +146,8 @@ enum GameToolEffect: Sendable, CustomStringConvertible {
 			"requestAction(roll)"
 		case .changeHealth(let amount):
 			"changeHealth(\(amount))"
+		case .changeMana(let amount):
+			"changeMana(\(amount))"
 		}
 	}
 }

@@ -9,14 +9,23 @@ import Foundation
 
 nonisolated struct ChangeHealthTool: ModelTool {
 	static let name = "changeHealth"
-	static let description =
-		"Changes the player's health value. Use positive amounts to heal and negative amounts for damage. Range: -40 to 40."
+	static let description = """
+		Changes the Mage's health (HP). This is the ONLY way HP ever moves; narrating a wound, heal, trap, or \
+		poison does nothing on its own — you MUST call this tool whenever HP should change. Negative amount deals \
+		damage, positive amount heals. Keep magnitudes proportional to the fiction: glancing harm -1 to -3, a \
+		solid hit -4 to -8, severe or deadly danger -9 or worse; healing follows the same bands. Do not change HP \
+		for mere tension or fatigue — narrate those without calling this tool. The app clamps the result to the \
+		valid range. Range: -40 to 40.
+		"""
 
 	static let parameters = ToolParameterSchema(
 		integerFields: [
 			ToolIntegerParameter(
 				name: "amount",
-				description: "The health delta. Positive values heal, negative values damage, and zero leaves health unchanged.",
+				description: """
+					The signed health delta. Negative values damage (glancing -1 to -3, solid -4 to -8, deadly \
+					-9+), positive values heal by the same bands, and zero leaves health unchanged.
+					""",
 				minimum: -40,
 				maximum: 40,
 				defaultValue: -5

@@ -391,7 +391,7 @@ final class OpenAIService {
 				example = " Example: [\"option1\", \"option2\", \"option3\"]"
 			case ("toolResults", "string"):
 				typeDescription = "string (plain text, NOT an array or object)"
-				example = " Example: \"rollDice: Rolled a d20: 15\" or \"decideAction: Action requested: text input\""
+				example = " Example: \"changeHealth: Health decreased by 6\" or \"changeMana: Mana spent: 2. decideAction: Action requested: text input\""
 			case ("narrative", "string"):
 				typeDescription = "string (plain text, NOT an array or object)"
 				example = " Example: \"> You enter the dark corridor...\""
