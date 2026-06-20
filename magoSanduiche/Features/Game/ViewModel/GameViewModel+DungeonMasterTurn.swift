@@ -184,6 +184,18 @@ extension GameViewModel {
                         "health_delta": health - healthBefore,
                     ]
                 )
+            case let .changeMana(amount):
+                let manaBefore = mana
+                mana = min(maxMana, max(0, mana + amount))
+                capture(
+                    "dm_mana_changed",
+                    extra: [
+                        "amount": amount,
+                        "mana_before": manaBefore,
+                        "mana_after": mana,
+                        "mana_delta": mana - manaBefore,
+                    ]
+                )
             }
         }
     }

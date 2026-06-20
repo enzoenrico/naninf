@@ -108,6 +108,7 @@ final class DungeonMasterService {
 		[
 			AnyModelTool(DecideActionTool.self),
 			AnyModelTool(ChangeHealthTool.self),
+			AnyModelTool(ChangeManaTool.self),
 		]
 	}
 
