@@ -28,6 +28,23 @@ struct AuthLoginSnapshot: Codable, Equatable {
 			?? user.userMetadata.stringValue(for: "name")
 		self.signedInAt = signedInAt
 	}
+
+	#if DEBUG
+		/// Builds a snapshot without a Supabase `Session`, for UI-test injection only.
+		init(
+			uiTestUserID: String,
+			email: String?,
+			provider: PlayerAuthProvider,
+			displayName: String?,
+			signedInAt: Date = Date(timeIntervalSince1970: 1_700_000_000)
+		) {
+			userID = uiTestUserID
+			self.email = email
+			self.provider = provider
+			self.displayName = displayName
+			self.signedInAt = signedInAt
+		}
+	#endif
 }
 
 struct AuthLoginSnapshotStore {

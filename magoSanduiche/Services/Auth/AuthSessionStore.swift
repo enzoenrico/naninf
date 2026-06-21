@@ -14,6 +14,7 @@ final class AuthSessionStore {
 	private let authService: SupabaseAuthService?
 	private var authListenerTask: Task<Void, Never>?
 	private var hasStarted = false
+	private var isUITestMode = false
 
 	private(set) var loginSnapshot: AuthLoginSnapshot?
 	private(set) var isAuthenticated = false
@@ -36,9 +37,43 @@ final class AuthSessionStore {
 		}
 	}
 
+	#if DEBUG
+		/// Builds a store with a fixed, network-free state for UI-test screenshots.
+		init(uiTestMode mode: UITestAuthMode, defaults: UserDefaults = .standard) {
+			snapshotStore = AuthLoginSnapshotStore(defaults: defaults)
+			authService = nil
+			isUITestMode = true
+			isLoadingSession = false
+
+			switch mode {
+			case .authenticated:
+				loginSnapshot = AuthLoginSnapshot(
+					uiTestUserID: "00000000-0000-0000-0000-000000000001",
+					email: "wizard@mago.test",
+					provider: .apple,
+					displayName: "Sandwich Wizard"
+				)
+				isAuthenticated = true
+			case .unauthenticated:
+				isAuthenticated = false
+			case .configMissing:
+				isAuthenticated = false
+				configurationMessage = String(localized: "nan_auth_config_missing")
+			case .error:
+				isAuthenticated = false
+				errorMessage = "Bind failed: the gate rejected your sigil. Try again."
+			case .loading:
+				isAuthenticated = false
+				isLoadingSession = true
+			}
+		}
+	#endif
+
 	func start() async {
 		guard !hasStarted else { return }
 		hasStarted = true
+
+		if isUITestMode { return }
 
 		guard let authService else {
 			isAuthenticated = false
