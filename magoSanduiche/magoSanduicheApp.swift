@@ -10,10 +10,33 @@ import SwiftUI
 
 @main
 struct magoSanduicheApp: App {
-	@State private var authSessionStore = AuthSessionStore()
+	@State private var authSessionStore: AuthSessionStore
+	private let modelContainer: ModelContainer
 
 	init() {
 		AppAnalytics.configure()
+
+		#if DEBUG
+			UITestConfiguration.applyLaunchSeedIfNeeded()
+			if let container = UITestConfiguration.makeModelContainerIfNeeded() {
+				modelContainer = container
+				_authSessionStore = State(initialValue: AuthSessionStore(uiTestMode: UITestConfiguration.authMode))
+			} else {
+				modelContainer = Self.makeDefaultContainer()
+				_authSessionStore = State(initialValue: AuthSessionStore())
+			}
+		#else
+			modelContainer = Self.makeDefaultContainer()
+			_authSessionStore = State(initialValue: AuthSessionStore())
+		#endif
+	}
+
+	private static func makeDefaultContainer() -> ModelContainer {
+		do {
+			return try ModelContainer(for: StoredGameRun.self)
+		} catch {
+			fatalError("Failed to create ModelContainer: \(error)")
+		}
 	}
 
 	var body: some Scene {
@@ -22,7 +45,7 @@ struct magoSanduicheApp: App {
 				.background(Color.background)
 				.font(.monocraft())
 				.environment(authSessionStore)
-				.modelContainer(for: StoredGameRun.self)
+				.modelContainer(modelContainer)
 				.task {
 					await authSessionStore.start()
 				}

@@ -169,6 +169,15 @@ final class OnboardingViewModel {
 			guard currentStep == .demo else { return }
 			completedDemoActions = demoActionTarget
 		}
+
+		/// Jumps directly to a step with seeded answers, for UI-test screenshots.
+		func jumpForUITest(to step: OnboardingStep, responses seeded: OnboardingResponses) {
+			currentIndex = step.rawValue
+			responses = seeded
+			if step == .demo {
+				completedDemoActions = 0
+			}
+		}
 	#endif
 
 	private func toggle(_ id: String, in set: inout Set<String>) {
