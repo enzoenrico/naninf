@@ -31,6 +31,13 @@ struct GameView: View {
         )
         .onAppear {
             vm.modelContext = modelContext
+            #if DEBUG
+                if let fixture = UITestConfiguration.gameFixture {
+                    vm.applyUITestState(fixture)
+                    coordinator.applyUITestGamePresentation(fixture)
+                    return
+                }
+            #endif
             if let runID = coordinator.consumePendingResumeRunID() {
                 vm.restore(runID: runID, modelContext: modelContext)
                 coordinator.applyResumePresentationState()
@@ -185,6 +192,11 @@ struct GameSessionView: View {
             vm.onCompletedPlayerAction = onCompletedPlayerAction
             presentInlineStatus(for: vm.uiPhase)
             configureTipsIfNeeded(shouldShowTips: shouldShowTips)
+            #if DEBUG
+                if UITestConfiguration.isActive, vm.uiTestShowsSuggestions {
+                    areSuggestionsVisible = true
+                }
+            #endif
         }
         .onChange(of: vm.uiPhase) { _, newPhase in
             presentInlineStatus(for: newPhase)
@@ -265,17 +277,19 @@ struct GameSessionView: View {
 
         return VStack(alignment: .leading, spacing: Self.terminalPanelSpacing) {
             #if DEBUG
-                HStack {
-                    Spacer(minLength: 0)
-                    Button {
-                        showAIToolsDebug = true
-                    } label: {
-                        Text("nan_debug_ai_tools_chat_entry")
-                            .font(.monocraft(relativeTo: .caption2, weight: .semibold))
-                            .foregroundStyle(Color.terminalWarning)
+                if !UITestConfiguration.isActive {
+                    HStack {
+                        Spacer(minLength: 0)
+                        Button {
+                            showAIToolsDebug = true
+                        } label: {
+                            Text("nan_debug_ai_tools_chat_entry")
+                                .font(.monocraft(relativeTo: .caption2, weight: .semibold))
+                                .foregroundStyle(Color.terminalWarning)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityHint(String(localized: "nan_debug_ai_tools_chat_entry_a11y"))
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityHint(String(localized: "nan_debug_ai_tools_chat_entry_a11y"))
                 }
             #endif
 

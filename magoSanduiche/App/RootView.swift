@@ -10,7 +10,13 @@ import Foundation
 
 struct AppStartupGate: View {
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
-	@State private var hasCompletedStartup = false
+	@State private var hasCompletedStartup: Bool = {
+		#if DEBUG
+			return UITestConfiguration.skipsBoot
+		#else
+			return false
+		#endif
+	}()
 
 	var body: some View {
 		Group {

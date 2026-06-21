@@ -69,6 +69,38 @@ final class GameViewModel {
         self.coordinator = coordinator
     }
 
+    #if DEBUG
+        var uiTestShowsSuggestions = false
+
+        /// Loads a deterministic fixture so UI tests can screenshot a specific game state.
+        func applyUITestState(_ fixture: UITestGameFixture) {
+            suppressTerminalAnimations = true
+            uiTestShowsSuggestions = fixture.showsSuggestions
+            let entries = fixture.terminalEntries.isEmpty
+                ? GameRunSnapshotMapper.defaultTerminalEntries
+                : fixture.terminalEntries
+            terminalEntries = entries
+            revealedTerminalEntryIDs = Set(entries.map(\.id))
+            suggestedOptions = fixture.suggestedOptions
+            selectedSuggestionIndex = nil
+            health = fixture.health
+            mana = fixture.mana
+            maxHealth = fixture.maxHealth
+            maxMana = fixture.maxMana
+            uiPhase = fixture.phase
+            contextAction = fixture.contextAction
+            diceValue = fixture.diceValue
+            diceRevealStage = fixture.diceRevealStage
+            pendingDiceRoll = fixture.pendingDiceRoll
+            diceResultText = fixture.diceResultText
+            contextualInput = fixture.contextualInput
+            invalidInputAttempts = fixture.invalidInputAttempts
+            loading = fixture.loading
+            hasSubmittedPlayerTurn = true
+            visionDisplayMode = .introStatic
+        }
+    #endif
+
     static func makeDungeonMaster() -> DungeonMasterService? {
         try? DungeonMasterService()
     }

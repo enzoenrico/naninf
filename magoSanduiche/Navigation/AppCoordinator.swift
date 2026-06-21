@@ -220,4 +220,27 @@ final class AppCoordinator {
 		update()
 		isUpdatingPresentationState = false
 	}
+
+	#if DEBUG
+		private var didApplyUITestRoute = false
+
+		/// Pushes the scenario's deep-link route exactly once after launch.
+		func applyUITestInitialRouteIfNeeded() {
+			guard !didApplyUITestRoute else { return }
+			didApplyUITestRoute = true
+			guard let route = UITestConfiguration.initialRoute else { return }
+			path.append(route)
+		}
+
+		/// Forces the game-session chrome into the fixture's presentation state.
+		func applyUITestGamePresentation(_ fixture: UITestGameFixture) {
+			updatePresentationState {
+				hasCompletedInitialText = fixture.hasCompletedInitialText
+				showActionButton = fixture.showActionButton
+				isImageCollapsed = fixture.imageCollapsed
+				isContextualInputVisible = fixture.contextualInputVisible
+				isDicePromptVisible = fixture.dicePromptVisible
+			}
+		}
+	#endif
 }

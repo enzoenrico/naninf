@@ -55,9 +55,14 @@ struct AppCoordinatorView: View {
 			}
 		}
 		.background(Color.background)
+		.task {
+			#if DEBUG
+				coordinator.applyUITestInitialRouteIfNeeded()
+			#endif
+		}
 		.overlay(alignment: .bottomTrailing) {
 			#if DEBUG
-				if hasFinishedOnboarding {
+				if hasFinishedOnboarding && !UITestConfiguration.isActive {
 					Button {
 						TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 							hasCompletedOnboarding = false

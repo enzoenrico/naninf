@@ -15,6 +15,9 @@ struct OnboardingView: View {
 	@AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 	@AppStorage("hasUnlockedFullGame") private var hasUnlockedFullGame = false
 	@State private var vm = OnboardingViewModel()
+	#if DEBUG
+		@State private var didApplyUITestStep = false
+	#endif
 
 	var body: some View {
 		@Bindable var vm = vm
@@ -56,6 +59,13 @@ struct OnboardingView: View {
 			AppAnalytics.capture("onboarding_step_viewed", properties: onboardingProperties)
 			await advanceAfterProcessingIfNeeded()
 		}
+		#if DEBUG
+			.onAppear {
+				guard !didApplyUITestStep, let step = UITestConfiguration.onboardingStep else { return }
+				didApplyUITestStep = true
+				vm.jumpForUITest(to: step, responses: UITestConfiguration.onboardingResponses)
+			}
+		#endif
 	}
 
 	#if DEBUG
@@ -161,6 +171,9 @@ struct OnboardingView: View {
 	}
 
 	private func advanceAfterProcessingIfNeeded() async {
+		#if DEBUG
+			if UITestConfiguration.isActive { return }
+		#endif
 		guard vm.currentStep == .processing else { return }
 		try? await Task.sleep(for: .milliseconds(1500))
 		guard !Task.isCancelled else { return }
