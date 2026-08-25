@@ -54,6 +54,8 @@ struct ProfileView: View {
 					)
 				}
 
+				ProfileCreditsSection()
+
 				ProfileSection(title: String(localized: "nan_profile_section_traits"), accent: .terminalMana) {
 					if traitRows.isEmpty {
 						Text("nan_profile_traits_empty")
@@ -248,4 +250,5 @@ struct ProfileView: View {
 	ProfileView()
 		.environment(AppCoordinator())
 		.environment(AuthSessionStore())
+		.environment(CreditWalletStore())
 }

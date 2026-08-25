@@ -497,6 +497,7 @@ private enum OnboardingDemoFlow: Identifiable {
 
 private struct DemoOnboardingScreen: View {
 	@Environment(AuthSessionStore.self) private var authSessionStore
+	@Environment(CreditWalletStore.self) private var creditWalletStore
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 	let vm: OnboardingViewModel
@@ -569,6 +570,9 @@ private struct DemoOnboardingScreen: View {
 				.buttonStyle(.plain)
 				.accessibilityLabel(String(localized: "nan_debug_onboarding_skip_demo_a11y"))
 			#endif
+		}
+		.onAppear {
+			gameVM.attachCreditWallet(creditWalletStore)
 		}
 		.fullScreenCover(item: $activeDemoFlow) { flow in
 			switch flow {
@@ -812,4 +816,5 @@ private struct OnboardingHeader: View {
 	OnboardingView()
 		.environment(AppCoordinator())
 		.environment(AuthSessionStore())
+		.environment(CreditWalletStore())
 }

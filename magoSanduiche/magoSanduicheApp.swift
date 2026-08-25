@@ -11,6 +11,7 @@ import SwiftUI
 @main
 struct magoSanduicheApp: App {
 	@State private var authSessionStore: AuthSessionStore
+	@State private var creditWalletStore = CreditWalletStore()
 	private let modelContainer: ModelContainer
 
 	init() {
@@ -45,9 +46,21 @@ struct magoSanduicheApp: App {
 				.background(Color.background)
 				.font(.monocraft())
 				.environment(authSessionStore)
+				.environment(creditWalletStore)
 				.modelContainer(modelContainer)
 				.task {
 					await authSessionStore.start()
+				}
+				.task(id: authSessionStore.loginSnapshot?.userID) {
+					let store = authSessionStore
+					creditWalletStore.bindAccessToken {
+						await MainActor.run { store.accessToken }
+					}
+					if let userID = authSessionStore.loginSnapshot?.userID {
+						await creditWalletStore.handleSignedIn(userID: userID)
+					} else if !authSessionStore.isLoadingSession {
+						await creditWalletStore.handleSignedOut()
+					}
 				}
 				.onOpenURL { url in
 					authSessionStore.handleOpenURL(url)

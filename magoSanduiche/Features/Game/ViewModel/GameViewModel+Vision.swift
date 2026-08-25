@@ -13,6 +13,15 @@ extension GameViewModel {
             return
         }
 
+        if creditWallet?.canAffordSceneImage() == false {
+            clearPostIntroVisionMedia()
+            capture(
+                "vision_scene_skipped_credits",
+                extra: ["turn_id": turnID]
+            )
+            return
+        }
+
         visionDisplayMode = .introStatic
         coordinator?.collapseVisionIfExpanded()
         visionMediaLoading = true
@@ -29,6 +38,7 @@ extension GameViewModel {
                 return
             }
             visionDisplayMode = .remote(resource)
+            await creditWallet?.chargeSceneImageIfNeeded(generationID: turnID)
         } catch {
             clearPostIntroVisionMedia()
         }

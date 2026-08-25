@@ -2,7 +2,9 @@
 
 ## Status
 
-Proposed (planning only — no StoreKit, backend, or product UI in this change)
+**Accepted for implementation** — see [Implementation addendum](#implementation-addendum-revenuecat--supabase) and [`docs/revenuecat-setup.md`](../revenuecat-setup.md).
+
+Originally proposed as planning-only; product code now ships RevenueCat + credits client + Supabase Edge Function sources.
 
 ## Branch basis
 
@@ -353,3 +355,33 @@ Planning reference only — **do not implement in this PR.**
 - `magoSanduiche/Navigation/AppCoordinatorView.swift`
 - `magoSanduiche/Features/Profile/ProfileView.swift`
 - `magoSanduiche/Features/Home/PlayerHomeView.swift`
+
+---
+
+## Implementation addendum (RevenueCat + Supabase)
+
+**Decision change vs original ADR §3:** IAP goes through **RevenueCat** (`RevenueCat` SPM `purchases-ios-spm` 5.85.0), not raw StoreKit. No Stripe / second billing vendor.
+
+**Shipped in app**
+
+| Piece | Location |
+| --- | --- |
+| Credit costs / product IDs | `Services/Credits/CreditCatalog.swift` |
+| Ledger HTTP contract | `Services/Credits/CreditsAPIClient.swift` |
+| Wallet + purchase UI state | `Services/Credits/CreditWalletStore.swift` |
+| RevenueCat wrapper | `Services/Payments/RevenueCatPurchasing.swift` |
+| Profile buy / restore / balance | `Features/Profile/Subviews/ProfileCreditsSection.swift` |
+| DM hold/capture + image charge-on-success | `GameViewModel+DungeonMasterTurn` / `+Vision` |
+| Auth identify | `Purchases.logIn(supabaseUserId)` from `magoSanduicheApp` after `AuthSessionStore` session |
+| Config placeholder | `REVENUECAT_API_KEY` in Info.plist / Build Settings; `Config/Secrets.xcconfig.example` |
+
+**Shipped as deployable backend source (not auto-deployed from CI here)**
+
+- `supabase/migrations/20260825180000_credits_ledger.sql`
+- `supabase/functions/credits-wallet`, `credits-meter`, `revenuecat-webhook`
+
+**Explicitly not done**
+
+- OpenAI generation proxy / removal of client `OPENAI_API_KEY` — metering Edge Functions do not hold the provider secret yet. Until `credits-*` are deployed, the client **fail-opens** (no local ledger writes). Until a proxy exists, extracted API keys can still bypass spend.
+
+Operator checklist: [`docs/revenuecat-setup.md`](../revenuecat-setup.md).

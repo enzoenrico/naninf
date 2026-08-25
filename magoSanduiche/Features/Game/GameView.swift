@@ -11,6 +11,7 @@ import TipKit
 
 struct GameView: View {
     @Environment(AppCoordinator.self) private var coordinator
+    @Environment(CreditWalletStore.self) private var creditWalletStore
     @Environment(\.modelContext) private var modelContext
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var vm = GameViewModel()
@@ -31,6 +32,7 @@ struct GameView: View {
         )
         .onAppear {
             vm.modelContext = modelContext
+            vm.attachCreditWallet(creditWalletStore)
             #if DEBUG
                 if let fixture = UITestConfiguration.gameFixture {
                     vm.applyUITestState(fixture)
@@ -685,4 +687,5 @@ private extension View {
 #Preview {
     GameView()
         .environment(AppCoordinator())
+        .environment(CreditWalletStore())
 }

@@ -1,0 +1,17 @@
+# NanInf Supabase project (matches app SUPABASE_URL in Xcode build settings).
+# Deploy: supabase link --project-ref hqbfifbyxrtegcpndjsg && supabase db push && supabase functions deploy
+
+[project]
+id = "hqbfifbyxrtegcpndjsg"
+
+[api]
+enabled = true
+
+[functions.credits-wallet]
+verify_jwt = true
+
+[functions.credits-meter]
+verify_jwt = true
+
+[functions.revenuecat-webhook]
+verify_jwt = false

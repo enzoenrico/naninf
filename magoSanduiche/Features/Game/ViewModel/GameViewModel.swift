@@ -12,6 +12,7 @@ import SwiftUI
 final class GameViewModel {
     weak var coordinator: AppCoordinator?
     var dungeonMaster: DungeonMasterService?
+    var creditWallet: CreditWalletStore?
 
     var gameSessionID: String
     var modelContext: ModelContext?
@@ -67,6 +68,10 @@ final class GameViewModel {
 
     func attachCoordinator(_ coordinator: AppCoordinator) {
         self.coordinator = coordinator
+    }
+
+    func attachCreditWallet(_ wallet: CreditWalletStore) {
+        creditWallet = wallet
     }
 
     #if DEBUG

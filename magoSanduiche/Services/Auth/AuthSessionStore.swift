@@ -17,6 +17,7 @@ final class AuthSessionStore {
 	private var isUITestMode = false
 
 	private(set) var loginSnapshot: AuthLoginSnapshot?
+	private(set) var accessToken: String?
 	private(set) var isAuthenticated = false
 	private(set) var isLoadingSession = true
 	private(set) var isAuthenticating = false
@@ -53,6 +54,7 @@ final class AuthSessionStore {
 					provider: .apple,
 					displayName: "Sandwich Wizard"
 				)
+				accessToken = "ui-test-access-token"
 				isAuthenticated = true
 			case .unauthenticated:
 				isAuthenticated = false
@@ -186,12 +188,14 @@ final class AuthSessionStore {
 	private func storeSession(_ session: Session, provider: PlayerAuthProvider? = nil) {
 		let snapshot = AuthLoginSnapshot(session: session, provider: provider)
 		loginSnapshot = snapshot
+		accessToken = session.accessToken
 		isAuthenticated = true
 		snapshotStore.save(snapshot)
 	}
 
 	private func clearSession() {
 		loginSnapshot = nil
+		accessToken = nil
 		isAuthenticated = false
 		snapshotStore.clear()
 	}

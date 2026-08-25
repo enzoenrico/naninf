@@ -66,17 +66,35 @@ extension GameViewModel {
                     }
                 }
             #endif
+            if let preflightError = await creditWallet?.preflightDMTurn(generationID: turnID) {
+                loading = false
+                appendSystemMessage(preflightError.localizedDescription)
+                persistRun()
+                capture(
+                    "dm_turn_blocked_credits",
+                    extra: [
+                        "turn_id": turnID,
+                        "error": preflightError.localizedDescription,
+                    ]
+                )
+                coordinator?.clearPendingNarrativeFetch()
+                return
+            }
             await fetchNarrative(context: context, turnID: turnID, startedAt: startedAt)
         }
         coordinator?.replacePendingNarrativeFetch(narrativeTask)
     }
 
     private func fetchNarrative(context: DungeonMasterTurnContext, turnID: String, startedAt: Date) async {
+        var turnSucceeded = false
         defer {
             coordinator?.clearPendingNarrativeFetch()
             loading = false
             persistRun()
             onCompletedPlayerAction?()
+            Task {
+                await creditWallet?.finalizeDMTurn(generationID: turnID, succeeded: turnSucceeded)
+            }
         }
 
         do {
@@ -105,6 +123,7 @@ extension GameViewModel {
             applyToolEffects(turn.toolEffects)
             suggestedOptions = result.options
             selectedSuggestionIndex = nil
+            turnSucceeded = true
             capture(
                 "dm_turn_succeeded",
                 extra: [

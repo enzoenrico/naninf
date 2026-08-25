@@ -11,6 +11,7 @@
 		5B51D8822EFAA23000EB5908 /* OpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B51D8812EFAA23000EB5908 /* OpenAI */; };
 		5BA0F0032F40000100A6C001 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA0F0022F40000100A6C001 /* Supabase */; };
 		5BA0F0132F40000100A6C001 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA0F0122F40000100A6C001 /* GoogleSignIn */; };
+		5BC0F0012F50000100A6C001 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC0F0002F50000100A6C001 /* RevenueCat */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +77,7 @@
 				5B0D71A42F1A000100A6C001 /* PostHog in Frameworks */,
 				5BA0F0032F40000100A6C001 /* Supabase in Frameworks */,
 				5BA0F0132F40000100A6C001 /* GoogleSignIn in Frameworks */,
+				5BC0F0012F50000100A6C001 /* RevenueCat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,6 +142,7 @@
 				5B0D71A32F1A000100A6C001 /* PostHog */,
 				5BA0F0022F40000100A6C001 /* Supabase */,
 				5BA0F0122F40000100A6C001 /* GoogleSignIn */,
+				5BC0F0002F50000100A6C001 /* RevenueCat */,
 			);
 			productName = magoSanduiche;
 			productReference = 5BE1F3002EDE1B62004ACDF5 /* magoSanduiche.app */;
@@ -228,6 +231,7 @@
 				5B0D71A22F1A000100A6C001 /* XCRemoteSwiftPackageReference "posthog-ios" */,
 				5BA0F0002F40000100A6C001 /* XCRemoteSwiftPackageReference "supabase-swift" */,
 				5BA0F0102F40000100A6C001 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				5BC0F0102F50000100A6C001 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5BE1F3012EDE1B62004ACDF5 /* Products */;
@@ -464,6 +468,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kyou.naninf;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				REVENUECAT_API_KEY = REPLACE_ME;
 				SUPABASE_PUBLISHABLE_KEY = sb_publishable_ZFYp9NWBCrQDBXBFYCq91w_nK9cIccT;
 				SUPABASE_URL = "https://hqbfifbyxrtegcpndjsg.supabase.co";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -504,6 +509,7 @@
 				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kyou.naninf;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REVENUECAT_API_KEY = REPLACE_ME;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPABASE_PUBLISHABLE_KEY = sb_publishable_ZFYp9NWBCrQDBXBFYCq91w_nK9cIccT;
 				SUPABASE_URL = "https://hqbfifbyxrtegcpndjsg.supabase.co";
@@ -684,6 +690,14 @@
 				minimumVersion = 9.1.0;
 			};
 		};
+		5BC0F0102F50000100A6C001 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.85.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -706,6 +720,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5BA0F0102F40000100A6C001 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignIn;
+		};
+		5BC0F0002F50000100A6C001 /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5BC0F0102F50000100A6C001 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
