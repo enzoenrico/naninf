@@ -1,5 +1,13 @@
 # Context
 
+## Architecture decision records
+
+Product/architecture decisions live under [`docs/adr/`](docs/adr/):
+
+- [0001 — Store auth tokens in Keychain](docs/adr/0001-store-auth-tokens-in-keychain.md)
+- [0002 — Typed model tools with provider adapters](docs/adr/0002-use-typed-model-tools-with-provider-adapters.md)
+- [0003 — Payments and token spend (plan)](docs/adr/0003-payments-and-token-spend.md)
+
 ## Glossary
 
 ### Onboarding Completion

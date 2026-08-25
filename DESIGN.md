@@ -309,6 +309,10 @@ All terminal semantics ship as Asset Catalog colorsets with explicit light/dark 
 5. **Motion constants** (`TerminalMotion`) belong in prose + optional YAML extension if timers become formal tokens.
 6. **Do not document every localized string**; link behavior to **semantic roles** (“border title”, “loader copy”) instead.
 
+## Related architecture docs
+
+Visual language only here. Cross-cutting product decisions (auth storage, model tools, payments/credits) are indexed from [`CONTEXT.md`](CONTEXT.md) and live in [`docs/adr/`](docs/adr/) — including the payments and token-spend plan ([`0003`](docs/adr/0003-payments-and-token-spend.md)). Any future credit-balance or purchase chrome should reuse existing terminal surfaces (`ProfileSection`, Home top strip, Game system `TerminalEntry`), not new card/hub patterns.
+
 ## Known gaps
 
 - **No formal radius scale** beyond “none”; if rounded surfaces are introduced, add `{rounded.sm}` … tokens and migrate components.
