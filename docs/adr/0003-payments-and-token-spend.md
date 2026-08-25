@@ -360,7 +360,9 @@ Planning reference only — **do not implement in this PR.**
 
 ## Implementation addendum (RevenueCat + Supabase)
 
-**Decision change vs original ADR §3:** IAP goes through **RevenueCat** (`RevenueCat` SPM `purchases-ios-spm` 5.85.0), not raw StoreKit. No Stripe / second billing vendor.
+**Decision change vs original ADR §3:** IAP goes through **RevenueCat** (`RevenueCat` SPM `purchases-ios-spm` **5.86.0**), not raw StoreKit. No Stripe / second billing vendor.
+
+**Live catalog (NanInf `projcb74c4bd` only):** entitlement `scribe`; monthly SKU `com.kyou.naninf.sub.scribe_monthly`; packs `starter_40` / `plus_100` / `vault_250`; offering `default`. Do not invent `credits`/`stipend` entitlements or a `stipend_monthly` product.
 
 **Shipped in app**
 

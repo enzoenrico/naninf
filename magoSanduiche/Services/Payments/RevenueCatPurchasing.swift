@@ -21,7 +21,7 @@ enum NanInfPackageKind: String, CaseIterable, Identifiable {
 	case starter40
 	case plus100
 	case vault250
-	case stipendMonthly
+	case scribeMonthly
 
 	var id: String { rawValue }
 
@@ -33,8 +33,8 @@ enum NanInfPackageKind: String, CaseIterable, Identifiable {
 			CreditCatalog.ProductID.plus100
 		case .vault250:
 			CreditCatalog.ProductID.vault250
-		case .stipendMonthly:
-			CreditCatalog.ProductID.stipendMonthly
+		case .scribeMonthly:
+			CreditCatalog.ProductID.scribeMonthly
 		}
 	}
 
@@ -46,7 +46,7 @@ enum NanInfPackageKind: String, CaseIterable, Identifiable {
 			"nan_credits_pack_plus_title"
 		case .vault250:
 			"nan_credits_pack_vault_title"
-		case .stipendMonthly:
+		case .scribeMonthly:
 			"nan_credits_pack_stipend_title"
 		}
 	}
@@ -59,7 +59,7 @@ enum NanInfPackageKind: String, CaseIterable, Identifiable {
 			"nan_credits_pack_plus_detail"
 		case .vault250:
 			"nan_credits_pack_vault_detail"
-		case .stipendMonthly:
+		case .scribeMonthly:
 			"nan_credits_pack_stipend_detail"
 		}
 	}
@@ -173,7 +173,7 @@ final class RevenueCatPurchaseService: RevenueCatPurchasing {
 		case .starter40: 0
 		case .plus100: 1
 		case .vault250: 2
-		case .stipendMonthly: 3
+		case .scribeMonthly: 3
 		}
 	}
 }

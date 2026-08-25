@@ -468,7 +468,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kyou.naninf;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				REVENUECAT_API_KEY = REPLACE_ME;
+				REVENUECAT_API_KEY = test_jCXzzWuNNSIPdTPDzgwBzefqtoa;
 				SUPABASE_PUBLISHABLE_KEY = sb_publishable_ZFYp9NWBCrQDBXBFYCq91w_nK9cIccT;
 				SUPABASE_URL = "https://hqbfifbyxrtegcpndjsg.supabase.co";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -509,7 +509,7 @@
 				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kyou.naninf;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				REVENUECAT_API_KEY = REPLACE_ME;
+				REVENUECAT_API_KEY = appl_vGMVhMXUbYDDBVfDylqKIvuFybX;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPABASE_PUBLISHABLE_KEY = sb_publishable_ZFYp9NWBCrQDBXBFYCq91w_nK9cIccT;
 				SUPABASE_URL = "https://hqbfifbyxrtegcpndjsg.supabase.co";
@@ -695,7 +695,7 @@
 			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.85.0;
+				minimumVersion = 5.86.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

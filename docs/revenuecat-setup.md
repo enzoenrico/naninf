@@ -1,43 +1,49 @@
 # RevenueCat + credits setup (NanInf)
 
-This app meters AI spend with **Credits** (1 / DM turn, 3 / successful DALL·E scene) and sells them through **RevenueCat** (not raw StoreKit / Stripe). The balance ledger lives in **Supabase** (`supabase/` in this repo).
+This app meters AI spend with **Credits** (1 / DM turn, 3 / successful DALL·E scene) and sells them through **RevenueCat** (not raw StoreKit / Stripe). The balance ledger lives in **Supabase** (`supabase/` in this repo). Virtual currency **CREDITS** in RevenueCat grants pack/monthly amounts; **Supabase remains spend authority**.
 
-## Xcode key to paste
+## Live project (do not recreate / do not use binis)
 
-| Build setting / Info.plist key | Value |
+| Field | Value |
 | --- | --- |
-| `REVENUECAT_API_KEY` | RevenueCat **public** Apple SDK key (`appl_…`) |
+| Project | `projcb74c4bd` (**NanInf**) — never `projf867d61b` (binis) |
+| App Store app | `app255cd2ec86` · bundle `com.kyou.naninf` · ASC **6749869965** |
+| Offering | `default` (current) |
+| Entitlement | `scribe` only (monthly). There is **no** `credits` or `stipend` entitlement. |
+| Virtual currency | `CREDITS` (40 / 100 / 250 / 120 monthly with `expire_at_cycle_end`) |
 
-Wire it like `SUPABASE_*`:
+### Product IDs (already in dashboard)
 
-1. Copy `magoSanduiche/Config/Secrets.xcconfig.example` → `magoSanduiche/Config/Secrets.xcconfig` (gitignored pattern: `Secrets.xcconfig`).
-2. Set `REVENUECAT_API_KEY = appl_your_key`.
-3. Or set **Build Settings → REVENUECAT_API_KEY** on the `magoSanduiche` target (Debug + Release).
+| Store product ID | Type | CREDITS grant |
+| --- | --- | --- |
+| `com.kyou.naninf.credits.starter_40` | Consumable | 40 |
+| `com.kyou.naninf.credits.plus_100` | Consumable | 100 |
+| `com.kyou.naninf.credits.vault_250` | Consumable | 250 |
+| `com.kyou.naninf.sub.scribe_monthly` | Auto-renewable → entitlement `scribe` | 120 / period |
 
-`Info.plist` already maps `REVENUECAT_API_KEY` → `$(REVENUECAT_API_KEY)`.
+## Xcode keys
 
-Without this key, Profile shows a hint and purchases stay disabled; generation still works until the ledger is deployed (fail-open).
+| Build setting / Info.plist | Value |
+| --- | --- |
+| `REVENUECAT_API_KEY` (Release / device) | `appl_vGMVhMXUbYDDBVfDylqKIvuFybX` |
+| `REVENUECAT_API_KEY` (DEBUG / Test Store only) | `test_jCXzzWuNNSIPdTPDzgwBzefqtoa` |
 
-## RevenueCat dashboard steps (Enzo)
+1. Copy `magoSanduiche/Config/Secrets.xcconfig.example` → `magoSanduiche/Config/Secrets.xcconfig` (gitignored), **or** set **Build Settings → REVENUECAT_API_KEY** on the `magoSanduiche` target.
+2. `Info.plist` maps `REVENUECAT_API_KEY` → `$(REVENUECAT_API_KEY)`.
 
-1. Open the existing RevenueCat project → **Apps** → ensure iOS app **bundle id** `com.kyou.naninf` / App Store ID **6749869965** is linked.
-2. **Project settings → API keys** → copy the **Apple** public SDK key into `REVENUECAT_API_KEY`.
-3. **Product catalog → Entitlements**
-   - Create `credits` (optional grouping for packs).
-   - Create `stipend` (attach the monthly subscription).
-4. **Products** (IDs must match App Store Connect + `CreditCatalog`):
-   - `com.kyou.naninf.credits.starter_40` — Consumable → entitlement `credits` (metadata / dashboard only).
-   - `com.kyou.naninf.credits.plus_100` — Consumable.
-   - `com.kyou.naninf.credits.vault_250` — Consumable.
-   - `com.kyou.naninf.sub.stipend_monthly` — Auto-renewable → entitlement `stipend`.
-5. **Offerings** → create/current offering id `default` containing those packages.
-6. **App Store Connect**: create the same product IDs, Paid Apps agreement active, then **Products → Import from App Store Connect** (or link manually) in RevenueCat.
-7. **Integrations → Webhooks** → URL  
+Without a real key, Profile shows a hint and purchases stay disabled; generation still works until the ledger is deployed (fail-open).
+
+## Dashboard checklist (align only — catalog already exists)
+
+1. Confirm project **NanInf** `projcb74c4bd` and app `app255cd2ec86`.
+2. Confirm offering **`default`** is current and contains the four products above.
+3. Confirm entitlement **`scribe`** is attached only to `com.kyou.naninf.sub.scribe_monthly`.
+4. **Integrations → Webhooks** →  
    `https://hqbfifbyxrtegcpndjsg.supabase.co/functions/v1/revenuecat-webhook`  
-   Authorization: `Bearer <REVENUECAT_WEBHOOK_AUTH>` (same secret set as a Supabase function secret).
-8. App identifies users with `Purchases.shared.logIn(supabaseUserId)` — **App User ID = Supabase `auth.users.id`**.
+   Authorization: `Bearer <REVENUECAT_WEBHOOK_AUTH>` (Supabase function secret).
+5. App identifies users with `Purchases.shared.logIn(supabaseUserId)` — **App User ID = Supabase `auth.users.id`**.
 
-Suggested credit grants (server webhook map): starter_40→40, plus_100→100, vault_250→250, stipend_monthly→**120 per INITIAL_PURCHASE/RENEWAL**.
+Webhook / ledger credit map matches RC virtual currency: starter_40→40, plus_100→100, vault_250→250, scribe_monthly→**120** on `INITIAL_PURCHASE` / `RENEWAL`.
 
 ## Supabase ledger deploy
 
@@ -45,7 +51,6 @@ Suggested credit grants (server webhook map): starter_40→40, plus_100→100, v
 supabase link --project-ref hqbfifbyxrtegcpndjsg
 supabase db push
 supabase secrets set REVENUECAT_WEBHOOK_AUTH=your_webhook_secret
-# SUPABASE_SERVICE_ROLE_KEY is provided to functions automatically when deployed via CLI
 supabase functions deploy credits-wallet
 supabase functions deploy credits-meter
 supabase functions deploy revenuecat-webhook
@@ -55,15 +60,15 @@ Tables: `credit_balances`, `credit_ledger`, `credit_holds` (see `supabase/migrat
 
 ## Enforcement status
 
-| Layer | Status in this PR |
+| Layer | Status |
 | --- | --- |
-| RevenueCat purchase / restore / identify | Implemented in app |
+| RevenueCat purchase / restore / identify | Implemented (`purchases-ios-spm` **5.86.0**) |
 | Profile balance + packages | Implemented |
 | Game preflight + hold/capture + image charge-on-success | Implemented against Edge Functions |
 | Server ledger | Source in `supabase/` — **must be deployed** |
-| OpenAI proxy (remove client `OPENAI_API_KEY`) | **Not shipped** — key remains; jailbreaks can still hit OpenAI until a generation proxy lands. Metering is **not** hard enforcement until `credits-wallet` / `credits-meter` are live; client fail-opens if functions 404. |
+| OpenAI proxy (remove client `OPENAI_API_KEY`) | **Not shipped** — key remains; fail-open until `credits-*` functions are live |
 
 ## App surfaces
 
-- **Profile** → credits balance, packs, monthly stipend, Restore.
+- **Profile** → credits balance, packs, monthly Scribe, Restore.
 - **Game** → insufficient-credits system `TerminalEntry` when ledger reports 402; images skipped (no charge) when underfunded or soft-fail.

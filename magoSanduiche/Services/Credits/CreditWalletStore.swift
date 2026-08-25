@@ -97,10 +97,11 @@ final class CreditWalletStore {
 		do {
 			let snapshot = try await ledger.fetchWallet()
 			apply(snapshot)
+			await refreshCustomerEntitlements()
 			AppAnalytics.capture("credits_wallet_refreshed", properties: [
 				"balance": snapshot.balance,
 				"starter_granted": snapshot.starterGranted,
-				"has_stipend": snapshot.hasActiveStipend
+				"has_stipend": hasActiveStipend
 			])
 		} catch let error as CreditsLedgerError {
 			handleLedgerError(error)
@@ -119,11 +120,22 @@ final class CreditWalletStore {
 		defer { isLoadingOfferings = false }
 		do {
 			packages = try await purchasing.refreshOfferings()
+			await refreshCustomerEntitlements()
 		} catch {
 			lastErrorMessage = error.localizedDescription
 			AppAnalytics.capture("credits_offerings_failed", properties: [
 				"error": error.localizedDescription
 			])
+		}
+	}
+
+	private func refreshCustomerEntitlements() async {
+		guard purchasing.isConfigured else { return }
+		do {
+			let info = try await purchasing.customerInfo()
+			hasActiveStipend = info.entitlements[CreditCatalog.Entitlement.scribe]?.isActive == true
+		} catch {
+			// Ledger snapshot may still populate hasActiveStipend; ignore RC entitlement errors.
 		}
 	}
 
@@ -145,7 +157,7 @@ final class CreditWalletStore {
 				"package_id": storePackage.id
 			])
 			statusMessage = String(localized: "nan_credits_purchase_success")
-			// Webhook credits the ledger; refresh shortly after.
+			await refreshCustomerEntitlements()
 			await refreshWallet()
 			return true
 		} catch {
@@ -172,6 +184,7 @@ final class CreditWalletStore {
 		do {
 			_ = try await purchasing.restorePurchases()
 			statusMessage = String(localized: "nan_credits_restore_success")
+			await refreshCustomerEntitlements()
 			await refreshWallet()
 			AppAnalytics.capture("credits_restore_succeeded")
 			return true
@@ -274,7 +287,10 @@ final class CreditWalletStore {
 	private func apply(_ snapshot: CreditWalletSnapshot) {
 		balance = snapshot.balance
 		starterGranted = snapshot.starterGranted
-		hasActiveStipend = snapshot.hasActiveStipend
+		// Prefer live RC `scribe` entitlement when available; ledger hint is fallback only.
+		if !purchasing.isConfigured {
+			hasActiveStipend = snapshot.hasActiveStipend
+		}
 		ledgerAvailable = snapshot.ledgerAvailable
 		lastErrorMessage = nil
 	}

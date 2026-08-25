@@ -51,13 +51,13 @@ Deno.serve(async (req) => {
       return jsonResponse({ ok: true, ignored_product: productID });
     }
 
-    // Only grant stipend on INITIAL_PURCHASE + RENEWAL for the sub product.
-    const isStipend = productID === "com.kyou.naninf.sub.stipend_monthly";
-    if (isStipend && type !== "INITIAL_PURCHASE" && type !== "RENEWAL") {
-      return jsonResponse({ ok: true, ignored_stipend_type: type });
+    // Only grant monthly CREDITS on INITIAL_PURCHASE + RENEWAL for the Scribe sub.
+    const isScribe = productID === "com.kyou.naninf.sub.scribe_monthly";
+    if (isScribe && type !== "INITIAL_PURCHASE" && type !== "RENEWAL") {
+      return jsonResponse({ ok: true, ignored_scribe_type: type });
     }
 
-    const kind = isStipend ? "stipend" : "purchase";
+    const kind = isScribe ? "stipend" : "purchase";
     const admin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
