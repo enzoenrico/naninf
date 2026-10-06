@@ -69,6 +69,26 @@
 		}
 	}
 
+	extension DungeonMasterTurnContext {
+		static func fixture(
+			kind: DungeonMasterTurnKind = .playerText,
+			playerMessage: String = "",
+			storySoFar: [TerminalEntry] = [],
+			diceRoll: Int? = nil
+		) -> DungeonMasterTurnContext {
+			DungeonMasterTurnContext(
+				kind: kind,
+				playerMessage: playerMessage,
+				health: 10,
+				maxHealth: 18,
+				mana: 8,
+				maxMana: 18,
+				storySoFar: storySoFar,
+				diceRoll: diceRoll
+			)
+		}
+	}
+
 	extension DungeonTurnDraft {
 		static func fixture(
 			narrative: String = "> Test",

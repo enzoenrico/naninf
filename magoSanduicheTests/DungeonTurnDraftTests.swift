@@ -63,3 +63,37 @@ struct DungeonTurnDraftTests {
 		#expect(turn.output.visualPrompt == nil)
 	}
 }
+
+@MainActor
+struct GameViewModelManaTests {
+	private func makeViewModel() -> GameViewModel {
+		GameViewModel(
+			persistRunsToLibrary: false,
+			dungeonMaster: DungeonMasterService(narrator: ScriptedNarrator(drafts: []))
+		)
+	}
+
+	@Test func changeManaClampsBetweenZeroAndMax() {
+		let vm = makeViewModel()
+		vm.mana = 5
+		vm.maxMana = 30
+
+		vm.applyToolEffectsFromDebug([.changeMana(-20)])
+		#expect(vm.mana == 0)
+
+		vm.applyToolEffectsFromDebug([.changeMana(999)])
+		#expect(vm.mana == 30)
+	}
+
+	@Test func changeManaAppliesSignedDelta() {
+		let vm = makeViewModel()
+		vm.mana = 10
+		vm.maxMana = 30
+
+		vm.applyToolEffectsFromDebug([.changeMana(-3)])
+		#expect(vm.mana == 7)
+
+		vm.applyToolEffectsFromDebug([.changeMana(5)])
+		#expect(vm.mana == 12)
+	}
+}

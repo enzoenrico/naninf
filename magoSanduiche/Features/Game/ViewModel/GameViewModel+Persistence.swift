@@ -16,7 +16,6 @@ extension GameViewModel {
         applyPlaybackState(GameRunSnapshotMapper.playbackState(from: stored))
         visionDisplayMode = .introStatic
         visionMediaLoading = false
-        dungeonMaster = Self.makeDungeonMaster()
     }
 
     func saveSnapshot(modelContext: ModelContext) {

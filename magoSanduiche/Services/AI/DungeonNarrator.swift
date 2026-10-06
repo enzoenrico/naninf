@@ -66,12 +66,10 @@ extension DungeonTurnDraft {
 		}
 		toolEffects.append(.requestAction(nextInput.gameAction))
 
-		let trimmedVisual = visualPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
 		let output = PromptOutput(
 			narrative: narrative,
-			toolResults: "",
-			options: DungeonMasterTurnValidation.paddedOptions(from: options),
-			visualPrompt: trimmedVisual.isEmpty ? nil : trimmedVisual
+			options: options,
+			visualPrompt: visualPrompt
 		)
 		return DungeonMasterTurn(output: output, toolEffects: toolEffects)
 	}

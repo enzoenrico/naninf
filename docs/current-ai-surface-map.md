@@ -12,12 +12,12 @@ This document maps the existing code surfaces that can support importing or rewo
 - Navigation: `NavigationStack` with an observable `AppCoordinator`.
 - State model: Swift Observation via `@Observable`, view-local `@State`, `@Environment(AppCoordinator.self)`, and `@AppStorage`.
 - Package manager: Swift Package Manager through Xcode. There is no `package.json`, npm, or server package in this app.
-- App target: bundle identifier `com.kyou.naninf`, marketing version `2.0`, Swift version `5.0`, app target deployment value `18.6` in `magoSanduiche.xcodeproj/project.pbxproj`.
+- App target: bundle identifier `com.kyou.naninf`, marketing version `2.0`, Swift version `5.0`, deployment target `27.0` in `magoSanduiche.xcodeproj/project.pbxproj`.
 - Build tooling: `buildServer.json` points to `xcode-build-server` for the `magoSanduiche` scheme.
 
 Relevant dependencies and Apple frameworks:
 
-- `OpenAI` Swift package from `https://github.com/MacPaw/OpenAI.git`, resolved to version `0.4.7` in `magoSanduiche.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved`.
+- Narration uses Apple `FoundationModels` `PrivateCloudComputeLanguageModel`. There is no OpenAI package and no `OPENAI_API_KEY`. Apple requires a managed Private Cloud Compute entitlement; the key is not in this repo.
 - `ImagePlayground` in `magoSanduiche/Services/ImageGeneration/ImageGenerator.swift`.
 - `TipKit` in `magoSanduiche/Features/Game/GameView.swift` and `magoSanduiche/Features/Game/Tips/GameTips.swift`.
 - `AVFoundation`, `ImageIO`, `CoreGraphics`, and `URLSession` inside `magoSanduiche/Shared/Views/AsciiMediaView.swift`.
@@ -48,10 +48,10 @@ magoSanduiche/
     Prompts/
   Services/
     AI/
-      OpenAIService.swift
+      PrivateCloudNarrator.swift
+      DungeonNarrator.swift
       DungeonMasterService.swift
-      StructuredOutput.swift
-      Tools/
+      DungeonMasterError.swift
     ImageGeneration/
       ImageGenerator.swift
   Shared/
@@ -63,13 +63,14 @@ magoSanduiche/
 
 ### AI Provider Connection
 
-The current app already has an OpenAI client wrapper.
+The dungeon master is one guided Private Cloud Compute turn per player action.
 
-- `OpenAIService` in `magoSanduiche/Services/AI/OpenAIService.swift` owns the `OpenAI` client, stores `conversationHistory`, appends system instructions, runs chat completions, supports tools, and decodes structured JSON outputs.
-- `DungeonMasterService` in `magoSanduiche/Services/AI/DungeonMasterService.swift` is the game-specific facade. It reads `OPENAI_API_KEY` from `Bundle.main.object(forInfoDictionaryKey:)`, initializes `OpenAIService` with `Prompts.systemPrompt`, and calls `generate(_:returning:tools:model:)` with `.gpt4_o_mini`.
-- `Info.plist` contains an `OPENAI_API_KEY` entry. The value is intentionally not reproduced here. This is a risky integration point because a client-bundled API key can be extracted from the app.
+- `PrivateCloudNarrator` builds a fresh `LanguageModelSession` on `PrivateCloudComputeLanguageModel()`, calls `respond(to:generating:contextOptions:)` for `DungeonTurnDraft`, and does not store a transcript.
+- `DungeonMasterService.generate` formats `storySoFar` from persisted terminal entries, asks the narrator for a draft, and returns `draft.resolved()`.
+- `resolved()` emits nonzero health, nonzero mana, then exactly one `.requestAction`. `GameViewModel.applyToolEffects` is the only writer of HP, mana, and input mode.
+- Failures are `DungeonMasterError`. The terminal shows `error.terminalMessage`.
 
-There are no server-side API routes or server actions in the current app. Searches for web/server patterns show a native iOS app only; the only direct network code found is OpenAI package usage and `URLSession.shared.data(from:)` for remote media loading in `AsciiMediaView`.
+There are no server-side API routes. Scene art is still the old remote-image path until the on-device illustrator replaces it. `AsciiMediaView` can still load a remote image, but the narrator no longer produces one.
 
 ### Prompting And Chat Loop
 
@@ -77,18 +78,18 @@ The interactive prompt flow exists and is centered in `GameViewModel`.
 
 - `GameViewModel.getResponse(for:)` in `magoSanduiche/Features/Game/GameViewModel.swift` trims user input, rejects empty prompts, appends a `.player` `TerminalEntry`, clears the input, sets `uiPhase = .awaitingDungeonMaster`, then starts `fetchNarrative(for:)`.
 - `GameViewModel.fetchNarrative(for:)` awaits `DungeonMasterService.generate`, appends the returned `PromptOutput.narrative` as a `.dungeonMaster` terminal entry, and moves the UI to `.result`.
-- `PromptOutput` in `magoSanduiche/Resources/Prompts/PromptOutput.swift` defines the expected structured response: `narrative`, `toolResults`, and `options`. It includes a compatibility decoder for `toolResults` as either a string, array of strings, or array of `{ tool, result }` objects.
+- `PromptOutput` is narrative, exactly three options, and an optional visual prompt. The wire draft is `DungeonTurnDraft`, and `resolved()` builds the output. There is no `toolResults` decoder.
 - `Prompts.systemPrompt` in `magoSanduiche/Resources/Prompts/Prompts.swift` is the active in-code system prompt. There is also `magoSanduiche/Public/Prompts/system_prompt.md`, which appears to be a prompt asset or earlier version and is not currently referenced by code.
 
 Important current behavior:
 
-- The UI currently renders only `result.narrative`. `PromptOutput.toolResults` and `PromptOutput.options` are decoded but not displayed or persisted.
-- Conversation memory exists only inside `OpenAIService.conversationHistory` for the lifetime of the `DungeonMasterService` instance. There is no durable game-session transcript persistence yet.
+- The terminal renders `output.narrative`. `output.options` fills the suggestion buttons. `output.visualPrompt` feeds scene art.
+- Conversation memory is the persisted terminal transcript. The formatter sends the newest player and dungeon-master lines that fit `storyCharacterBudget`. There is no stored model transcript.
 - `DungeonMasterService.clearHistory()` exists but is not called by the current game lifecycle.
 
 ### AI Tools And Action Buttons
 
-The current app has a tool-call model that already maps AI decisions into UI action changes.
+Tool calls are gone. `healthChange`, `manaChange`, and `nextInput` are guided fields. The notes below describe the removed OpenAI tools and should not be reintroduced.
 
 - `ExecutableTool` in `magoSanduiche/Services/AI/OpenAIService.swift` defines the common static tool interface.
 - `RollDiceTool` in `magoSanduiche/Services/AI/Tools/RollDice.swift` accepts `faces` and returns a random roll string.
@@ -274,7 +275,7 @@ flowchart TD
 
 ### Prompt And Provider Layer
 
-- `magoSanduiche/Services/AI/OpenAIService.swift` / `OpenAIService`: best place to keep generic provider-client concerns, conversation history, structured output, and tool-loop mechanics.
+- `PrivateCloudNarrator` owns the Private Cloud Compute session, availability, quota, and error mapping. Do not add a second provider client here.
 - `magoSanduiche/Services/AI/DungeonMasterService.swift` / `DungeonMasterService`: best current seam for game-specific model choice, system prompt injection, tool registration, and future provider abstraction.
 - `magoSanduiche/Resources/Prompts/Prompts.swift` / `Prompts.systemPrompt`: current active prompt. If old-app prompting is merged, update this or replace it with a loaded prompt asset, but avoid maintaining divergent prompt copies.
 - `magoSanduiche/Public/Prompts/system_prompt.md`: currently appears unused. It should either become the canonical editable prompt source or be deleted/ignored after consolidation.
@@ -337,7 +338,7 @@ What is missing or incomplete:
 
 Risky integration points:
 
-- Client-bundled OpenAI API key in `Info.plist`. Any implementation plan should move provider secrets behind a backend, local development config, or another secure boundary before release.
+- Private Cloud Compute has no app-held API key. The missing piece is Apple's managed entitlement, which this repo does not name.
 - Static callbacks on tool structs: `DecideActionTool.onActionRequested` and `ChangeHealthTool.onHealthChange` are global mutable state. This can behave poorly with multiple sessions, previews, tests, or overlapping requests.
 - `OpenAIService` is `@MainActor`, so long tool loops and client calls are invoked from a main-actor object. The underlying async calls yield, but UI-coupled service ownership should be reviewed before adding heavier work.
 - `OpenAIService.runAgentLoop` allows up to 20 tool iterations; richer tools should guard against repeated UI side effects.

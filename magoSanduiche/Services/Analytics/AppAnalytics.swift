@@ -55,10 +55,9 @@ enum AppAnalytics {
 		spanID: String,
 		spanName: String,
 		model: String,
-		input: Any,
-		outputChoices: Any?,
 		inputTokens: Int?,
 		outputTokens: Int?,
+		reasoningTokens: Int?,
 		totalTokens: Int?,
 		latency: TimeInterval,
 		properties: [String: Any] = [:]
@@ -69,48 +68,16 @@ enum AppAnalytics {
 		eventProperties["$ai_span_id"] = spanID
 		eventProperties["$ai_span_name"] = spanName
 		eventProperties["$ai_model"] = model
-		eventProperties["$ai_provider"] = "openai"
-		eventProperties["$ai_input"] = input
+		eventProperties["$ai_provider"] = PrivateCloudNarrator.analyticsProvider
 		eventProperties.setIfPresent(inputTokens, forKey: "$ai_input_tokens")
-		eventProperties.setIfPresent(outputChoices, forKey: "$ai_output_choices")
 		eventProperties.setIfPresent(outputTokens, forKey: "$ai_output_tokens")
+		eventProperties.setIfPresent(reasoningTokens, forKey: "$ai_reasoning_tokens")
 		eventProperties.setIfPresent(totalTokens, forKey: "total_tokens")
 		eventProperties["$ai_latency"] = latency
 		eventProperties["$ai_stream"] = false
 		eventProperties["distinct_id"] = distinctID
 
 		capture("$ai_generation", properties: eventProperties)
-	}
-
-	static func captureAIError(
-		traceID: String,
-		sessionID: String?,
-		spanID: String,
-		spanName: String,
-		model: String,
-		input: Any,
-		latency: TimeInterval,
-		error: Error,
-		properties: [String: Any] = [:]
-	) {
-		captureAIGeneration(
-			traceID: traceID,
-			sessionID: sessionID,
-			spanID: spanID,
-			spanName: spanName,
-			model: model,
-			input: input,
-			outputChoices: nil,
-			inputTokens: nil,
-			outputTokens: nil,
-			totalTokens: nil,
-			latency: latency,
-			properties: properties.merging([
-				"$ai_is_error": true,
-				"$ai_error": error.localizedDescription,
-				"error_type": String(describing: type(of: error))
-			]) { _, new in new }
-		)
 	}
 
 	private static func identifyAnonymousPlayer() {

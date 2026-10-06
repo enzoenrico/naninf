@@ -37,8 +37,7 @@ extension GameViewModel {
         let context = dungeonMasterTurnContext(
             kind: .diceResultConfirmation,
             playerMessage: "",
-            diceRoll: roll,
-            diceOutcomeSummary: nil
+            diceRoll: roll
         )
         beginDungeonMasterTurn(
             displayText: String(format: String(localized: "nan_dice_player_confirmed"), roll),

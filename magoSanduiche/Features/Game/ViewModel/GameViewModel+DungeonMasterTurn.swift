@@ -21,8 +21,7 @@ extension GameViewModel {
         let context = dungeonMasterTurnContext(
             kind: .playerText,
             playerMessage: trimmed,
-            diceRoll: nil,
-            diceOutcomeSummary: nil
+            diceRoll: nil
         )
         beginDungeonMasterTurn(
             displayText: trimmed,
@@ -80,23 +79,10 @@ extension GameViewModel {
         }
 
         do {
-            guard
-                let turn = try await dungeonMaster?.generate(
-                    context: context,
-                    analyticsContext: aiContext(turnID: turnID)
-                )
-            else {
-                appendSystemMessage(String(localized: "nan_dm_silent"))
-                capture(
-                    "dm_turn_empty_response",
-                    extra: [
-                        "turn_id": turnID,
-                        "duration": Date().timeIntervalSince(startedAt),
-                    ]
-                )
-                return
-            }
-
+            let turn = try await dungeonMaster.generate(
+                context: context,
+                analyticsContext: aiContext(turnID: turnID)
+            )
             let result = turn.output
             terminalEntries.append(TerminalEntry(kind: .dungeonMaster, text: result.narrative))
             pruneTypewriterProgress()
@@ -126,19 +112,17 @@ extension GameViewModel {
                     "turn_id": turnID,
                     "turn_kind": context.kind.rawValue,
                     "duration": Date().timeIntervalSince(startedAt),
-                    "error_type": String(describing: type(of: error)),
-                    "error_message": error.localizedDescription,
+                    "error_kind": error.analyticsKind,
                 ]
             )
-            appendSystemMessage(String(localized: "nan_dm_error"))
+            appendSystemMessage(error.terminalMessage)
         }
     }
 
     func dungeonMasterTurnContext(
         kind: DungeonMasterTurnKind,
         playerMessage: String,
-        diceRoll: Int?,
-        diceOutcomeSummary: String?
+        diceRoll: Int?
     ) -> DungeonMasterTurnContext {
         DungeonMasterTurnContext(
             kind: kind,
@@ -147,18 +131,9 @@ extension GameViewModel {
             maxHealth: maxHealth,
             mana: mana,
             maxMana: maxMana,
-            latestDungeonMasterExcerpt: latestDungeonMasterExcerpt(),
-            diceRoll: diceRoll,
-            diceOutcomeSummary: diceOutcomeSummary
+            storySoFar: terminalEntries,
+            diceRoll: diceRoll
         )
-    }
-
-    private func latestDungeonMasterExcerpt() -> String? {
-        for entry in terminalEntries.reversed() where entry.kind == .dungeonMaster {
-            let trimmed = entry.text.trimmingCharacters(in: .whitespacesAndNewlines)
-            return trimmed.isEmpty ? nil : trimmed
-        }
-        return nil
     }
 
     private func appendSystemMessage(_ text: String) {

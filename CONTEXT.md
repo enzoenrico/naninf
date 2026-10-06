@@ -20,11 +20,11 @@ The state where the player can reach `PlayerHomeView`. It requires both Onboardi
 
 ### Model Provider
 
-The runtime that generates dungeon-master responses. OpenAI is the current production Model Provider; Apple Foundation Models is a future local-provider target.
+The runtime that generates dungeon-master responses. Private Cloud Compute is the production Model Provider. Each turn is one guided response on a fresh session. The app does not keep a second provider.
 
 ### Model Tool
 
-A typed capability the dungeon master can call while generating a turn, such as requesting the next player interaction (text or dice), changing player health or mana, or applying other game effects. Model Tools are defined in app-owned terms and adapted to each Model Provider. Numeric dice outcomes come from the **Player-facing roll**, not from a DM-side roll tool.
+Retired. Health, mana, and the next input mode are guided fields on `DungeonTurnDraft` (`healthChange`, `manaChange`, `nextInput`). `resolved()` turns those fields into `GameToolEffect` values. Numeric dice outcomes come from the **Player-facing roll**, not from the narrator.
 
 ### Tool Arguments
 
@@ -36,7 +36,7 @@ The typed output of a Model Tool. A Tool Result includes a model-facing message 
 
 ### Player-facing roll
 
-A die roll performed through the game’s dice UI. The numeric outcome is authoritative for anything framed as the player’s skill check or uncertain player action. The app holds that result locally until the player **explicitly confirms** sending it; confirmation triggers a structured message to the Model Provider on the next DM turn. **Dice animation alone does not change health or mana**; resource updates follow DM **`changeHealth`** / **`changeMana`** (or narration-only beats).
+A die roll performed through the game’s dice UI. The numeric outcome is authoritative for anything framed as the player’s skill check or uncertain player action. The app holds that result locally until the player **explicitly confirms** sending it; confirmation triggers a structured message to the Model Provider on the next DM turn. **Dice animation alone does not change health or mana**; resource updates follow the turn’s `healthChange` and `manaChange` fields.
 
 ### Dice result confirmation
 

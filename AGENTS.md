@@ -7,7 +7,7 @@
 `magoSanduiche` (display name **NanInf**, bundle id `com.kyou.naninf`) is a native
 **iOS / iPadOS SwiftUI application** — a CRT/terminal-styled, AI dungeon-master RPG.
 It is built and run exclusively through **Xcode** (project created with Xcode 26,
-`SDKROOT = iphoneos`, app deployment target `IPHONEOS_DEPLOYMENT_TARGET = 18.6`,
+`SDKROOT = iphoneos`, app deployment target `IPHONEOS_DEPLOYMENT_TARGET = 27.0`,
 shared scheme `magoSanduiche`). There is **no `Package.swift`** and no SwiftPM target.
 
 ### Critical: this app cannot be built/run/tested on the Linux Cloud Agent VM
@@ -28,7 +28,7 @@ dependency. Concretely verified on this VM:
 
 Do **not** spend time trying to `swift build`/`swiftc` the app on Linux — it will not
 work. A future agent that needs to build, run, lint, or test this app must do so on
-**macOS with Xcode 26 + an iOS 18.6 Simulator**.
+**macOS with Xcode 27 + an iOS 27 Simulator**.
 
 ### Commands to use on macOS (for reference, not runnable on the Linux VM)
 
@@ -41,7 +41,7 @@ work. A future agent that needs to build, run, lint, or test this app must do so
 
 | Service | Required | Purpose | Where configured |
 | --- | --- | --- | --- |
-| OpenAI | Yes (core) | Dungeon-master turns (MacPaw OpenAI SDK) | `OPENAI_API_KEY` in `magoSanduiche/Info.plist` |
+| Private Cloud Compute | Yes (core) | Dungeon-master turns via `PrivateCloudComputeLanguageModel` | Apple-managed entitlement. The key is not in this repo. No app credential. |
 | Supabase | Yes (auth gating) | Apple/Google sign-in sessions | `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` build settings in `project.pbxproj`, surfaced into `Info.plist` |
 | Google Sign-In | Yes (one sign-in path) | OAuth → Supabase | `GIDClientID` + URL types in `Info.plist`; `magoSanduiche/GoogleOAuthClient.plist` |
 | Apple Sign-In | Yes (other sign-in path) | OAuth → Supabase | `magoSanduiche.entitlements`; needs Apple Developer team `DEVELOPMENT_TEAM` |
