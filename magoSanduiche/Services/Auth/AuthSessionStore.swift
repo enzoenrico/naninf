@@ -91,24 +91,24 @@ final class AuthSessionStore {
 		await refreshStoredSession()
 	}
 
-	func handleOpenURL(_ url: URL) {
-		_ = authService?.handleOpenURL(url)
-	}
-
 	func handleAppleSignInButtonCompletion(_ result: Result<ASAuthorization, Error>) async {
-		await authenticate(provider: .apple) { authService in
-			try await authService.signInWithApple(result)
-		}
-	}
+		guard let authService else { return }
+		isAuthenticating = true
+		errorMessage = nil
+		defer { isAuthenticating = false }
 
-	func signIn(with provider: PlayerAuthProvider) async {
-		switch provider {
-		case .google:
-			await authenticate(provider: .google) { authService in
-				try await authService.signInWithGoogle()
-			}
-		case .apple, .unknown:
-			break
+		do {
+			let session = try await authService.signInWithApple(result)
+			storeSession(session, provider: .apple)
+			AppAnalytics.capture("auth_signed_in", properties: [
+				"provider": PlayerAuthProvider.apple.rawValue
+			])
+		} catch {
+			errorMessage = error.localizedDescription
+			AppAnalytics.capture("auth_sign_in_failed", properties: [
+				"provider": PlayerAuthProvider.apple.rawValue,
+				"error": error.localizedDescription
+			])
 		}
 	}
 
@@ -140,30 +140,6 @@ final class AuthSessionStore {
 			storeSession(session)
 		} catch {
 			clearSession()
-		}
-	}
-
-	private func authenticate(
-		provider: PlayerAuthProvider,
-		operation: (SupabaseAuthService) async throws -> Session
-	) async {
-		guard let authService else { return }
-		isAuthenticating = true
-		errorMessage = nil
-		defer { isAuthenticating = false }
-
-		do {
-			let session = try await operation(authService)
-			storeSession(session, provider: provider)
-			AppAnalytics.capture("auth_signed_in", properties: [
-				"provider": provider.rawValue
-			])
-		} catch {
-			errorMessage = error.localizedDescription
-			AppAnalytics.capture("auth_sign_in_failed", properties: [
-				"provider": provider.rawValue,
-				"error": error.localizedDescription
-			])
 		}
 	}
 
