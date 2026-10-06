@@ -27,4 +27,9 @@ extension GameViewModel {
         }
         AppAnalytics.capture(event, properties: properties)
     }
+
+    func incrementStoredCounter(_ key: String) {
+        let defaults = UserDefaults.standard
+        defaults.set(defaults.integer(forKey: key) + 1, forKey: key)
+    }
 }

@@ -40,8 +40,10 @@ nonisolated enum DungeonMasterError: Error, Equatable, Sendable {
 
 	var analyticsKind: String {
 		switch self {
-		case .unavailable:
-			"unavailable"
+		case .unavailable(.deviceNotEligible):
+			"unavailable_device"
+		case .unavailable(.systemNotReady):
+			"unavailable_system"
 		case .quotaReached:
 			"quota_reached"
 		case .unreachable:
@@ -52,6 +54,15 @@ nonisolated enum DungeonMasterError: Error, Equatable, Sendable {
 			"cancelled"
 		case .failed:
 			"failed"
+		}
+	}
+
+	var analyticsDetail: String? {
+		switch self {
+		case .failed(let message):
+			message.count > 160 ? String(message.prefix(160)) : message
+		case .unavailable, .quotaReached, .unreachable, .refused, .cancelled:
+			nil
 		}
 	}
 }

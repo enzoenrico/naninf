@@ -40,6 +40,9 @@ final class GameViewModel {
     var suggestedOptions: [String] = []
     var selectedSuggestionIndex: Int?
     var onCompletedPlayerAction: (() -> Void)?
+    var sessionOrigin = "unopened"
+    private var didCaptureSessionStart = false
+    private var sessionStartedAt: Date?
     var terminalEntries: [TerminalEntry] = GameRunSnapshotMapper.defaultTerminalEntries
     var revealedTerminalEntryIDs: Set<UUID> = []
     var typewriterProgressByEntryID: [UUID: Int] = [:]
@@ -60,16 +63,41 @@ final class GameViewModel {
         gameSessionID = UUID().uuidString
 		self.persistRunsToLibrary = persistRunsToLibrary
 		self.dungeonMaster = dungeonMaster ?? DungeonMasterService()
-        capture(
-            "game_session_started",
-            extra: [
-                "persist_runs": persistRunsToLibrary,
-            ]
-        )
     }
 
     func attachCoordinator(_ coordinator: AppCoordinator) {
         self.coordinator = coordinator
+    }
+
+    func noteSessionOpened(origin: String) {
+        guard !didCaptureSessionStart else { return }
+        didCaptureSessionStart = true
+        sessionOrigin = origin
+        sessionStartedAt = Date()
+        capture(
+            "game_session_started",
+            extra: [
+                "persist_runs": persistRunsToLibrary,
+                "origin": origin,
+            ]
+        )
+        if origin == "fresh", persistRunsToLibrary {
+            incrementStoredCounter("runsStarted")
+        }
+    }
+
+    func sessionLeaveProperties() -> [String: Any] {
+        var properties: [String: Any] = [
+            "origin": sessionOrigin,
+            "ui_phase": uiPhase.analyticsName,
+            "loading": loading,
+            "has_submitted_player_turn": hasSubmittedPlayerTurn,
+            "terminal_entry_count": terminalEntries.count,
+        ]
+        if let sessionStartedAt {
+            properties["duration"] = Date().timeIntervalSince(sessionStartedAt)
+        }
+        return properties
     }
 
     #if DEBUG

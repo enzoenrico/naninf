@@ -21,7 +21,7 @@ struct GameView: View {
             coordinator: coordinator,
             showsTips: true,
             onNavigateBack: {
-                AppAnalytics.capture("game_back_tapped")
+                vm.capture("game_back_tapped", extra: vm.sessionLeaveProperties())
                 vm.saveSnapshot(modelContext: modelContext)
                 TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
                     coordinator.resetGamePresentation()
@@ -41,7 +41,11 @@ struct GameView: View {
             if let runID = coordinator.consumePendingResumeRunID() {
                 vm.restore(runID: runID, modelContext: modelContext)
                 coordinator.applyResumePresentationState()
+                vm.noteSessionOpened(origin: vm.persistedRunID == nil ? "resume_missing" : "resume")
+            } else {
+                vm.noteSessionOpened(origin: "fresh")
             }
+            AppAnalytics.screen("Game", properties: ["origin": vm.sessionOrigin])
         }
         .onDisappear {
             vm.saveSnapshot(modelContext: modelContext)
@@ -530,7 +534,7 @@ struct GameSessionView: View {
             {
                 let choice = vm.suggestedOptions[selectedIndex]
                 TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
-                    if vm.getResponse(for: choice) {
+                    if vm.getResponse(for: choice, inputSource: "suggestion", suggestionIndex: selectedIndex) {
                         coordinator.resetActionPresentation()
                     }
                 }

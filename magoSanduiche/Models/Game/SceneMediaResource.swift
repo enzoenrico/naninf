@@ -35,6 +35,17 @@ nonisolated enum SceneMediaError: Error, LocalizedError, Equatable {
 			String(localized: "nan_vision_error_no_image")
 		}
 	}
+
+	var analyticsKind: String {
+		switch self {
+		case .emptyPrompt:
+			"empty_prompt"
+		case .unavailable:
+			"unavailable"
+		case .noImage:
+			"no_image"
+		}
+	}
 }
 
 nonisolated enum VisionDisplayMode: Equatable {

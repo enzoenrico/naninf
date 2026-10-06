@@ -37,6 +37,9 @@ struct LoadRunView: View {
 				backButton
 			}
 		}
+		.onAppear {
+			AppAnalytics.screen("Load", properties: ["saved_run_count": savedRuns.count])
+		}
 	}
 
 	#if DEBUG
@@ -91,6 +94,15 @@ struct LoadRunView: View {
 		List {
 			ForEach(savedRuns, id: \.id) { run in
 				Button {
+					AppAnalytics.capture(
+						"game_run_resumed",
+						properties: [
+							"health": run.health,
+							"mana": run.mana,
+							"max_health": run.maxHealth,
+							"max_mana": run.maxMana,
+							"age_seconds": Date().timeIntervalSince(run.updatedAt),
+						])
 					TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 						coordinator.beginResume(runID: run.id)
 						coordinator.navigate(to: .game)
@@ -149,6 +161,13 @@ struct LoadRunView: View {
 	private func deleteRuns(at offsets: IndexSet) {
 		for index in offsets {
 			let run = savedRuns[index]
+			AppAnalytics.capture(
+				"game_run_deleted",
+				properties: [
+					"health": run.health,
+					"mana": run.mana,
+					"age_seconds": Date().timeIntervalSince(run.updatedAt),
+				])
 			modelContext.delete(run)
 		}
 		try? modelContext.save()

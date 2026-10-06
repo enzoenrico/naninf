@@ -30,6 +30,9 @@ struct AboutView: View {
                 }
             }
         }
+        .onAppear {
+            AppAnalytics.screen("About")
+        }
         .enableInjection()
     }
 

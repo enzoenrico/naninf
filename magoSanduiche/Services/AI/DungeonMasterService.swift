@@ -103,10 +103,22 @@ final class DungeonMasterService {
 			AppAnalytics.capture("vision_scene_generate_succeeded", properties: properties)
 			return SceneImage(cgImage: cgImage)
 		} catch {
-			properties["error_type"] = String(describing: type(of: error))
+			properties["error_kind"] = visionErrorKind(error)
+			properties["error_detail"] = AppAnalytics.clipped(error.localizedDescription)
 			AppAnalytics.capture("vision_scene_generate_failed", properties: properties)
 			throw error
 		}
+	}
+
+	private func visionErrorKind(_ error: Error) -> String {
+		if let sceneError = error as? SceneMediaError {
+			return sceneError.analyticsKind
+		}
+		let nsError = error as NSError
+		if nsError.domain.isEmpty {
+			return "illustrator"
+		}
+		return nsError.domain
 	}
 
 	static func defaultNarrator() -> any DungeonNarrator {

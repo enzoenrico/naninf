@@ -33,6 +33,7 @@ struct AuthView: View {
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
 		}
 		.task {
+			AppAnalytics.screen("Sign in")
 			await authSessionStore.start()
 		}
 	}

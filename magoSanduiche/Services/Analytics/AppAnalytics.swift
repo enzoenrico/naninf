@@ -19,15 +19,7 @@ enum AppAnalytics {
 		static let host = "POSTHOG_HOST"
 	}
 
-	private enum StorageKey {
-		static let anonymousPlayerID = "analyticsAnonymousPlayerID"
-	}
-
 	private static var isConfigured = false
-
-	static var distinctID: String {
-		anonymousPlayerID()
-	}
 
 	static func configure(bundle: Bundle = .main) {
 		guard !isConfigured else { return }
@@ -36,17 +28,64 @@ enum AppAnalytics {
 
 		let config = PostHogConfig(projectToken: projectToken, host: host)
 		config.captureApplicationLifecycleEvents = true
+		// SwiftUI screen autocapture records hosting-controller type names, which cannot be used as screens.
+		config.captureScreenViews = false
+		// Onboarding drop-off happens before sign-in, so anonymous players still need person profiles.
+		config.personProfiles = .always
 		#if DEBUG
 			config.debug = true
 		#endif
 		PostHogSDK.shared.setup(config)
 		isConfigured = true
-		identifyAnonymousPlayer()
 	}
 
 	static func capture(_ event: String, properties: [String: Any] = [:]) {
-		guard isConfigured else { return }
+		guard shouldCapture else { return }
 		PostHogSDK.shared.capture(event, properties: commonProperties().merging(properties) { _, new in new })
+	}
+
+	static func screen(_ name: String, properties: [String: Any] = [:]) {
+		guard shouldCapture else { return }
+		PostHogSDK.shared.screen(name, properties: commonProperties().merging(properties) { _, new in new })
+	}
+
+	/// Links this device's anonymous activity to the signed-in player.
+	/// Earlier builds called `identify` with a local UUID, which blocks a later identify. Only that stuck state resets.
+	static func identifySignedInPlayer(userID: String, provider: String) {
+		guard shouldCapture else { return }
+		guard !userID.isEmpty else { return }
+		let properties: [String: Any] = [
+			"user_type": "player",
+			"auth_provider": provider,
+			"signed_in": true,
+		]
+		if PostHogSDK.shared.getDistinctId() == userID {
+			PostHogSDK.shared.identify(userID, userProperties: properties)
+			return
+		}
+		PostHogSDK.shared.identify(userID, userProperties: properties)
+		if PostHogSDK.shared.getDistinctId() == userID {
+			return
+		}
+		PostHogSDK.shared.reset()
+		PostHogSDK.shared.identify(userID, userProperties: properties)
+	}
+
+	static func markSignedOut() {
+		guard shouldCapture else { return }
+		PostHogSDK.shared.setPersonProperties(userPropertiesToSet: ["signed_in": false])
+		PostHogSDK.shared.reset()
+	}
+
+	static func setPersonProperties(_ properties: [String: Any]) {
+		guard shouldCapture else { return }
+		guard !properties.isEmpty else { return }
+		PostHogSDK.shared.setPersonProperties(userPropertiesToSet: properties)
+	}
+
+	static func clipped(_ text: String, limit: Int = 160) -> String {
+		guard text.count > limit else { return text }
+		return String(text.prefix(limit))
 	}
 
 	static func captureAIGeneration(
@@ -75,26 +114,13 @@ enum AppAnalytics {
 		eventProperties.setIfPresent(totalTokens, forKey: "total_tokens")
 		eventProperties["$ai_latency"] = latency
 		eventProperties["$ai_stream"] = false
-		eventProperties["distinct_id"] = distinctID
 
 		capture("$ai_generation", properties: eventProperties)
 	}
 
-	private static func identifyAnonymousPlayer() {
-		PostHogSDK.shared.identify(distinctID, userProperties: [
-			"user_type": "anonymous_player"
-		])
-	}
-
-	private static func anonymousPlayerID() -> String {
-		let defaults = UserDefaults.standard
-		if let existing = defaults.string(forKey: StorageKey.anonymousPlayerID), !existing.isEmpty {
-			return existing
-		}
-
-		let created = UUID().uuidString
-		defaults.set(created, forKey: StorageKey.anonymousPlayerID)
-		return created
+	private static var shouldCapture: Bool {
+		guard isConfigured else { return false }
+		return !UITestConfiguration.isActive
 	}
 
 	private static func sanitizedString(for key: String, in bundle: Bundle) -> String? {
@@ -107,7 +133,6 @@ enum AppAnalytics {
 
 	private static func commonProperties() -> [String: Any] {
 		[
-			"distinct_id": distinctID,
 			"app_platform": "ios",
 			"app_version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown",
 			"app_build": Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"

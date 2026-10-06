@@ -105,9 +105,12 @@ final class AuthSessionStore {
 			])
 		} catch {
 			errorMessage = error.localizedDescription
+			let nsError = error as NSError
 			AppAnalytics.capture("auth_sign_in_failed", properties: [
 				"provider": PlayerAuthProvider.apple.rawValue,
-				"error": error.localizedDescription
+				"error_domain": nsError.domain,
+				"error_code": nsError.code,
+				"error": AppAnalytics.clipped(nsError.localizedDescription),
 			])
 		}
 	}
@@ -121,6 +124,7 @@ final class AuthSessionStore {
 			try await authService?.signOut()
 			clearSession()
 			AppAnalytics.capture("auth_signed_out")
+			AppAnalytics.markSignedOut()
 		} catch {
 			errorMessage = error.localizedDescription
 			AppAnalytics.capture("auth_sign_out_failed", properties: [
@@ -164,6 +168,7 @@ final class AuthSessionStore {
 		loginSnapshot = snapshot
 		isAuthenticated = true
 		snapshotStore.save(snapshot)
+		AppAnalytics.identifySignedInPlayer(userID: snapshot.userID, provider: snapshot.provider.rawValue)
 	}
 
 	private func clearSession() {
