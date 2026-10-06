@@ -42,9 +42,14 @@ work. A future agent that needs to build, run, lint, or test this app must do so
 | Service | Required | Purpose | Where configured |
 | --- | --- | --- | --- |
 | Private Cloud Compute | Yes (core) | Dungeon-master turns via `PrivateCloudComputeLanguageModel` | Apple-managed entitlement. The key is not in this repo. No app credential. |
+<<<<<<< HEAD
 | Supabase | Yes (auth gating) | Apple/Google sign-in sessions | `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` build settings in `project.pbxproj`, surfaced into `Info.plist` |
 | Google Sign-In | Yes (one sign-in path) | OAuth → Supabase | `GIDClientID` + URL types in `Info.plist`; `magoSanduiche/GoogleOAuthClient.plist` |
 | Apple Sign-In | Yes (other sign-in path) | OAuth → Supabase | `magoSanduiche.entitlements`; needs Apple Developer team `DEVELOPMENT_TEAM` |
+=======
+| Supabase | Yes (auth gating) | Apple sign-in sessions | `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` build settings in `project.pbxproj`, surfaced into `Info.plist` |
+| Apple Sign-In | Yes | OAuth → Supabase | `magoSanduiche.entitlements`; needs Apple Developer team `DEVELOPMENT_TEAM` |
+>>>>>>> narrator-private-cloud-compute
 | PostHog | Optional | Analytics (non-blocking) | `POSTHOG_*` in `Info.plist` / scheme env vars |
 | Image Playground | Optional | On-device scene art through `ImageCreator`. The iOS 27 sheet is interactive, so the vision panel keeps the programmatic API. | Apple framework. No app credential. |
 

@@ -5,12 +5,7 @@
 
 import AuthenticationServices
 import Foundation
-import GoogleSignIn
 import Supabase
-
-#if canImport(UIKit)
-	import UIKit
-#endif
 
 final class SupabaseAuthService {
 	private let client: SupabaseClient
@@ -20,17 +15,6 @@ final class SupabaseAuthService {
 			supabaseURL: configuration.supabaseURL,
 			supabaseKey: configuration.supabasePublishableKey
 		)
-
-		if let serverClientID = configuration.googleServerClientID {
-			GIDSignIn.sharedInstance.configuration = GIDConfiguration(
-				clientID: configuration.googleIOSClientID,
-				serverClientID: serverClientID
-			)
-		} else {
-			GIDSignIn.sharedInstance.configuration = GIDConfiguration(
-				clientID: configuration.googleIOSClientID
-			)
-		}
 	}
 
 	var authStateChanges: AsyncStream<(event: AuthChangeEvent, session: Session?)> {
@@ -61,39 +45,8 @@ final class SupabaseAuthService {
 		return session
 	}
 
-	@MainActor
-	func signInWithGoogle() async throws -> Session {
-		#if canImport(UIKit)
-			guard let presentingViewController = UIApplication.shared.authPresentingViewController else {
-				throw AuthServiceError.missingPresentingViewController
-			}
-
-			let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: presentingViewController)
-			guard let idToken = result.user.idToken?.tokenString else {
-				throw AuthServiceError.missingIdentityToken
-			}
-
-			let accessToken = result.user.accessToken.tokenString
-			return try await client.auth.signInWithIdToken(
-				credentials: OpenIDConnectCredentials(
-					provider: .google,
-					idToken: idToken,
-					accessToken: accessToken
-				)
-			)
-		#else
-			throw AuthServiceError.unsupportedPlatform
-		#endif
-	}
-
 	func signOut() async throws {
 		try await client.auth.signOut()
-		GIDSignIn.sharedInstance.signOut()
-	}
-
-	@discardableResult
-	func handleOpenURL(_ url: URL) -> Bool {
-		GIDSignIn.sharedInstance.handle(url)
 	}
 
 	private func appleNameMetadata(from name: PersonNameComponents?) -> [String: AnyJSON]? {
@@ -122,8 +75,6 @@ final class SupabaseAuthService {
 enum AuthServiceError: LocalizedError {
 	case missingAppleCredential
 	case missingIdentityToken
-	case missingPresentingViewController
-	case unsupportedPlatform
 
 	var errorDescription: String? {
 		switch self {
@@ -131,42 +82,6 @@ enum AuthServiceError: LocalizedError {
 			"Apple did not return a valid authorization credential."
 		case .missingIdentityToken:
 			"The identity provider did not return an ID token."
-		case .missingPresentingViewController:
-			"Could not find a screen for the Google sign-in prompt."
-		case .unsupportedPlatform:
-			"Native Google sign-in is only available on UIKit platforms."
 		}
 	}
 }
-
-#if canImport(UIKit)
-	private extension UIApplication {
-		var authPresentingViewController: UIViewController? {
-			connectedScenes
-				.compactMap { $0 as? UIWindowScene }
-				.flatMap(\.windows)
-				.first { $0.isKeyWindow }?
-				.rootViewController?
-				.topPresentedViewController
-		}
-	}
-
-	private extension UIViewController {
-		var topPresentedViewController: UIViewController {
-			if let presentedViewController {
-				return presentedViewController.topPresentedViewController
-			}
-			if let navigationController = self as? UINavigationController,
-				let visibleViewController = navigationController.visibleViewController
-			{
-				return visibleViewController.topPresentedViewController
-			}
-			if let tabBarController = self as? UITabBarController,
-				let selectedViewController = tabBarController.selectedViewController
-			{
-				return selectedViewController.topPresentedViewController
-			}
-			return self
-		}
-	}
-#endif

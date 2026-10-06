@@ -711,13 +711,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Auth is waiting for Supabase and Google client values in the app configuration."
+            "value" : "Auth is waiting for Supabase values in the app configuration."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A autenticação aguarda os valores de cliente do Supabase e Google na configuração do app."
+            "value" : "A autenticação aguarda os valores do Supabase na configuração do app."
           }
         }
       }
@@ -782,22 +782,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "> Onboarding completo. Vincule uma conta antes de entrar no hub."
-          }
-        }
-      }
-    },
-    "nan_auth_sign_in_google" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign in with Google"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entrar com Google"
           }
         }
       }
@@ -904,13 +888,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use Apple or Google for quick signup."
+            "value" : "Use Apple for quick signup."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use sua conta da Apple ou Google"
+            "value" : "Use sua conta da Apple"
           }
         }
       }
@@ -2541,108 +2525,6 @@
         }
       }
     },
-    "nan_onboarding_demo_login_border" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> Save run"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "> Salvar run"
-          }
-        }
-      }
-    },
-    "nan_onboarding_demo_login_footnote" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your demo progress is tied to your account so you can pick up where you left off."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O progresso da demo fica na sua conta para você continuar de onde parou."
-          }
-        }
-      }
-    },
-    "nan_onboarding_demo_login_status_binding" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Binding your adventurer sigil..."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vinculando seu sigilo de aventureiro..."
-          }
-        }
-      }
-    },
-    "nan_onboarding_demo_login_status_checking" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Checking for an existing sigil..."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verificando sigilo existente..."
-          }
-        }
-      }
-    },
-    "nan_onboarding_demo_login_subtitle" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign in with Apple or Google to save this run and unlock the full dungeon."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entre com Apple ou Google para salvar esta run e desbloquear a masmorra completa."
-          }
-        }
-      }
-    },
-    "nan_onboarding_demo_login_title" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keep your demo going."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue sua demo."
-          }
-        }
-      }
-    },
     "nan_onboarding_demo_mode_border" : {
       "localizations" : {
         "en" : {
@@ -3862,13 +3744,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use Apple or Google to bind your account before entering."
+            "value" : "Use Apple to bind your account before entering."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use Apple ou Google para vincular sua conta antes de entrar."
+            "value" : "Use Apple para vincular sua conta antes de entrar."
           }
         }
       }
