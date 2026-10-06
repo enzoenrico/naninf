@@ -133,25 +133,6 @@ struct ToolIntegerParameter: Identifiable, Sendable {
 	}
 }
 
-enum GameToolEffect: Sendable, CustomStringConvertible {
-	case requestAction(GameAction)
-	case changeHealth(Int)
-	case changeMana(Int)
-
-	var description: String {
-		switch self {
-		case .requestAction(.write):
-			"requestAction(write)"
-		case .requestAction(.roll):
-			"requestAction(roll)"
-		case .changeHealth(let amount):
-			"changeHealth(\(amount))"
-		case .changeMana(let amount):
-			"changeMana(\(amount))"
-		}
-	}
-}
-
 struct AITurnResult<Output> {
 	let output: Output
 	let toolEffects: [GameToolEffect]

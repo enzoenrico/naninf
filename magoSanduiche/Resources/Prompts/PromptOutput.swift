@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct PromptOutput: StructuredOutput, Sendable {
+nonisolated struct PromptOutput: StructuredOutput, Sendable, Equatable {
 	var narrative: String
 	var toolResults: String
 	var options: [String]
@@ -98,4 +98,9 @@ struct PromptOutput: StructuredOutput, Sendable {
 		guard let result = value["result"] else { return tool }
 		return "\(tool): \(result)"
 	}
+}
+
+nonisolated struct DungeonMasterTurn: Sendable, Equatable {
+	let output: PromptOutput
+	let toolEffects: [GameToolEffect]
 }

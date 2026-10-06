@@ -19,7 +19,7 @@ enum AIAvailabilityErrors: Error, LocalizedError {
 	}
 }
 
-enum DungeonMasterTurnValidation {
+nonisolated enum DungeonMasterTurnValidation {
 	static let minimumOptionCount = 3
 
 	static let fallbackOptions: [String] = [
