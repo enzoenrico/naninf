@@ -1133,13 +1133,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Runs the canonical typed model tool. OpenAI and future local model providers adapt from this same contract; game/UI changes are returned as typed effects."
+            "value" : "Builds one guided turn and applies the same health, mana, and next-input effects the game uses."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Executa a ferramenta tipada canônica do modelo. OpenAI e futuros provedores locais adaptam esse mesmo contrato; mudanças de jogo/UI voltam como efeitos tipados."
+            "value" : "Monta um turno guiado e aplica os mesmos efeitos de vida, mana e próxima entrada que o jogo usa."
           }
         }
       }
@@ -1608,18 +1608,98 @@
         }
       }
     },
-    "nan_dm_silent" : {
+    "nan_dm_offline" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The dungeon master remains silent."
+            "value" : "The dungeon master cannot be reached. Check the connection and try again."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O mestre da masmorra permanece em silêncio."
+            "value" : "Não foi possível alcançar o mestre da masmorra. Verifique a conexão e tente de novo."
+          }
+        }
+      }
+    },
+    "nan_dm_quota_reached" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The dungeon master has reached today's limit. It resets %@."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O mestre da masmorra atingiu o limite de hoje. Ele volta %@."
+          }
+        }
+      }
+    },
+    "nan_dm_quota_reached_plain" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The dungeon master has reached today's limit."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O mestre da masmorra atingiu o limite de hoje."
+          }
+        }
+      }
+    },
+    "nan_dm_refused" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The dungeon master declined that turn. Try a different action."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O mestre da masmorra recusou este turno. Tente outra ação."
+          }
+        }
+      }
+    },
+    "nan_dm_unavailable_device" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This device cannot run the dungeon master."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este aparelho não pode usar o mestre da masmorra."
+          }
+        }
+      }
+    },
+    "nan_dm_unavailable_not_ready" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The dungeon master is not ready yet. Try again in a moment."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O mestre da masmorra ainda não está pronto. Tente de novo em instantes."
           }
         }
       }
@@ -5433,34 +5513,34 @@
         }
       }
     },
-    "nan_vision_error_invalid_url" : {
+    "nan_vision_error_no_image" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Image URL is invalid."
+            "value" : "Scene art did not produce an image."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A URL da imagem é inválida."
+            "value" : "A arte da cena não produziu uma imagem."
           }
         }
       }
     },
-    "nan_vision_error_no_url" : {
+    "nan_vision_error_unavailable" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Image service returned no URL."
+            "value" : "Scene art is not available on this device."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O serviço de imagem não retornou URL."
+            "value" : "A arte da cena não está disponível neste aparelho."
           }
         }
       }

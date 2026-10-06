@@ -52,15 +52,9 @@ struct VisionPanel: View {
 		case .introStatic:
 			AsciiMediaView(catalogVideoNamed: VisionDisplayMode.introPlaceholderCatalogName)
 				.asciiScaleMode(.fit)
-		case .remote(let resource):
-			switch resource.kind {
-			case .image:
-				AsciiMediaView(imageURL: resource.url, isRemote: true)
-					.asciiScaleMode(.fit)
-			case .video:
-				AsciiMediaView(videoURL: resource.url, isRemote: true)
-					.asciiScaleMode(.fit)
-			}
+		case .scene(let image):
+			AsciiMediaView(image: image.cgImage)
+				.asciiScaleMode(.fit)
 		}
 	}
 }

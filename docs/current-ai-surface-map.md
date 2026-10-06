@@ -12,13 +12,13 @@ This document maps the existing code surfaces that can support importing or rewo
 - Navigation: `NavigationStack` with an observable `AppCoordinator`.
 - State model: Swift Observation via `@Observable`, view-local `@State`, `@Environment(AppCoordinator.self)`, and `@AppStorage`.
 - Package manager: Swift Package Manager through Xcode. There is no `package.json`, npm, or server package in this app.
-- App target: bundle identifier `com.kyou.naninf`, marketing version `2.0`, Swift version `5.0`, app target deployment value `18.6` in `magoSanduiche.xcodeproj/project.pbxproj`.
+- App target: bundle identifier `com.kyou.naninf`, marketing version `2.0`, Swift version `5.0`, deployment target `27.0` in `magoSanduiche.xcodeproj/project.pbxproj`.
 - Build tooling: `buildServer.json` points to `xcode-build-server` for the `magoSanduiche` scheme.
 
 Relevant dependencies and Apple frameworks:
 
-- `OpenAI` Swift package from `https://github.com/MacPaw/OpenAI.git`, resolved to version `0.4.7` in `magoSanduiche.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved`.
-- `ImagePlayground` in `magoSanduiche/Services/ImageGeneration/ImageGenerator.swift`.
+- Narration uses Apple `FoundationModels` `PrivateCloudComputeLanguageModel`. There is no OpenAI package and no `OPENAI_API_KEY`. Apple requires a managed Private Cloud Compute entitlement; the key is not in this repo.
+- `ImagePlayground` in `magoSanduiche/Services/ImageGeneration/SceneIllustrator.swift`. `ImageCreator` is deprecated in iOS 27 in favor of an interactive sheet. The vision panel still calls `images(for:style:limit:)` and renders the `CGImage` through `AsciiMediaView`.
 - `TipKit` in `magoSanduiche/Features/Game/GameView.swift` and `magoSanduiche/Features/Game/Tips/GameTips.swift`.
 - `AVFoundation`, `ImageIO`, `CoreGraphics`, and `URLSession` inside `magoSanduiche/Shared/Views/AsciiMediaView.swift`.
 
@@ -48,12 +48,12 @@ magoSanduiche/
     Prompts/
   Services/
     AI/
-      OpenAIService.swift
+      PrivateCloudNarrator.swift
+      DungeonNarrator.swift
       DungeonMasterService.swift
-      StructuredOutput.swift
-      Tools/
+      DungeonMasterError.swift
     ImageGeneration/
-      ImageGenerator.swift
+      SceneIllustrator.swift
   Shared/
     Views/
   Public/
@@ -63,13 +63,14 @@ magoSanduiche/
 
 ### AI Provider Connection
 
-The current app already has an OpenAI client wrapper.
+The dungeon master is one guided Private Cloud Compute turn per player action.
 
-- `OpenAIService` in `magoSanduiche/Services/AI/OpenAIService.swift` owns the `OpenAI` client, stores `conversationHistory`, appends system instructions, runs chat completions, supports tools, and decodes structured JSON outputs.
-- `DungeonMasterService` in `magoSanduiche/Services/AI/DungeonMasterService.swift` is the game-specific facade. It reads `OPENAI_API_KEY` from `Bundle.main.object(forInfoDictionaryKey:)`, initializes `OpenAIService` with `Prompts.systemPrompt`, and calls `generate(_:returning:tools:model:)` with `.gpt4_o_mini`.
-- `Info.plist` contains an `OPENAI_API_KEY` entry. The value is intentionally not reproduced here. This is a risky integration point because a client-bundled API key can be extracted from the app.
+- `PrivateCloudNarrator` builds a fresh `LanguageModelSession` on `PrivateCloudComputeLanguageModel()`, calls `respond(to:generating:contextOptions:)` for `DungeonTurnDraft`, and does not store a transcript.
+- `DungeonMasterService.generate` formats `storySoFar` from persisted terminal entries, asks the narrator for a draft, and returns `draft.resolved()`.
+- `resolved()` emits nonzero health, nonzero mana, then exactly one `.requestAction`. `GameViewModel.applyToolEffects` is the only writer of HP, mana, and input mode.
+- Failures are `DungeonMasterError`. The terminal shows `error.terminalMessage`.
 
-There are no server-side API routes or server actions in the current app. Searches for web/server patterns show a native iOS app only; the only direct network code found is OpenAI package usage and `URLSession.shared.data(from:)` for remote media loading in `AsciiMediaView`.
+There are no server-side API routes. Scene art is an on-device `CGImage` from Image Playground, shown as `VisionDisplayMode.scene`. The narrator does not return an image URL.
 
 ### Prompting And Chat Loop
 
@@ -77,18 +78,18 @@ The interactive prompt flow exists and is centered in `GameViewModel`.
 
 - `GameViewModel.getResponse(for:)` in `magoSanduiche/Features/Game/GameViewModel.swift` trims user input, rejects empty prompts, appends a `.player` `TerminalEntry`, clears the input, sets `uiPhase = .awaitingDungeonMaster`, then starts `fetchNarrative(for:)`.
 - `GameViewModel.fetchNarrative(for:)` awaits `DungeonMasterService.generate`, appends the returned `PromptOutput.narrative` as a `.dungeonMaster` terminal entry, and moves the UI to `.result`.
-- `PromptOutput` in `magoSanduiche/Resources/Prompts/PromptOutput.swift` defines the expected structured response: `narrative`, `toolResults`, and `options`. It includes a compatibility decoder for `toolResults` as either a string, array of strings, or array of `{ tool, result }` objects.
+- `PromptOutput` is narrative, exactly three options, and an optional visual prompt. The wire draft is `DungeonTurnDraft`, and `resolved()` builds the output. There is no `toolResults` decoder.
 - `Prompts.systemPrompt` in `magoSanduiche/Resources/Prompts/Prompts.swift` is the active in-code system prompt. There is also `magoSanduiche/Public/Prompts/system_prompt.md`, which appears to be a prompt asset or earlier version and is not currently referenced by code.
 
 Important current behavior:
 
-- The UI currently renders only `result.narrative`. `PromptOutput.toolResults` and `PromptOutput.options` are decoded but not displayed or persisted.
-- Conversation memory exists only inside `OpenAIService.conversationHistory` for the lifetime of the `DungeonMasterService` instance. There is no durable game-session transcript persistence yet.
+- The terminal renders `output.narrative`. `output.options` fills the suggestion buttons. `output.visualPrompt` feeds scene art.
+- Conversation memory is the persisted terminal transcript. The formatter sends the newest player and dungeon-master lines that fit `storyCharacterBudget`. There is no stored model transcript.
 - `DungeonMasterService.clearHistory()` exists but is not called by the current game lifecycle.
 
 ### AI Tools And Action Buttons
 
-The current app has a tool-call model that already maps AI decisions into UI action changes.
+Tool calls are gone. `healthChange`, `manaChange`, and `nextInput` are guided fields. The notes below describe the removed OpenAI tools and should not be reintroduced.
 
 - `ExecutableTool` in `magoSanduiche/Services/AI/OpenAIService.swift` defines the common static tool interface.
 - `RollDiceTool` in `magoSanduiche/Services/AI/Tools/RollDice.swift` accepts `faces` and returns a random roll string.
@@ -111,9 +112,8 @@ There are two separate current surfaces: generated images and ASCII media render
 
 Generated image surface:
 
-- `ImageGenerator` in `magoSanduiche/Services/ImageGeneration/ImageGenerator.swift` wraps Apple `ImagePlayground`. It builds a text `ImagePlaygroundConcept`, optionally adds a reference `CGImage`, creates an `ImageCreator`, selects the first available style, and returns up to one generated `CGImage`.
-- `GameViewModel` owns `imageGenService = ImageGenerator(concept: "An old wizard eating a sandwich")`, `selectedImage: CGImage?`, and `getImage()`.
-- Search evidence shows `getImage()` and `selectedImage` are currently defined but not called or rendered by `GameView` or `VisionPanel`.
+- `ImagePlaygroundIllustrator` calls `ImageCreator().images(for:style:limit:)`, prefers `.sketch`, and returns one `CGImage`. `DungeonMasterService.illustrate` wraps that in `SceneImage`.
+- `GameViewModel.handleVisionAfterTurn` sets `visionDisplayMode` to `.scene` and `VisionPanel` renders it with `AsciiMediaView(image:)`.
 
 Media rendering surface:
 
@@ -274,7 +274,7 @@ flowchart TD
 
 ### Prompt And Provider Layer
 
-- `magoSanduiche/Services/AI/OpenAIService.swift` / `OpenAIService`: best place to keep generic provider-client concerns, conversation history, structured output, and tool-loop mechanics.
+- `PrivateCloudNarrator` owns the Private Cloud Compute session, availability, quota, and error mapping. Do not add a second provider client here.
 - `magoSanduiche/Services/AI/DungeonMasterService.swift` / `DungeonMasterService`: best current seam for game-specific model choice, system prompt injection, tool registration, and future provider abstraction.
 - `magoSanduiche/Resources/Prompts/Prompts.swift` / `Prompts.systemPrompt`: current active prompt. If old-app prompting is merged, update this or replace it with a loaded prompt asset, but avoid maintaining divergent prompt copies.
 - `magoSanduiche/Public/Prompts/system_prompt.md`: currently appears unused. It should either become the canonical editable prompt source or be deleted/ignored after consolidation.
@@ -292,9 +292,9 @@ flowchart TD
 
 ### Image Layer
 
-- `magoSanduiche/Services/ImageGeneration/ImageGenerator.swift` / `ImageGenerator`: current Apple image-generation wrapper. Use this for local/on-device image generation if the old app image feature can map to `ImagePlayground`.
-- `magoSanduiche/Features/Game/GameViewModel.swift` / `selectedImage` and `getImage()`: current unrendered generated-image state. This is the most direct place to trigger generation from AI output and expose images to the view.
-- `magoSanduiche/Features/Game/Subviews/VisionPanel.swift` / `VisionPanel`: current game visual panel. It should accept an optional generated image or media source rather than hard-coding only `mageOpening`.
+- `magoSanduiche/Services/ImageGeneration/SceneIllustrator.swift` / `ImagePlaygroundIllustrator`: on-device scene art. Keep `ImageCreator` for this programmatic path. Do not replace the panel with `imagePlaygroundSheet`.
+- `magoSanduiche/Features/Game/ViewModel/GameViewModel+Vision.swift` / `handleVisionAfterTurn`: asks `DungeonMasterService.illustrate` after a turn that has a visual prompt.
+- `magoSanduiche/Features/Game/Subviews/VisionPanel.swift` / `VisionPanel`: shows `.introStatic` or `.scene(SceneImage)`.
 - `magoSanduiche/Shared/Views/AsciiMediaView.swift` / `AsciiMediaView`: already supports `CGImage`, `UIImage`, remote image URLs, and videos. This should be reused for generated images rather than introducing another image renderer.
 
 ### Persistence Layer
@@ -331,20 +331,20 @@ What is missing or incomplete:
 - `ChangeHealthTool` is not wired to update `GameViewModel.health`.
 - No mana tool exists even though the active prompt references mana management.
 - Prompt/tool names are inconsistent: active prompt mentions `playerMana`, `playerDamage`, `decide`, and `rollDice`; `Public/Prompts/system_prompt.md` mentions `roll_dice`; implemented tools are `rollDice`, `decideAction`, and `changeHealth`.
-- `ImageGenerator` is present but not used by the visible `VisionPanel`.
+- Scene art is `VisionDisplayMode.scene`, a `CGImage`, not a remote URL.
 - Generated images are stored as `CGImage?` in memory only and are not persisted or associated with turns.
 - The AI-returned action model is currently an integer side effect from a tool call, not a durable typed action response.
 
 Risky integration points:
 
-- Client-bundled OpenAI API key in `Info.plist`. Any implementation plan should move provider secrets behind a backend, local development config, or another secure boundary before release.
+- Private Cloud Compute has no app-held API key. The missing piece is Apple's managed entitlement, which this repo does not name.
 - Static callbacks on tool structs: `DecideActionTool.onActionRequested` and `ChangeHealthTool.onHealthChange` are global mutable state. This can behave poorly with multiple sessions, previews, tests, or overlapping requests.
 - `OpenAIService` is `@MainActor`, so long tool loops and client calls are invoked from a main-actor object. The underlying async calls yield, but UI-coupled service ownership should be reviewed before adding heavier work.
 - `OpenAIService.runAgentLoop` allows up to 20 tool iterations; richer tools should guard against repeated UI side effects.
 - `PromptOutput` currently gives schema instructions manually while also using `responseFormat: .jsonObject`; this is pragmatic but not a strict JSON schema enforcement path.
 - `GameViewModel.rollDice()` currently resolves local game consequences independently of AI. If the old app expects AI-mediated dice outcomes, this flow needs a clear handoff contract.
 - `AsciiMediaView` can load remote media via `URLSession`; remote URLs from AI should be validated before loading.
-- `ImagePlayground` availability and policy constraints may differ by device and OS; `ImageGenerator` currently swallows errors and returns `nil`.
+- `ImagePlayground` availability differs by device. `ImageCreator` is deprecated in iOS 27. A deprecation warning is expected. Failures become `SceneMediaError` and the panel returns to the intro still.
 
 ## Recommendations For Implementation Planning
 

@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum GameAction: Sendable {
+nonisolated enum GameAction: Sendable, Equatable {
 	case write
 	case roll
 

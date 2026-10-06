@@ -11,7 +11,7 @@ import SwiftUI
 @MainActor
 final class GameViewModel {
     weak var coordinator: AppCoordinator?
-    var dungeonMaster: DungeonMasterService?
+    let dungeonMaster: DungeonMasterService
 
     var gameSessionID: String
     var modelContext: ModelContext?
@@ -47,19 +47,22 @@ final class GameViewModel {
     var canOpenVisionTerminal: Bool {
         if !hasSubmittedPlayerTurn { return true }
         if visionMediaLoading { return false }
-        if case .remote = visionDisplayMode { return true }
+        if case .scene = visionDisplayMode { return true }
         return false
     }
 
-    init(coordinator: AppCoordinator? = nil, persistRunsToLibrary: Bool = true) {
+    init(
+        coordinator: AppCoordinator? = nil,
+        persistRunsToLibrary: Bool = true,
+        dungeonMaster: DungeonMasterService? = nil
+    ) {
         self.coordinator = coordinator
         gameSessionID = UUID().uuidString
-        self.persistRunsToLibrary = persistRunsToLibrary
-        dungeonMaster = Self.makeDungeonMaster()
+		self.persistRunsToLibrary = persistRunsToLibrary
+		self.dungeonMaster = dungeonMaster ?? DungeonMasterService()
         capture(
             "game_session_started",
             extra: [
-                "has_dungeon_master": dungeonMaster != nil,
                 "persist_runs": persistRunsToLibrary,
             ]
         )
@@ -100,8 +103,4 @@ final class GameViewModel {
             visionDisplayMode = .introStatic
         }
     #endif
-
-    static func makeDungeonMaster() -> DungeonMasterService? {
-        try? DungeonMasterService()
-    }
 }

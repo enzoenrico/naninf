@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Superseded by [0003. Narrate With Private Cloud Compute Guided Turns](0003-narrate-with-private-cloud-compute-guided-turns.md).
 
 ## Context
 

@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum TerminalEntryKind {
+enum TerminalEntryKind: Sendable {
 	case dungeonMaster
 	case player
 	case dice
@@ -27,7 +27,7 @@ enum TerminalEntryKind {
 	}
 }
 
-struct TerminalEntry: Identifiable {
+struct TerminalEntry: Identifiable, Sendable {
 	let id: UUID
 	let kind: TerminalEntryKind
 	let text: String
