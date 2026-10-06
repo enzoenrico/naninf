@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import FoundationModels
 import Testing
 @testable import magoSanduiche
 
@@ -20,6 +21,18 @@ struct DungeonMasterErrorTests {
 			.failed("x"),
 		]
 		#expect(all.allSatisfy { !$0.terminalMessage.isEmpty })
+	}
+
+	@Test func privateCloudAccessMapsAvailability() {
+		#expect(PrivateCloudAccess(availability: .available) == .granted)
+		#expect(
+			PrivateCloudAccess(availability: .unavailable(.deviceNotEligible))
+				== .denied(.deviceNotEligible)
+		)
+		#expect(
+			PrivateCloudAccess(availability: .unavailable(.systemNotReady))
+				== .denied(.systemNotReady)
+		)
 	}
 
 	@Test func analyticsKindsStayClosed() {

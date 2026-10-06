@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import FoundationModels
 
 nonisolated enum DungeonMasterError: Error, Equatable, Sendable {
 	case unavailable(PCCUnavailability)
@@ -58,4 +59,22 @@ nonisolated enum DungeonMasterError: Error, Equatable, Sendable {
 nonisolated enum PCCUnavailability: Equatable, Sendable {
 	case deviceNotEligible
 	case systemNotReady
+}
+
+nonisolated enum PrivateCloudAccess: Equatable, Sendable {
+	case granted
+	case denied(PCCUnavailability)
+
+	init(availability: PrivateCloudComputeLanguageModel.Availability) {
+		switch availability {
+		case .available:
+			self = .granted
+		case .unavailable(.deviceNotEligible):
+			self = .denied(.deviceNotEligible)
+		case .unavailable(.systemNotReady):
+			self = .denied(.systemNotReady)
+		@unknown default:
+			self = .denied(.systemNotReady)
+		}
+	}
 }

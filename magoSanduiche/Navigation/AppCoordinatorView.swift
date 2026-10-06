@@ -5,6 +5,7 @@
 //  Created by Enzo Enrico on 09/12/25.
 //
 
+import FoundationModels
 import SwiftUI
 import Foundation
 
@@ -14,6 +15,7 @@ struct AppCoordinatorView: View {
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 	@AppStorage("hasUnlockedFullGame") private var hasUnlockedFullGame = false
+	@State private var cloudModel = PrivateCloudComputeLanguageModel()
 
 	var body: some View {
 		@Bindable var coordinator = coordinator
@@ -28,25 +30,25 @@ struct AppCoordinatorView: View {
 				case .onboarding:
 					OnboardingView()
 				case .game:
-					if canEnterHome {
+					if canEnterPlay {
 						GameView()
 					} else {
 						rootScreen
 					}
 				case .profile:
-					if canEnterHome {
+					if canEnterPlay {
 						ProfileView()
 					} else {
 						rootScreen
 					}
 				case .load:
-					if canEnterHome {
+					if canEnterPlay {
 						LoadRunView()
 					} else {
 						rootScreen
 					}
 				case .about:
-					if canEnterHome {
+					if canEnterPlay {
 						AboutView()
 					} else {
 						rootScreen
@@ -94,6 +96,19 @@ struct AppCoordinatorView: View {
 		hasFinishedOnboarding && authSessionStore.isAuthenticated
 	}
 
+	private var canEnterPlay: Bool {
+		canEnterHome && cloudAccess == .granted
+	}
+
+	private var cloudAccess: PrivateCloudAccess {
+		#if DEBUG
+			if UITestConfiguration.isActive || ScriptedNarrator.isEnabledByDefaults {
+				return .granted
+			}
+		#endif
+		return PrivateCloudAccess(availability: cloudModel.availability)
+	}
+
 	@ViewBuilder
 	private var rootScreen: some View {
 		if !hasFinishedOnboarding {
@@ -106,9 +121,19 @@ struct AppCoordinatorView: View {
 	@ViewBuilder
 	private var gatedHomeScreen: some View {
 		if authSessionStore.isAuthenticated {
-			PlayerHomeView()
+			authenticatedScreen
 		} else {
 			AuthView()
+		}
+	}
+
+	@ViewBuilder
+	private var authenticatedScreen: some View {
+		switch cloudAccess {
+		case .granted:
+			PlayerHomeView()
+		case .denied(let reason):
+			PrivateCloudAccessGate(reason: reason)
 		}
 	}
 }
