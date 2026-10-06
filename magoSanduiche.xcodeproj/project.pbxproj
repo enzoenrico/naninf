@@ -651,7 +651,7 @@
 			repositoryURL = "https://github.com/PostHog/posthog-ios";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 3.0.0;
+				minimumVersion = 3.90.1;
 			};
 		};
 		5BA0F0002F40000100A6C001 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
