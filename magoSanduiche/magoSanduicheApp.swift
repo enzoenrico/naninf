@@ -49,9 +49,6 @@ struct magoSanduicheApp: App {
 				.task {
 					await authSessionStore.start()
 				}
-				.onOpenURL { url in
-					authSessionStore.handleOpenURL(url)
-				}
 		}
 	}
 }

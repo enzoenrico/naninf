@@ -8,7 +8,7 @@ The point where a player has answered the onboarding questions, finished the dem
 
 ### Authenticated Session
 
-A Supabase Auth session created through Apple or Google social sign-in. The Supabase access and refresh tokens are session secrets and live in secure system storage managed by the auth SDK, not in UserDefaults.
+A Supabase Auth session created through Apple sign-in. The Supabase access and refresh tokens are session secrets and live in secure system storage managed by the auth SDK, not in UserDefaults.
 
 ### Login Snapshot
 
