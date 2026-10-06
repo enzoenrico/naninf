@@ -5513,34 +5513,34 @@
         }
       }
     },
-    "nan_vision_error_invalid_url" : {
+    "nan_vision_error_no_image" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Image URL is invalid."
+            "value" : "Scene art did not produce an image."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A URL da imagem é inválida."
+            "value" : "A arte da cena não produziu uma imagem."
           }
         }
       }
     },
-    "nan_vision_error_no_url" : {
+    "nan_vision_error_unavailable" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Image service returned no URL."
+            "value" : "Scene art is not available on this device."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O serviço de imagem não retornou URL."
+            "value" : "A arte da cena não está disponível neste aparelho."
           }
         }
       }

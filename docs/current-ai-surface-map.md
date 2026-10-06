@@ -18,7 +18,7 @@ This document maps the existing code surfaces that can support importing or rewo
 Relevant dependencies and Apple frameworks:
 
 - Narration uses Apple `FoundationModels` `PrivateCloudComputeLanguageModel`. There is no OpenAI package and no `OPENAI_API_KEY`. Apple requires a managed Private Cloud Compute entitlement; the key is not in this repo.
-- `ImagePlayground` in `magoSanduiche/Services/ImageGeneration/ImageGenerator.swift`.
+- `ImagePlayground` in `magoSanduiche/Services/ImageGeneration/SceneIllustrator.swift`. `ImageCreator` is deprecated in iOS 27 in favor of an interactive sheet. The vision panel still calls `images(for:style:limit:)` and renders the `CGImage` through `AsciiMediaView`.
 - `TipKit` in `magoSanduiche/Features/Game/GameView.swift` and `magoSanduiche/Features/Game/Tips/GameTips.swift`.
 - `AVFoundation`, `ImageIO`, `CoreGraphics`, and `URLSession` inside `magoSanduiche/Shared/Views/AsciiMediaView.swift`.
 
@@ -53,7 +53,7 @@ magoSanduiche/
       DungeonMasterService.swift
       DungeonMasterError.swift
     ImageGeneration/
-      ImageGenerator.swift
+      SceneIllustrator.swift
   Shared/
     Views/
   Public/
@@ -70,7 +70,7 @@ The dungeon master is one guided Private Cloud Compute turn per player action.
 - `resolved()` emits nonzero health, nonzero mana, then exactly one `.requestAction`. `GameViewModel.applyToolEffects` is the only writer of HP, mana, and input mode.
 - Failures are `DungeonMasterError`. The terminal shows `error.terminalMessage`.
 
-There are no server-side API routes. Scene art is still the old remote-image path until the on-device illustrator replaces it. `AsciiMediaView` can still load a remote image, but the narrator no longer produces one.
+There are no server-side API routes. Scene art is an on-device `CGImage` from Image Playground, shown as `VisionDisplayMode.scene`. The narrator does not return an image URL.
 
 ### Prompting And Chat Loop
 
@@ -112,9 +112,8 @@ There are two separate current surfaces: generated images and ASCII media render
 
 Generated image surface:
 
-- `ImageGenerator` in `magoSanduiche/Services/ImageGeneration/ImageGenerator.swift` wraps Apple `ImagePlayground`. It builds a text `ImagePlaygroundConcept`, optionally adds a reference `CGImage`, creates an `ImageCreator`, selects the first available style, and returns up to one generated `CGImage`.
-- `GameViewModel` owns `imageGenService = ImageGenerator(concept: "An old wizard eating a sandwich")`, `selectedImage: CGImage?`, and `getImage()`.
-- Search evidence shows `getImage()` and `selectedImage` are currently defined but not called or rendered by `GameView` or `VisionPanel`.
+- `ImagePlaygroundIllustrator` calls `ImageCreator().images(for:style:limit:)`, prefers `.sketch`, and returns one `CGImage`. `DungeonMasterService.illustrate` wraps that in `SceneImage`.
+- `GameViewModel.handleVisionAfterTurn` sets `visionDisplayMode` to `.scene` and `VisionPanel` renders it with `AsciiMediaView(image:)`.
 
 Media rendering surface:
 
@@ -293,9 +292,9 @@ flowchart TD
 
 ### Image Layer
 
-- `magoSanduiche/Services/ImageGeneration/ImageGenerator.swift` / `ImageGenerator`: current Apple image-generation wrapper. Use this for local/on-device image generation if the old app image feature can map to `ImagePlayground`.
-- `magoSanduiche/Features/Game/GameViewModel.swift` / `selectedImage` and `getImage()`: current unrendered generated-image state. This is the most direct place to trigger generation from AI output and expose images to the view.
-- `magoSanduiche/Features/Game/Subviews/VisionPanel.swift` / `VisionPanel`: current game visual panel. It should accept an optional generated image or media source rather than hard-coding only `mageOpening`.
+- `magoSanduiche/Services/ImageGeneration/SceneIllustrator.swift` / `ImagePlaygroundIllustrator`: on-device scene art. Keep `ImageCreator` for this programmatic path. Do not replace the panel with `imagePlaygroundSheet`.
+- `magoSanduiche/Features/Game/ViewModel/GameViewModel+Vision.swift` / `handleVisionAfterTurn`: asks `DungeonMasterService.illustrate` after a turn that has a visual prompt.
+- `magoSanduiche/Features/Game/Subviews/VisionPanel.swift` / `VisionPanel`: shows `.introStatic` or `.scene(SceneImage)`.
 - `magoSanduiche/Shared/Views/AsciiMediaView.swift` / `AsciiMediaView`: already supports `CGImage`, `UIImage`, remote image URLs, and videos. This should be reused for generated images rather than introducing another image renderer.
 
 ### Persistence Layer
@@ -332,7 +331,7 @@ What is missing or incomplete:
 - `ChangeHealthTool` is not wired to update `GameViewModel.health`.
 - No mana tool exists even though the active prompt references mana management.
 - Prompt/tool names are inconsistent: active prompt mentions `playerMana`, `playerDamage`, `decide`, and `rollDice`; `Public/Prompts/system_prompt.md` mentions `roll_dice`; implemented tools are `rollDice`, `decideAction`, and `changeHealth`.
-- `ImageGenerator` is present but not used by the visible `VisionPanel`.
+- Scene art is `VisionDisplayMode.scene`, a `CGImage`, not a remote URL.
 - Generated images are stored as `CGImage?` in memory only and are not persisted or associated with turns.
 - The AI-returned action model is currently an integer side effect from a tool call, not a durable typed action response.
 
@@ -345,7 +344,7 @@ Risky integration points:
 - `PromptOutput` currently gives schema instructions manually while also using `responseFormat: .jsonObject`; this is pragmatic but not a strict JSON schema enforcement path.
 - `GameViewModel.rollDice()` currently resolves local game consequences independently of AI. If the old app expects AI-mediated dice outcomes, this flow needs a clear handoff contract.
 - `AsciiMediaView` can load remote media via `URLSession`; remote URLs from AI should be validated before loading.
-- `ImagePlayground` availability and policy constraints may differ by device and OS; `ImageGenerator` currently swallows errors and returns `nil`.
+- `ImagePlayground` availability differs by device. `ImageCreator` is deprecated in iOS 27. A deprecation warning is expected. Failures become `SceneMediaError` and the panel returns to the intro still.
 
 ## Recommendations For Implementation Planning
 

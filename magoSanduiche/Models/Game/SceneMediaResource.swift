@@ -3,39 +3,43 @@
 //  magoSanduiche
 //
 
+import CoreGraphics
 import Foundation
 
-enum SceneMediaKind: String, Sendable {
-	case image
-	case video
+nonisolated struct SceneImage: Sendable, Equatable {
+	let id: UUID
+	let cgImage: CGImage
+
+	init(cgImage: CGImage, id: UUID = UUID()) {
+		self.id = id
+		self.cgImage = cgImage
+	}
+
+	static func == (lhs: SceneImage, rhs: SceneImage) -> Bool {
+		lhs.id == rhs.id
+	}
 }
 
-struct SceneMediaResource: Sendable, Equatable {
-	let url: URL
-	let kind: SceneMediaKind
-}
-
-enum SceneMediaError: Error, LocalizedError {
+nonisolated enum SceneMediaError: Error, LocalizedError, Equatable {
 	case emptyPrompt
-	case noImageURL
-	case invalidImageURL
+	case unavailable
+	case noImage
 
 	var errorDescription: String? {
 		switch self {
 		case .emptyPrompt:
 			String(localized: "nan_vision_error_empty_prompt")
-		case .noImageURL:
-			String(localized: "nan_vision_error_no_url")
-		case .invalidImageURL:
-			String(localized: "nan_vision_error_invalid_url")
+		case .unavailable:
+			String(localized: "nan_vision_error_unavailable")
+		case .noImage:
+			String(localized: "nan_vision_error_no_image")
 		}
 	}
 }
 
-enum VisionDisplayMode: Equatable {
-	/// Bundled catalog video used as a still frame for the pre-turn vision placeholder.
+nonisolated enum VisionDisplayMode: Equatable {
 	static let introPlaceholderCatalogName = "mageOpening"
 
 	case introStatic
-	case remote(SceneMediaResource)
+	case scene(SceneImage)
 }

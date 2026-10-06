@@ -19,11 +19,11 @@ extension GameViewModel {
         defer { visionMediaLoading = false }
 
         do {
-            let resource = try await dungeonMaster.generateSceneMedia(
+            let image = try await dungeonMaster.illustrate(
                 visualPrompt: visualPrompt,
                 analyticsContext: aiContext(turnID: turnID)
             )
-            visionDisplayMode = .remote(resource)
+            visionDisplayMode = .scene(image)
         } catch {
             clearPostIntroVisionMedia()
         }

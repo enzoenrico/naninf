@@ -46,7 +46,7 @@ work. A future agent that needs to build, run, lint, or test this app must do so
 | Google Sign-In | Yes (one sign-in path) | OAuth → Supabase | `GIDClientID` + URL types in `Info.plist`; `magoSanduiche/GoogleOAuthClient.plist` |
 | Apple Sign-In | Yes (other sign-in path) | OAuth → Supabase | `magoSanduiche.entitlements`; needs Apple Developer team `DEVELOPMENT_TEAM` |
 | PostHog | Optional | Analytics (non-blocking) | `POSTHOG_*` in `Info.plist` / scheme env vars |
-| ImagePlayground | Optional | On-device scene art | `import ImagePlayground` (Apple framework) |
+| Image Playground | Optional | On-device scene art through `ImageCreator`. The iOS 27 sheet is interactive, so the vision panel keeps the programmatic API. | Apple framework. No app credential. |
 
 Note: the intended secret-injection pattern is an untracked `Secrets.xcconfig`
 (see `.gitignore`), though some keys are currently committed in `Info.plist` /

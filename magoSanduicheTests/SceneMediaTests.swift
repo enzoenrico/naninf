@@ -3,25 +3,22 @@
 //  magoSanduicheTests
 //
 
+import CoreGraphics
 import Foundation
 import Testing
 @testable import magoSanduiche
 
 struct SceneMediaTests {
-	@Test @MainActor func generateSceneMediaRejectsEmptyPrompt() async {
-		let service = DungeonMasterService(narrator: ScriptedNarrator(drafts: []))
+	@Test @MainActor func illustrateReturnsASceneImage() async throws {
+		let service = DungeonMasterService(
+			narrator: ScriptedNarrator(drafts: []),
+			illustrator: ScriptedIllustrator()
+		)
 
-		await #expect(throws: SceneMediaError.emptyPrompt) {
-			_ = try await service.generateSceneMedia(visualPrompt: "   ")
-		}
-	}
+		let scene = try await service.illustrate(visualPrompt: "Torchlit corridor")
 
-	@Test @MainActor func generateSceneMediaHasNoRemoteImage() async {
-		let service = DungeonMasterService(narrator: ScriptedNarrator(drafts: []))
-
-		await #expect(throws: SceneMediaError.noImageURL) {
-			_ = try await service.generateSceneMedia(visualPrompt: "Torchlit corridor")
-		}
+		#expect(scene.cgImage.width == 1)
+		#expect(scene.cgImage.height == 1)
 	}
 }
 
@@ -30,7 +27,10 @@ struct GameViewModelVisionTests {
 	private func makeViewModel() -> GameViewModel {
 		GameViewModel(
 			persistRunsToLibrary: false,
-			dungeonMaster: DungeonMasterService(narrator: ScriptedNarrator(drafts: []))
+			dungeonMaster: DungeonMasterService(
+				narrator: ScriptedNarrator(drafts: []),
+				illustrator: ScriptedIllustrator()
+			)
 		)
 	}
 
@@ -42,7 +42,7 @@ struct GameViewModelVisionTests {
 		#expect(vm.visionDisplayMode == .introStatic)
 	}
 
-	@Test @MainActor func postIntroWithoutRemoteMediaBlocksVision() {
+	@Test @MainActor func postIntroWithoutSceneBlocksVision() {
 		let vm = makeViewModel()
 		vm.hasSubmittedPlayerTurn = true
 		vm.visionDisplayMode = .introStatic
@@ -50,20 +50,20 @@ struct GameViewModelVisionTests {
 		#expect(!vm.canOpenVisionTerminal)
 	}
 
-	@Test @MainActor func postIntroWithRemoteMediaAllowsVision() {
+	@Test @MainActor func postIntroWithSceneAllowsVision() async throws {
 		let vm = makeViewModel()
 		vm.hasSubmittedPlayerTurn = true
-		let url = URL(string: "https://cdn.example.com/scene.png")!
-		vm.visionDisplayMode = .remote(SceneMediaResource(url: url, kind: .image))
+		let image = try await ScriptedIllustrator().illustrate("torch")
+		vm.visionDisplayMode = .scene(SceneImage(cgImage: image))
 
 		#expect(vm.canOpenVisionTerminal)
 	}
 
-	@Test @MainActor func visionLoadingBlocksOpening() {
+	@Test @MainActor func visionLoadingBlocksOpening() async throws {
 		let vm = makeViewModel()
 		vm.hasSubmittedPlayerTurn = true
-		let url = URL(string: "https://cdn.example.com/scene.png")!
-		vm.visionDisplayMode = .remote(SceneMediaResource(url: url, kind: .image))
+		let image = try await ScriptedIllustrator().illustrate("torch")
+		vm.visionDisplayMode = .scene(SceneImage(cgImage: image))
 		vm.visionMediaLoading = true
 
 		#expect(!vm.canOpenVisionTerminal)

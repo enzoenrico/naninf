@@ -45,6 +45,16 @@ struct DungeonMasterServiceTests {
 		#expect(turn.toolEffects.last == .requestAction(.roll))
 	}
 
+	@Test @MainActor func illustrateRejectsEmptyPrompt() async {
+		let dm = DungeonMasterService(
+			narrator: ScriptedNarrator(drafts: []),
+			illustrator: ScriptedIllustrator()
+		)
+		await #expect(throws: SceneMediaError.emptyPrompt) {
+			_ = try await dm.illustrate(visualPrompt: "   ")
+		}
+	}
+
 	@Test @MainActor func generatePropagatesTypedFailure() async {
 		let narrator = ScriptedNarrator(failure: .quotaReached(resetDate: nil))
 		let dm = DungeonMasterService(narrator: narrator)

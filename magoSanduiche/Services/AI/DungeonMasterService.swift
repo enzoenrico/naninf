@@ -48,9 +48,14 @@ nonisolated enum DungeonMasterTurnValidation {
 @MainActor
 final class DungeonMasterService {
 	private let narrator: any DungeonNarrator
+	private let illustrator: any SceneIllustrator
 
-	init(narrator: (any DungeonNarrator)? = nil) {
+	init(
+		narrator: (any DungeonNarrator)? = nil,
+		illustrator: (any SceneIllustrator)? = nil
+	) {
 		self.narrator = narrator ?? Self.defaultNarrator()
+		self.illustrator = illustrator ?? ImagePlaygroundIllustrator()
 	}
 
 	func generate(
@@ -75,14 +80,33 @@ final class DungeonMasterService {
 		return draft.resolved()
 	}
 
-	func generateSceneMedia(
+	func illustrate(
 		visualPrompt: String,
 		analyticsContext: AIAnalyticsContext? = nil
-	) async throws -> SceneMediaResource {
-		_ = analyticsContext
+	) async throws -> SceneImage {
 		let trimmed = visualPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
 		guard !trimmed.isEmpty else { throw SceneMediaError.emptyPrompt }
-		throw SceneMediaError.noImageURL
+
+		var properties: [String: Any] = [
+			"prompt_length": trimmed.count,
+		]
+		if let sessionID = analyticsContext?.sessionID {
+			properties["game_session_id"] = sessionID
+		}
+		if let turnID = analyticsContext?.turnID {
+			properties["turn_id"] = turnID
+		}
+		AppAnalytics.capture("vision_scene_generate_started", properties: properties)
+
+		do {
+			let cgImage = try await illustrator.illustrate(trimmed)
+			AppAnalytics.capture("vision_scene_generate_succeeded", properties: properties)
+			return SceneImage(cgImage: cgImage)
+		} catch {
+			properties["error_type"] = String(describing: type(of: error))
+			AppAnalytics.capture("vision_scene_generate_failed", properties: properties)
+			throw error
+		}
 	}
 
 	static func defaultNarrator() -> any DungeonNarrator {

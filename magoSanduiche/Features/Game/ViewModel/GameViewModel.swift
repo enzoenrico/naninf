@@ -47,7 +47,7 @@ final class GameViewModel {
     var canOpenVisionTerminal: Bool {
         if !hasSubmittedPlayerTurn { return true }
         if visionMediaLoading { return false }
-        if case .remote = visionDisplayMode { return true }
+        if case .scene = visionDisplayMode { return true }
         return false
     }
 
