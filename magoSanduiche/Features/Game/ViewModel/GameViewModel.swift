@@ -58,9 +58,8 @@ final class GameViewModel {
     ) {
         self.coordinator = coordinator
         gameSessionID = UUID().uuidString
-        self.persistRunsToLibrary = persistRunsToLibrary
-        // Default arguments are nonisolated, so the narrator is created in this MainActor body.
-        self.dungeonMaster = dungeonMaster ?? DungeonMasterService()
+		self.persistRunsToLibrary = persistRunsToLibrary
+		self.dungeonMaster = dungeonMaster ?? DungeonMasterService()
         capture(
             "game_session_started",
             extra: [
