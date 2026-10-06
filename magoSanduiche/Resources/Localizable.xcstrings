@@ -4600,6 +4600,86 @@
         }
       }
     },
+    "nan_pcc_gate_border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PCC.SYS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PCC.SYS"
+          }
+        }
+      }
+    },
+    "nan_pcc_gate_headline_device" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ACCESS DENIED"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ACESSO NEGADO"
+          }
+        }
+      }
+    },
+    "nan_pcc_gate_headline_not_ready" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SYSTEM NOT READY"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SISTEMA INDISPONÍVEL"
+          }
+        }
+      }
+    },
+    "nan_pcc_gate_subscribe" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SUBSCRIBE FOR A PAID MODEL"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ASSINAR UM MODELO PAGO"
+          }
+        }
+      }
+    },
+    "nan_pcc_gate_subscribe_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscribe for a paid model. This option is not available yet."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assinar um modelo pago. Esta opção ainda não está disponível."
+          }
+        }
+      }
+    },
     "nan_profile_back" : {
       "localizations" : {
         "en" : {
