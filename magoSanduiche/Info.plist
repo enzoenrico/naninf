@@ -6,6 +6,10 @@
 	<array>
 		<string>Monocraft.otf</string>
 	</array>
+	<key>DREAMLITE_ENDPOINT</key>
+	<string>$(DREAMLITE_ENDPOINT)</string>
+	<key>DREAMLITE_HF_TOKEN</key>
+	<string>$(DREAMLITE_HF_TOKEN)</string>
 	<key>GIDClientID</key>
 	<string>889846342771-1ksj627me9rk2kavklohje4gqafdnu4h.apps.googleusercontent.com</string>
 	<key>POSTHOG_HOST</key>

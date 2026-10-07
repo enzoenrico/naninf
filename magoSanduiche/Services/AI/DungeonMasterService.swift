@@ -55,7 +55,7 @@ final class DungeonMasterService {
 		illustrator: (any SceneIllustrator)? = nil
 	) {
 		self.narrator = narrator ?? Self.defaultNarrator()
-		self.illustrator = illustrator ?? ImagePlaygroundIllustrator()
+		self.illustrator = illustrator ?? DreamLiteIllustrator()
 	}
 
 	var illustratesWithSystemSheet: Bool {
@@ -117,6 +117,9 @@ final class DungeonMasterService {
 	private func visionErrorKind(_ error: Error) -> String {
 		if let sceneError = error as? SceneMediaError {
 			return sceneError.analyticsKind
+		}
+		if let dreamLiteError = error as? DreamLiteError {
+			return dreamLiteError.analyticsKind
 		}
 		let nsError = error as NSError
 		if nsError.domain.isEmpty {

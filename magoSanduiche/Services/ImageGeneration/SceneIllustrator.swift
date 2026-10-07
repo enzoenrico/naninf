@@ -47,6 +47,32 @@ enum SceneImageLoader {
 		}
 		return image
 	}
+
+	nonisolated static func cgImage(from data: Data) throws -> CGImage {
+		guard
+			let source = CGImageSourceCreateWithData(data as CFData, nil),
+			let image = CGImageSourceCreateImageAtIndex(source, 0, nil)
+		else {
+			throw SceneMediaError.noImage
+		}
+		return image
+	}
+}
+
+/// Scene art from `carlofkl/DreamLite-mobile`. The ASCII renderer only needs the bitmap.
+struct DreamLiteIllustrator: SceneIllustrator {
+	let client: DreamLiteClient
+
+	init(client: DreamLiteClient? = nil) {
+		self.client = client ?? DreamLiteClient(
+			configuration: .fromInfoDictionary(Bundle.main.infoDictionary)
+		)
+	}
+
+	func illustrate(_ prompt: String) async throws -> CGImage {
+		let data = try await client.generateImageData(prompt: prompt)
+		return try SceneImageLoader.cgImage(from: data)
+	}
 }
 
 /// iOS 27 discontinued `ImageCreator`. Scene art is created in the system Image Playground sheet.
