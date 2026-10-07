@@ -72,3 +72,9 @@ buildServer.json
 
 # Logs
 *.log
+
+# DreamLite-mobile Core ML conversion (multi-GB weights; see tools/dreamlite-coreml)
+magoSanduiche/Resources/DreamLiteModels/
+tools/dreamlite-coreml/.cache/
+tools/dreamlite-coreml/DreamLiteCoreML/
+__pycache__/

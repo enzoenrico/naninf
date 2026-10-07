@@ -1,0 +1,12 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.7.1
+torchvision==0.22.1
+transformers==4.57.3
+diffusers==0.39.0
+accelerate==1.15.0
+safetensors==0.8.0
+coremltools==9.0
+# coremltools 9.0 const-folds shape math through int(ndarray), which NumPy >= 2.3 rejects.
+numpy==2.2.6
+pillow==12.3.0
+huggingface_hub==0.36.2
