@@ -5,22 +5,57 @@
 
 import CoreGraphics
 import Foundation
+import ImageIO
 import ImagePlayground
 
 protocol SceneIllustrator {
 	func illustrate(_ prompt: String) async throws -> CGImage
+	var illustratesWithSystemSheet: Bool { get }
 }
 
-struct ImagePlaygroundIllustrator: SceneIllustrator {
-	func illustrate(_ prompt: String) async throws -> CGImage {
-		let creator = try await ImageCreator()
-		let style = creator.availableStyles.contains(.sketch) ? ImagePlaygroundStyle.sketch : creator.availableStyles.first
-		guard let style else { throw SceneMediaError.unavailable }
+extension SceneIllustrator {
+	var illustratesWithSystemSheet: Bool { false }
+}
 
-		for try await image in creator.images(for: [.text(prompt)], style: style, limit: 1) {
-			return image.cgImage
+enum SceneImageGeneration {
+	/// Image Playground cannot return a bitmap without its system sheet. Keep generation off until a direct API exists.
+	static let isLocked = true
+}
+
+enum ScenePlaygroundConfiguration {
+	static var options: ImagePlaygroundOptions {
+		var options = ImagePlaygroundOptions()
+		options.personalization = .disabled
+		options.creationStrategy = .generateNew
+		return options
+	}
+}
+
+enum SceneImageLoader {
+	static func cgImage(at url: URL) throws -> CGImage {
+		let didAccess = url.startAccessingSecurityScopedResource()
+		defer {
+			if didAccess {
+				url.stopAccessingSecurityScopedResource()
+			}
 		}
-		throw SceneMediaError.noImage
+		guard
+			let source = CGImageSourceCreateWithURL(url as CFURL, nil),
+			let image = CGImageSourceCreateImageAtIndex(source, 0, nil)
+		else {
+			throw SceneMediaError.noImage
+		}
+		return image
+	}
+}
+
+/// iOS 27 discontinued `ImageCreator`. Scene art is created in the system Image Playground sheet.
+struct ImagePlaygroundIllustrator: SceneIllustrator {
+	var illustratesWithSystemSheet: Bool { true }
+
+	func illustrate(_ prompt: String) async throws -> CGImage {
+		_ = prompt
+		throw SceneMediaError.unavailable
 	}
 }
 

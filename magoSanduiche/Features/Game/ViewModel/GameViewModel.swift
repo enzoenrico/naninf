@@ -24,6 +24,12 @@ final class GameViewModel {
     var loading = false
     var visionDisplayMode: VisionDisplayMode = .introStatic
     var visionMediaLoading = false
+    var isImagePlaygroundPresented = false
+    var imagePlaygroundConcept = ""
+    #if DEBUG
+        var imagePlaygroundAvailabilityOverride: Bool?
+        var queuedDebugPlaygroundPrompt: String?
+    #endif
     var hasSubmittedPlayerTurn = false
     var contextAction: GameAction = .write
     var uiPhase: GameUIPhase = .reading
@@ -46,13 +52,6 @@ final class GameViewModel {
     var terminalEntries: [TerminalEntry] = GameRunSnapshotMapper.defaultTerminalEntries
     var revealedTerminalEntryIDs: Set<UUID> = []
     var typewriterProgressByEntryID: [UUID: Int] = [:]
-
-    var canOpenVisionTerminal: Bool {
-        if !hasSubmittedPlayerTurn { return true }
-        if visionMediaLoading { return false }
-        if case .scene = visionDisplayMode { return true }
-        return false
-    }
 
     init(
         coordinator: AppCoordinator? = nil,

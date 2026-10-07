@@ -176,6 +176,13 @@ final class AppCoordinator {
 		}
 	}
 
+	func revealVisionIfCollapsed(reduceMotion: Bool = false) {
+		guard isImageCollapsed else { return }
+		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
+			isImageCollapsed = false
+		}
+	}
+
 	func navigate(to route: AppRoute) {
 		AppAnalytics.capture(
 			"navigation_route_opened",

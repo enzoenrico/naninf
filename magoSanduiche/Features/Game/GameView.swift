@@ -5,6 +5,7 @@
 //  Created by Enzo Enrico on 01/12/25.
 //
 
+import ImagePlayground
 import SwiftData
 import SwiftUI
 import TipKit
@@ -67,7 +68,6 @@ struct GameSessionView: View {
     @State private var tipsConfigured = false
     @State private var inlineResponseStatus: ResponseStatus?
     @State private var inlineStatusDismissTask: Task<Void, Never>?
-    @State private var showVisionUnavailableAlert = false
     @State private var terminalPanelHeight: CGFloat = 0
     @State private var isSuggestionExpanded = false
     @State private var areSuggestionsVisible = false
@@ -105,6 +105,7 @@ struct GameSessionView: View {
 
     var body: some View {
         @Bindable var coordinator = coordinator
+        @Bindable var vm = vm
 
         let shouldShowTips = showsTips && !hasSeenGameTips
 
@@ -182,14 +183,18 @@ struct GameSessionView: View {
             TerminalMotion.animation(reduceMotion, TerminalMotion.panelAnimation),
             value: areSuggestionsVisible
         )
-        .alert(
-            String(localized: "nan_vision_unavailable_alert_title"),
-            isPresented: $showVisionUnavailableAlert
-        ) {
-            Button(String(localized: "nan_vision_unavailable_alert_ok"), role: .cancel) {}
-        } message: {
-            Text(String(localized: "nan_vision_unavailable_alert_message"))
-        }
+        .imagePlaygroundSheet(
+            isPresented: $vm.isImagePlaygroundPresented,
+            concept: vm.imagePlaygroundConcept,
+            onCompletion: { url in
+                vm.acceptPlaygroundImage(at: url)
+            },
+            onCancellation: {
+                vm.cancelImagePlayground()
+            }
+        )
+        .imagePlaygroundGenerationStyle(.sketch, in: [.sketch, .illustration])
+        .imagePlaygroundOptions(ScenePlaygroundConfiguration.options)
         .tipViewStyle(AsciiTipStyle())
         .task {
             vm.attachCoordinator(coordinator)
@@ -212,11 +217,21 @@ struct GameSessionView: View {
         #if DEBUG
         .sheet(isPresented: $showAIToolsDebug) {
                 NavigationStack {
-                    AIToolsDebugView { effects in
-                        vm.applyToolEffectsFromDebug(effects)
-                    }
+                    AIToolsDebugView(
+                        applyEffectsToGame: { effects in
+                            vm.applyToolEffectsFromDebug(effects)
+                        },
+                        generateImage: { prompt in
+                            await vm.illustrateFromDebug(visualPrompt: prompt)
+                        }
+                    )
                 }
-                .presentationDetents([.fraction(0.25), .medium])
+                .presentationDetents([.medium, .large])
+            }
+            .onChange(of: showAIToolsDebug) { _, isShown in
+                if !isShown {
+                    vm.consumeDebugPlaygroundRequest()
+                }
             }
         #endif
     }
@@ -611,10 +626,6 @@ struct GameSessionView: View {
 
     private func handleVisionTap() {
         guard coordinator.hasCompletedInitialText else { return }
-        if vm.hasSubmittedPlayerTurn, !vm.canOpenVisionTerminal {
-            showVisionUnavailableAlert = true
-            return
-        }
         if coordinator.isContextualInputVisible {
             dismissContextualInputIfActive()
         }

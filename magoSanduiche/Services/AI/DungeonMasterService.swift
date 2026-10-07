@@ -58,6 +58,10 @@ final class DungeonMasterService {
 		self.illustrator = illustrator ?? ImagePlaygroundIllustrator()
 	}
 
+	var illustratesWithSystemSheet: Bool {
+		illustrator.illustratesWithSystemSheet
+	}
+
 	func generate(
 		context: DungeonMasterTurnContext,
 		analyticsContext: AIAnalyticsContext? = nil

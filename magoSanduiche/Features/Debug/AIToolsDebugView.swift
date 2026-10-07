@@ -4,14 +4,22 @@
 
 	struct AIToolsDebugView: View {
 		var applyEffectsToGame: (([GameToolEffect]) -> Void)?
+		var generateImage: ((String) async -> DebugImageGeneration)?
 
 		@Environment(\.accessibilityReduceMotion) private var reduceMotion
+		@Environment(\.dismiss) private var dismiss
 
-		init(applyEffectsToGame: (([GameToolEffect]) -> Void)? = nil) {
+		init(
+			applyEffectsToGame: (([GameToolEffect]) -> Void)? = nil,
+			generateImage: ((String) async -> DebugImageGeneration)? = nil
+		) {
 			self.applyEffectsToGame = applyEffectsToGame
+			self.generateImage = generateImage
 		}
 
 		@State private var draft = DungeonTurnDraft.fixture()
+		@State private var visualPrompt = String(localized: "nan_debug_ai_tools_image_sample")
+		@State private var isGeneratingImage = false
 		@State private var history: [String] = []
 
 		var body: some View {
@@ -29,6 +37,8 @@
 							.padding(.vertical, 14)
 					}
 					.buttonStyle(OnboardingPrimaryButtonStyle())
+
+					imageGeneration
 
 					VStack(alignment: .leading, spacing: 8) {
 						Text("nan_debug_ai_tools_output")
@@ -98,16 +108,75 @@
 			.foregroundStyle(Color.accent)
 		}
 
+		private var imageGeneration: some View {
+			VStack(alignment: .leading, spacing: 10) {
+				Text("nan_debug_ai_tools_image_heading")
+					.font(.monocraft(relativeTo: .caption, weight: .semibold))
+					.foregroundStyle(Color.terminalWarning)
+
+				TextField("nan_debug_ai_tools_image_placeholder", text: $visualPrompt, axis: .vertical)
+					.lineLimit(2...4)
+					.font(.monocraft(relativeTo: .caption))
+					.foregroundStyle(Color.accent)
+					.textInputAutocapitalization(.sentences)
+					.padding(10)
+					.drawBorder(nil, color: .terminalWarning.opacity(0.5), lineWidth: 1)
+					.disabled(isGeneratingImage)
+
+				Button {
+					Task { await runImageGeneration() }
+				} label: {
+					Group {
+						if isGeneratingImage {
+							Text("nan_debug_ai_tools_image_generating")
+						} else {
+							Text("nan_debug_ai_tools_generate_image")
+						}
+					}
+					.font(.monocraft(relativeTo: .headline, weight: .semibold))
+					.frame(maxWidth: .infinity)
+					.padding(.vertical, 14)
+				}
+				.buttonStyle(OnboardingPrimaryButtonStyle())
+				.disabled(isGeneratingImage)
+			}
+		}
+
 		private func runDraft() {
 			let effects = draft.resolved().toolEffects
 			let effectsDescription = effects.map(\.description).joined(separator: ", ")
 			let block = "EFFECTS: \(effectsDescription)"
+			record(block)
+			applyEffectsToGame?(effects)
+		}
+
+		private func runImageGeneration() async {
+			let trimmed = visualPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+			guard !trimmed.isEmpty else {
+				record(String(localized: "nan_debug_ai_tools_image_empty"))
+				return
+			}
+			guard let generateImage else {
+				record(String(localized: "nan_debug_ai_tools_image_unattached"))
+				return
+			}
+
+			isGeneratingImage = true
+			defer { isGeneratingImage = false }
+
+			let result = await generateImage(trimmed)
+			record(result.message)
+			if result.didProduceImage || result.shouldDismiss {
+				dismiss()
+			}
+		}
+
+		private func record(_ block: String) {
 			TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 				history.insert(block, at: 0)
 				while history.count > 20 {
 					history.removeLast()
 				}
-				applyEffectsToGame?(effects)
 			}
 		}
 	}

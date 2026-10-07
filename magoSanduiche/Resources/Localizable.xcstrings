@@ -1128,6 +1128,23 @@
         }
       }
     },
+    "nan_debug_ai_tools_generate_image" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> GENERATE IMAGE"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> GERAR IMAGEM"
+          }
+        }
+      }
+    },
     "nan_debug_ai_tools_heading" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1141,6 +1158,174 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "> CHAMAR FERRAMENTAS DO MODELO"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_image_empty" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prompt is empty."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prompt vazio."
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_image_generating" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> RENDERING"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> RENDERIZANDO"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_image_heading" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> SCENE IMAGE"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> IMAGEM DA CENA"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_image_placeholder" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What the Mage sees"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O que o Mago vê"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_image_ready" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scene applied to the vision panel."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cena aplicada ao painel de visão."
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_image_locked" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image generation is locked."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A geração de imagem está bloqueada."
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_image_sample" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A torchlit stone corridor, a hooded mage, cold blue light"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um corredor de pedra à luz de tochas, um mago encapuzado, luz azul fria"
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_image_sheet" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opening Image Playground."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrindo o Image Playground."
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_image_unattached" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image generator is not attached."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerador de imagem não está ligado."
+          }
+        }
+      }
+    },
+    "nan_debug_ai_tools_image_unavailable" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image Playground isn't available. Turn on Apple Intelligence in Settings."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Image Playground não está disponível. Ative a Apple Intelligence nos Ajustes."
           }
         }
       }
@@ -4290,6 +4475,86 @@
         }
       }
     },
+    "nan_pcc_gate_border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PCC.SYS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PCC.SYS"
+          }
+        }
+      }
+    },
+    "nan_pcc_gate_headline_device" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ACCESS DENIED"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ACESSO NEGADO"
+          }
+        }
+      }
+    },
+    "nan_pcc_gate_headline_not_ready" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SYSTEM NOT READY"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SISTEMA INDISPONÍVEL"
+          }
+        }
+      }
+    },
+    "nan_pcc_gate_subscribe" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SUBSCRIBE FOR A PAID MODEL"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ASSINAR UM MODELO PAGO"
+          }
+        }
+      }
+    },
+    "nan_pcc_gate_subscribe_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscribe for a paid model. This option is not available yet."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assinar um modelo pago. Esta opção ainda não está disponível."
+          }
+        }
+      }
+    },
     "nan_phase_action_composing" : {
       "localizations" : {
         "en" : {
@@ -4478,86 +4743,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "> MOTOR DO DESTINO GIRANDO"
-          }
-        }
-      }
-    },
-    "nan_pcc_gate_border" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PCC.SYS"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PCC.SYS"
-          }
-        }
-      }
-    },
-    "nan_pcc_gate_headline_device" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ACCESS DENIED"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ACESSO NEGADO"
-          }
-        }
-      }
-    },
-    "nan_pcc_gate_headline_not_ready" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SYSTEM NOT READY"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SISTEMA INDISPONÍVEL"
-          }
-        }
-      }
-    },
-    "nan_pcc_gate_subscribe" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SUBSCRIBE FOR A PAID MODEL"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ASSINAR UM MODELO PAGO"
-          }
-        }
-      }
-    },
-    "nan_pcc_gate_subscribe_a11y" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Subscribe for a paid model. This option is not available yet."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Assinar um modelo pago. Esta opção ainda não está disponível."
           }
         }
       }
@@ -5591,6 +5776,7 @@
       }
     },
     "nan_vision_unavailable_alert_message" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5607,6 +5793,7 @@
       }
     },
     "nan_vision_unavailable_alert_ok" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5623,6 +5810,7 @@
       }
     },
     "nan_vision_unavailable_alert_title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
