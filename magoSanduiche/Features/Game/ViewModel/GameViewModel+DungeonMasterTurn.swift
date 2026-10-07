@@ -10,7 +10,7 @@ import Foundation
 #endif
 
 extension GameViewModel {
-    func getResponse(for prompt: String) -> Bool {
+    func getResponse(for prompt: String, inputSource: String = "typed", suggestionIndex: Int? = nil) -> Bool {
         let trimmed = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             registerEmptyInput()
@@ -23,11 +23,18 @@ extension GameViewModel {
             playerMessage: trimmed,
             diceRoll: nil
         )
+        var extraAnalytics: [String: Any] = [
+            "prompt_length": trimmed.count,
+            "input_source": inputSource,
+        ]
+        if let suggestionIndex {
+            extraAnalytics["suggestion_index"] = suggestionIndex
+        }
         beginDungeonMasterTurn(
             displayText: trimmed,
             context: context,
             analyticsEvent: "player_turn_submitted",
-            extraAnalytics: ["prompt_length": trimmed.count]
+            extraAnalytics: extraAnalytics
         )
         return true
     }
@@ -106,15 +113,16 @@ extension GameViewModel {
                 await handleVisionAfterTurn(visualPrompt: result.visualPrompt, turnID: turnID)
             }
         } catch {
-            capture(
-                "dm_turn_failed",
-                extra: [
-                    "turn_id": turnID,
-                    "turn_kind": context.kind.rawValue,
-                    "duration": Date().timeIntervalSince(startedAt),
-                    "error_kind": error.analyticsKind,
-                ]
-            )
+            var failureProperties: [String: Any] = [
+                "turn_id": turnID,
+                "turn_kind": context.kind.rawValue,
+                "duration": Date().timeIntervalSince(startedAt),
+                "error_kind": error.analyticsKind,
+            ]
+            if let detail = error.analyticsDetail {
+                failureProperties["error_detail"] = detail
+            }
+            capture("dm_turn_failed", extra: failureProperties)
             appendSystemMessage(error.terminalMessage)
         }
     }
@@ -159,6 +167,18 @@ extension GameViewModel {
                         "health_delta": health - healthBefore,
                     ]
                 )
+                if health == 0, healthBefore > 0 {
+                    capture(
+                        "player_defeated",
+                        extra: [
+                            "amount": amount,
+                            "health_before": healthBefore,
+                        ]
+                    )
+                    if persistRunsToLibrary {
+                        incrementStoredCounter("runsDefeats")
+                    }
+                }
             case let .changeMana(amount):
                 let manaBefore = mana
                 mana = min(maxMana, max(0, mana + amount))

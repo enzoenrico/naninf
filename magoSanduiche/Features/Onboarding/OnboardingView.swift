@@ -56,6 +56,7 @@ struct OnboardingView: View {
 			}
 		}
 		.task(id: vm.currentStep) {
+			AppAnalytics.screen("Onboarding", properties: ["step": String(describing: vm.currentStep)])
 			AppAnalytics.capture("onboarding_step_viewed", properties: onboardingProperties)
 			await advanceAfterProcessingIfNeeded()
 		}
@@ -94,6 +95,12 @@ struct OnboardingView: View {
 			guard authSessionStore.isAuthenticated else { return }
 			vm.persistResponsesOnUnlock()
 			AppAnalytics.capture("onboarding_unlocked", properties: onboardingProperties)
+			AppAnalytics.setPersonProperties([
+				"onboarding_completed": true,
+				"onboarding_goal": vm.responses.selectedGoalID ?? "",
+				"onboarding_pain_points": vm.responses.selectedPainPointIDs.sorted(),
+				"onboarding_preferences": vm.responses.selectedPreferenceIDs.sorted(),
+			])
 			TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 				hasCompletedOnboarding = true
 				hasUnlockedFullGame = true
@@ -543,6 +550,7 @@ private struct DemoOnboardingScreen: View {
 						"demo_action_target": vm.demoActionTarget,
 						"is_resume": vm.completedDemoActions > 0,
 					])
+				gameVM.noteSessionOpened(origin: "onboarding_demo")
 				activeDemoFlow = .game
 			} label: {
 				Text(
@@ -581,12 +589,10 @@ private struct DemoOnboardingScreen: View {
 					onDemoNeedsLogin: { activeDemoFlow = .auth },
 					onSkipDemoForDebug: skipDemoAsCompleted
 				) {
-					AppAnalytics.capture(
-						"onboarding_demo_closed",
-						properties: [
-							"completed_demo_actions": vm.completedDemoActions,
-							"demo_action_target": vm.demoActionTarget,
-						])
+					var properties = gameVM.sessionLeaveProperties()
+					properties["completed_demo_actions"] = vm.completedDemoActions
+					properties["demo_action_target"] = vm.demoActionTarget
+					AppAnalytics.capture("onboarding_demo_closed", properties: properties)
 					activeDemoFlow = nil
 				}
 			case .auth:

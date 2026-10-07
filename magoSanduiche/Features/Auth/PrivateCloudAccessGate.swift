@@ -29,6 +29,11 @@ struct PrivateCloudAccessGate: View {
 			}
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
 		}
+		.onAppear {
+			let reasonName = reason == .deviceNotEligible ? "device_not_eligible" : "system_not_ready"
+			AppAnalytics.screen("Cloud access", properties: ["reason": reasonName])
+			AppAnalytics.capture("cloud_access_blocked", properties: ["reason": reasonName])
+		}
 	}
 
 	private var statusPanel: some View {

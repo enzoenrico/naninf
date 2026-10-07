@@ -99,6 +99,9 @@ struct ProfileView: View {
 		.task(id: reduceMotion) {
 			await hydrateCounters()
 		}
+		.onAppear {
+			AppAnalytics.screen("Profile")
+		}
 	}
 
 	#if DEBUG

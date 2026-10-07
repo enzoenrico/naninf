@@ -57,6 +57,9 @@ struct PlayerHomeView: View {
 		.safeAreaInset(edge: .bottom, spacing: 0) {
 			footerStrip
 		}
+		.onAppear {
+			AppAnalytics.screen("Home")
+		}
 	}
 
 	#if DEBUG

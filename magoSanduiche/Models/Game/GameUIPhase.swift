@@ -15,6 +15,23 @@ enum GameUIPhase: Equatable {
 	case rollingDice
 	case result
 
+	var analyticsName: String {
+		switch self {
+		case .reading:
+			"reading"
+		case .ready:
+			"ready"
+		case .composing:
+			"composing"
+		case .awaitingDungeonMaster:
+			"awaiting_dungeon_master"
+		case .rollingDice:
+			"rolling_dice"
+		case .result:
+			"result"
+		}
+	}
+
 	var statusLine: String {
 		switch self {
 		case .reading:

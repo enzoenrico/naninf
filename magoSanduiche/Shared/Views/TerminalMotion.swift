@@ -11,6 +11,8 @@ enum TerminalMotion {
 	static let cursorSymbol = "▌"
 	static let blockCursorSymbol = "█"
 	static let scrambleGlyphs = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ$#@|&*~`.<>/?")
+	/// Letters only: punctuation glyphs add line-break opportunities and make wrapped text reflow mid-scramble.
+	static let typewriterScrambleGlyphs = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 	static let cursorInterval: Duration = .milliseconds(520)
 	static let loaderInterval: Duration = .milliseconds(180)

@@ -36,7 +36,10 @@ struct DungeonMasterErrorTests {
 	}
 
 	@Test func analyticsKindsStayClosed() {
-		#expect(DungeonMasterError.unavailable(.deviceNotEligible).analyticsKind == "unavailable")
+		#expect(DungeonMasterError.unavailable(.deviceNotEligible).analyticsKind == "unavailable_device")
+		#expect(DungeonMasterError.unavailable(.systemNotReady).analyticsKind == "unavailable_system")
+		#expect(DungeonMasterError.failed("x").analyticsDetail == "x")
+		#expect(DungeonMasterError.refused.analyticsDetail == nil)
 		#expect(DungeonMasterError.quotaReached(resetDate: nil).analyticsKind == "quota_reached")
 		#expect(DungeonMasterError.unreachable.analyticsKind == "unreachable")
 		#expect(DungeonMasterError.refused.analyticsKind == "refused")

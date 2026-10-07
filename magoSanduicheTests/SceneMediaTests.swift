@@ -5,6 +5,7 @@
 
 import CoreGraphics
 import Foundation
+import ImageIO
 import Testing
 @testable import magoSanduiche
 
@@ -34,38 +35,208 @@ struct GameViewModelVisionTests {
 		)
 	}
 
-	@Test @MainActor func introAllowsVisionBeforePlayerTurn() {
+	@Test @MainActor func visualPromptBecomesTheSceneAndOpensThePanel() async throws {
 		let vm = makeViewModel()
+		let coordinator = AppCoordinator()
+		coordinator.isImageCollapsed = true
+		vm.attachCoordinator(coordinator)
+		vm.hasSubmittedPlayerTurn = true
 
-		#expect(!vm.hasSubmittedPlayerTurn)
-		#expect(vm.canOpenVisionTerminal)
-		#expect(vm.visionDisplayMode == .introStatic)
+		await vm.handleVisionAfterTurn(visualPrompt: "Torchlit corridor", turnID: "turn")
+
+		guard case .scene(let scene) = vm.visionDisplayMode else {
+			Issue.record("expected a generated scene")
+			return
+		}
+		#expect(scene.cgImage.width == 1)
+		#expect(!vm.visionMediaLoading)
+		#expect(!coordinator.isImageCollapsed)
 	}
 
-	@Test @MainActor func postIntroWithoutSceneBlocksVision() {
+	@Test @MainActor func missingVisualPromptKeepsTheCurrentFrame() async {
 		let vm = makeViewModel()
+		let coordinator = AppCoordinator()
+		coordinator.isImageCollapsed = true
+		vm.attachCoordinator(coordinator)
 		vm.hasSubmittedPlayerTurn = true
 		vm.visionDisplayMode = .introStatic
 
-		#expect(!vm.canOpenVisionTerminal)
+		await vm.handleVisionAfterTurn(visualPrompt: nil, turnID: "turn")
+
+		#expect(vm.visionDisplayMode == .introStatic)
+		#expect(coordinator.isImageCollapsed)
 	}
 
-	@Test @MainActor func postIntroWithSceneAllowsVision() async throws {
-		let vm = makeViewModel()
+	@Test @MainActor func failedIllustrationKeepsThePreviousScene() async throws {
+		let vm = GameViewModel(
+			persistRunsToLibrary: false,
+			dungeonMaster: DungeonMasterService(
+				narrator: ScriptedNarrator(drafts: []),
+				illustrator: FailingIllustrator()
+			)
+		)
+		let coordinator = AppCoordinator()
+		vm.attachCoordinator(coordinator)
 		vm.hasSubmittedPlayerTurn = true
 		let image = try await ScriptedIllustrator().illustrate("torch")
-		vm.visionDisplayMode = .scene(SceneImage(cgImage: image))
+		let previous = SceneImage(cgImage: image)
+		vm.visionDisplayMode = .scene(previous)
 
-		#expect(vm.canOpenVisionTerminal)
+		await vm.handleVisionAfterTurn(visualPrompt: "A dark stair", turnID: "turn")
+
+		#expect(vm.visionDisplayMode == .scene(previous))
+		#expect(!vm.visionMediaLoading)
 	}
 
-	@Test @MainActor func visionLoadingBlocksOpening() async throws {
+	@Test @MainActor func debugIllustrationShowsTheScene() async {
 		let vm = makeViewModel()
+		let coordinator = AppCoordinator()
+		coordinator.isImageCollapsed = true
+		vm.attachCoordinator(coordinator)
+
+		let result = await vm.illustrateFromDebug(visualPrompt: "Torchlit corridor")
+
+		#expect(result.didProduceImage)
+		#expect(result.message.contains("1x1"))
+		guard case .scene = vm.visionDisplayMode else {
+			Issue.record("expected a generated scene")
+			return
+		}
+		#expect(!vm.visionMediaLoading)
+		#expect(!coordinator.isImageCollapsed)
+	}
+
+	@Test @MainActor func debugIllustrationRejectsAnEmptyPrompt() async {
+		let vm = makeViewModel()
+		vm.visionDisplayMode = .introStatic
+
+		let result = await vm.illustrateFromDebug(visualPrompt: "   ")
+
+		#expect(!result.didProduceImage)
+		#expect(vm.visionDisplayMode == .introStatic)
+		#expect(!vm.visionMediaLoading)
+	}
+
+	@Test @MainActor func debugIllustrationKeepsThePreviousSceneOnFailure() async throws {
+		let vm = GameViewModel(
+			persistRunsToLibrary: false,
+			dungeonMaster: DungeonMasterService(
+				narrator: ScriptedNarrator(drafts: []),
+				illustrator: FailingIllustrator()
+			)
+		)
 		vm.hasSubmittedPlayerTurn = true
 		let image = try await ScriptedIllustrator().illustrate("torch")
-		vm.visionDisplayMode = .scene(SceneImage(cgImage: image))
-		vm.visionMediaLoading = true
+		let previous = SceneImage(cgImage: image)
+		vm.visionDisplayMode = .scene(previous)
 
-		#expect(!vm.canOpenVisionTerminal)
+		let result = await vm.illustrateFromDebug(visualPrompt: "A dark stair")
+
+		#expect(!result.didProduceImage)
+		#expect(vm.visionDisplayMode == .scene(previous))
+		#expect(!vm.visionMediaLoading)
+	}
+
+	@Test @MainActor func lockedGenerationDoesNotOpenTheSheet() async {
+		let vm = GameViewModel(
+			persistRunsToLibrary: false,
+			dungeonMaster: DungeonMasterService(
+				narrator: ScriptedNarrator(drafts: []),
+				illustrator: SheetIllustrator()
+			)
+		)
+		vm.imagePlaygroundAvailabilityOverride = true
+		vm.hasSubmittedPlayerTurn = true
+
+		await vm.handleVisionAfterTurn(visualPrompt: "Torchlit corridor", turnID: "turn")
+
+		#expect(SceneImageGeneration.isLocked)
+		#expect(!vm.isImagePlaygroundPresented)
+		#expect(vm.imagePlaygroundConcept.isEmpty)
+		#expect(vm.visionDisplayMode == .introStatic)
+	}
+
+	@Test @MainActor func unavailablePlaygroundDoesNotPresent() async {
+		let vm = GameViewModel(
+			persistRunsToLibrary: false,
+			dungeonMaster: DungeonMasterService(
+				narrator: ScriptedNarrator(drafts: []),
+				illustrator: SheetIllustrator()
+			)
+		)
+		vm.imagePlaygroundAvailabilityOverride = false
+		vm.hasSubmittedPlayerTurn = true
+
+		await vm.handleVisionAfterTurn(visualPrompt: "Torchlit corridor", turnID: "turn")
+
+		#expect(!vm.isImagePlaygroundPresented)
+		#expect(vm.visionDisplayMode == .introStatic)
+	}
+
+	@Test @MainActor func debugGenerationStaysLocked() async {
+		let vm = GameViewModel(
+			persistRunsToLibrary: false,
+			dungeonMaster: DungeonMasterService(
+				narrator: ScriptedNarrator(drafts: []),
+				illustrator: SheetIllustrator()
+			)
+		)
+		vm.imagePlaygroundAvailabilityOverride = true
+
+		let result = await vm.illustrateFromDebug(visualPrompt: "A cold stair")
+
+		#expect(!result.shouldDismiss)
+		#expect(!result.didProduceImage)
+		#expect(vm.queuedDebugPlaygroundPrompt == nil)
+
+		vm.consumeDebugPlaygroundRequest()
+
+		#expect(!vm.isImagePlaygroundPresented)
+		#expect(vm.imagePlaygroundConcept.isEmpty)
+	}
+
+	@Test @MainActor func acceptedPlaygroundFileBecomesTheScene() async throws {
+		let vm = makeViewModel()
+		let coordinator = AppCoordinator()
+		coordinator.isImageCollapsed = true
+		vm.attachCoordinator(coordinator)
+		let image = try await ScriptedIllustrator().illustrate("torch")
+		let url = FileManager.default.temporaryDirectory
+			.appendingPathComponent("\(UUID().uuidString).png")
+		guard
+			let destination = CGImageDestinationCreateWithURL(url as CFURL, "public.png" as CFString, 1, nil)
+		else {
+			Issue.record("could not create image destination")
+			return
+		}
+		CGImageDestinationAddImage(destination, image, nil)
+		#expect(CGImageDestinationFinalize(destination))
+
+		vm.acceptPlaygroundImage(at: url)
+
+		guard case .scene(let scene) = vm.visionDisplayMode else {
+			Issue.record("expected a scene from the playground file")
+			return
+		}
+		#expect(scene.cgImage.width == 1)
+		#expect(!vm.isImagePlaygroundPresented)
+		#expect(!coordinator.isImageCollapsed)
+	}
+}
+
+private struct SheetIllustrator: SceneIllustrator {
+	var illustratesWithSystemSheet: Bool { true }
+
+	func illustrate(_ prompt: String) async throws -> CGImage {
+		_ = prompt
+		Issue.record("ImageCreator must not run on iOS 27")
+		throw SceneMediaError.unavailable
+	}
+}
+
+private struct FailingIllustrator: SceneIllustrator {
+	func illustrate(_ prompt: String) async throws -> CGImage {
+		_ = prompt
+		throw SceneMediaError.unavailable
 	}
 }
