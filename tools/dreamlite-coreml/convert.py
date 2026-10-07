@@ -50,7 +50,7 @@ def fetch_sources(model_dir: Path | None, space_dir: Path | None, cache: Path) -
     return model_dir, space_dir
 
 
-WEIGHT_OP_TYPES = ("linear", "conv", "matmul", "gather")
+WEIGHT_OP_TYPES = {"linear", "conv", "matmul", "gather"}
 
 
 def quantize(model: ct.models.MLModel, bits: int | None) -> ct.models.MLModel:
@@ -63,7 +63,14 @@ def quantize(model: ct.models.MLModel, bits: int | None) -> ct.models.MLModel:
         op_config = cto.coreml.OpLinearQuantizerConfig(mode="linear_symmetric", dtype="int4", granularity="per_block", block_size=32, weight_threshold=2048)
     else:
         raise ValueError(f"unsupported weight bits: {bits}")
-    config = cto.coreml.OptimizationConfig(op_type_configs={op_type: op_config for op_type in WEIGHT_OP_TYPES})
+    # Per-op-type configs conflict on small constants that op fusion shares between weight and
+    # non-weight ops, so exclude by name every constant that feeds no weight op instead.
+    keep_float = {}
+    for const in model._mil_program.find_ops(op_type="const"):
+        consumers = {child.op_type for output in const.outputs for child in output.child_ops}
+        if consumers and not consumers & WEIGHT_OP_TYPES:
+            keep_float[const.name] = None
+    config = cto.coreml.OptimizationConfig(global_config=op_config, op_name_configs=keep_float)
     return cto.coreml.linear_quantize_weights(model, config=config)
 
 
