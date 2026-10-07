@@ -18,7 +18,7 @@ This document maps the existing code surfaces that can support importing or rewo
 Relevant dependencies and Apple frameworks:
 
 - Narration uses Apple `FoundationModels` `PrivateCloudComputeLanguageModel`. There is no OpenAI package and no `OPENAI_API_KEY`. Apple requires a managed Private Cloud Compute entitlement; the key is not in this repo.
-- `ImagePlayground` in `magoSanduiche/Services/ImageGeneration/SceneIllustrator.swift`. `ImageCreator` is deprecated in iOS 27 in favor of an interactive sheet. The vision panel still calls `images(for:style:limit:)` and renders the `CGImage` through `AsciiMediaView`.
+- Scene art comes from [`carlofkl/DreamLite-mobile`](https://huggingface.co/carlofkl/DreamLite-mobile) through `DreamLiteIllustrator` in `magoSanduiche/Services/ImageGeneration/SceneIllustrator.swift`. `DreamLiteClient` (`DreamLiteClient.swift`) calls the DreamLite Gradio app's `generate_image` endpoint with the `DreamLite-mobile` model (1024×1024, 4 steps, no CFG). The vision panel renders the decoded `CGImage` through `AsciiMediaView`. The model is a ~5 GB PyTorch diffusers pipeline, so it runs server-side, not on device.
 - `TipKit` in `magoSanduiche/Features/Game/GameView.swift` and `magoSanduiche/Features/Game/Tips/GameTips.swift`.
 - `AVFoundation`, `ImageIO`, `CoreGraphics`, and `URLSession` inside `magoSanduiche/Shared/Views/AsciiMediaView.swift`.
 
@@ -53,6 +53,7 @@ magoSanduiche/
       DungeonMasterService.swift
       DungeonMasterError.swift
     ImageGeneration/
+      DreamLiteClient.swift
       SceneIllustrator.swift
   Shared/
     Views/
@@ -70,7 +71,7 @@ The dungeon master is one guided Private Cloud Compute turn per player action.
 - `resolved()` emits nonzero health, nonzero mana, then exactly one `.requestAction`. `GameViewModel.applyToolEffects` is the only writer of HP, mana, and input mode.
 - Failures are `DungeonMasterError`. The terminal shows `error.terminalMessage`.
 
-There are no server-side API routes. Scene art is an on-device `CGImage` from Image Playground, shown as `VisionDisplayMode.scene`. The narrator does not return an image URL.
+There are no app-owned server routes. Scene art is a `CGImage` decoded from DreamLite-mobile output, shown as `VisionDisplayMode.scene`. The narrator does not return an image URL.
 
 ### Prompting And Chat Loop
 
@@ -112,8 +113,8 @@ There are two separate current surfaces: generated images and ASCII media render
 
 Generated image surface:
 
-- `ImagePlaygroundIllustrator` calls `ImageCreator().images(for:style:limit:)`, prefers `.sketch`, and returns one `CGImage`. `DungeonMasterService.illustrate` wraps that in `SceneImage`.
-- `GameViewModel.handleVisionAfterTurn` sets `visionDisplayMode` to `.scene` and `VisionPanel` renders it with `AsciiMediaView(image:)`.
+- `DreamLiteIllustrator` sends the visual prompt to DreamLite-mobile (`POST /gradio_api/call/generate_image`, then reads the `complete` server-sent event and downloads the image file). It decodes the bytes into one `CGImage`. `DungeonMasterService.illustrate` wraps that in `SceneImage`.
+- `GameViewModel.handleVisionAfterTurn` runs as soon as a turn's `visualPrompt` is ready, sets `visionDisplayMode` to `.scene`, and `VisionPanel` renders it with `AsciiMediaView(image:)`. Only the latest prompt's image is applied; a slower generation from an earlier turn is dropped.
 
 Media rendering surface:
 
@@ -292,7 +293,8 @@ flowchart TD
 
 ### Image Layer
 
-- `magoSanduiche/Services/ImageGeneration/SceneIllustrator.swift` / `ImagePlaygroundIllustrator`: on-device scene art. Keep `ImageCreator` for this programmatic path. Do not replace the panel with `imagePlaygroundSheet`.
+- `magoSanduiche/Services/ImageGeneration/SceneIllustrator.swift` / `DreamLiteIllustrator`: default scene art via DreamLite-mobile. `ImagePlaygroundIllustrator` remains for the locked system-sheet path.
+- `magoSanduiche/Services/ImageGeneration/DreamLiteClient.swift` / `DreamLiteClient`: Gradio queue client. `DREAMLITE_ENDPOINT` (build setting, defaults to `https://carlofkl-dreamlite.hf.space`) can point at a self-hosted DreamLite app; optional `DREAMLITE_HF_TOKEN` is sent as a bearer token for ZeroGPU quota.
 - `magoSanduiche/Features/Game/ViewModel/GameViewModel+Vision.swift` / `handleVisionAfterTurn`: asks `DungeonMasterService.illustrate` after a turn that has a visual prompt.
 - `magoSanduiche/Features/Game/Subviews/VisionPanel.swift` / `VisionPanel`: shows `.introStatic` or `.scene(SceneImage)`.
 - `magoSanduiche/Shared/Views/AsciiMediaView.swift` / `AsciiMediaView`: already supports `CGImage`, `UIImage`, remote image URLs, and videos. This should be reused for generated images rather than introducing another image renderer.
@@ -316,7 +318,7 @@ What already exists:
 - AI-selected UI action type via `decideAction`.
 - Local dice rolling and dice UI.
 - Health and mana bars in UI state.
-- Apple `ImagePlayground` wrapper.
+- DreamLite-mobile scene illustrator (plus the locked Apple `ImagePlayground` wrapper).
 - General ASCII media renderer that can render `CGImage`, `UIImage`, remote image URLs, and video frames.
 - Local onboarding persistence through `UserDefaults` and `@AppStorage`.
 
@@ -344,7 +346,7 @@ Risky integration points:
 - `PromptOutput` currently gives schema instructions manually while also using `responseFormat: .jsonObject`; this is pragmatic but not a strict JSON schema enforcement path.
 - `GameViewModel.rollDice()` currently resolves local game consequences independently of AI. If the old app expects AI-mediated dice outcomes, this flow needs a clear handoff contract.
 - `AsciiMediaView` can load remote media via `URLSession`; remote URLs from AI should be validated before loading.
-- `ImagePlayground` availability differs by device. `ImageCreator` is deprecated in iOS 27. A deprecation warning is expected. Failures become `SceneMediaError` and the panel returns to the intro still.
+- DreamLite generation needs network access. The hosted Space runs on ZeroGPU, so anonymous callers share a small GPU quota and can be queued or rejected; set `DREAMLITE_HF_TOKEN` or self-host for production. Failures become `DreamLiteError` or `SceneMediaError` and the panel keeps its current frame. DreamLite-mobile is licensed CC BY-NC 4.0 (non-commercial).
 
 ## Recommendations For Implementation Planning
 

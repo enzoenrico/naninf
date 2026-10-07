@@ -51,7 +51,7 @@ work. A future agent that needs to build, run, lint, or test this app must do so
 | Apple Sign-In | Yes | OAuth → Supabase | `magoSanduiche.entitlements`; needs Apple Developer team `DEVELOPMENT_TEAM` |
 >>>>>>> narrator-private-cloud-compute
 | PostHog | Optional | Analytics (non-blocking) | `POSTHOG_*` in `Info.plist` / scheme env vars |
-| Image Playground | Optional | On-device scene art through `ImageCreator`. The iOS 27 sheet is interactive, so the vision panel keeps the programmatic API. | Apple framework. No app credential. |
+| DreamLite-mobile | Optional | Scene art for the vision panel from `carlofkl/DreamLite-mobile`, called over HTTPS via the DreamLite Gradio app. CC BY-NC 4.0. | `DREAMLITE_ENDPOINT` build setting (defaults to the hosted Space) and optional `DREAMLITE_HF_TOKEN`, surfaced into `Info.plist` |
 
 Note: the intended secret-injection pattern is an untracked `Secrets.xcconfig`
 (see `.gitignore`), though some keys are currently committed in `Info.plist` /
