@@ -16,6 +16,7 @@ extension GameViewModel {
         applyPlaybackState(GameRunSnapshotMapper.playbackState(from: stored))
         visionDisplayMode = .introStatic
         visionMediaLoading = false
+        latestVisionRequestID = nil
     }
 
     func saveSnapshot(modelContext: ModelContext) {

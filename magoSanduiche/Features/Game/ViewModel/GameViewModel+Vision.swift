@@ -17,15 +17,23 @@ extension GameViewModel {
             return
         }
 
+        let requestID = UUID()
+        latestVisionRequestID = requestID
         visionMediaLoading = true
         coordinator?.revealVisionIfCollapsed()
-        defer { visionMediaLoading = false }
+        defer {
+            if latestVisionRequestID == requestID {
+                visionMediaLoading = false
+            }
+        }
 
         do {
             let image = try await dungeonMaster.illustrate(
                 visualPrompt: visualPrompt,
                 analyticsContext: aiContext(turnID: turnID)
             )
+            // A newer turn's prompt (or a restored run) supersedes this scene.
+            guard latestVisionRequestID == requestID else { return }
             visionDisplayMode = .scene(image)
             coordinator?.revealVisionIfCollapsed()
         } catch {

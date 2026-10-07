@@ -24,6 +24,7 @@ final class GameViewModel {
     var loading = false
     var visionDisplayMode: VisionDisplayMode = .introStatic
     var visionMediaLoading = false
+    var latestVisionRequestID: UUID?
     var isImagePlaygroundPresented = false
     var imagePlaygroundConcept = ""
     #if DEBUG
