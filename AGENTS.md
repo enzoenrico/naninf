@@ -51,7 +51,7 @@ work. A future agent that needs to build, run, lint, or test this app must do so
 | Apple Sign-In | Yes | OAuth → Supabase | `magoSanduiche.entitlements`; needs Apple Developer team `DEVELOPMENT_TEAM` |
 >>>>>>> narrator-private-cloud-compute
 | PostHog | Optional | Analytics (non-blocking) | `POSTHOG_*` in `Info.plist` / scheme env vars |
-| DreamLite-mobile | Optional | Scene art for the vision panel from `carlofkl/DreamLite-mobile`, called over HTTPS via the DreamLite Gradio app. CC BY-NC 4.0. | `DREAMLITE_ENDPOINT` build setting (defaults to the hosted Space) and optional `DREAMLITE_HF_TOKEN`, surfaced into `Info.plist` |
+| DreamLite-mobile | Optional | Scene art for the vision panel from `carlofkl/DreamLite-mobile`, run on device with Core ML (no server). Models (~2.1 GB) come from `tools/dreamlite-coreml/convert.py`. CC BY-NC 4.0. | Bundle the converted folder in `magoSanduiche/Resources/DreamLiteModels/` (git-ignored), or host it and set the `DREAMLITE_MODEL_BASE_URL` build setting (surfaced into `Info.plist`) so the app downloads it once |
 
 Note: the intended secret-injection pattern is an untracked `Secrets.xcconfig`
 (see `.gitignore`), though some keys are currently committed in `Info.plist` /

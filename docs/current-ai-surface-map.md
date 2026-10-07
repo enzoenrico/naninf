@@ -18,7 +18,7 @@ This document maps the existing code surfaces that can support importing or rewo
 Relevant dependencies and Apple frameworks:
 
 - Narration uses Apple `FoundationModels` `PrivateCloudComputeLanguageModel`. There is no OpenAI package and no `OPENAI_API_KEY`. Apple requires a managed Private Cloud Compute entitlement; the key is not in this repo.
-- Scene art comes from [`carlofkl/DreamLite-mobile`](https://huggingface.co/carlofkl/DreamLite-mobile) through `DreamLiteIllustrator` in `magoSanduiche/Services/ImageGeneration/SceneIllustrator.swift`. `DreamLiteClient` (`DreamLiteClient.swift`) calls the DreamLite Gradio app's `generate_image` endpoint with the `DreamLite-mobile` model (1024×1024, 4 steps, no CFG). The vision panel renders the decoded `CGImage` through `AsciiMediaView`. The model is a ~5 GB PyTorch diffusers pipeline, so it runs server-side, not on device.
+- Scene art comes from [`carlofkl/DreamLite-mobile`](https://huggingface.co/carlofkl/DreamLite-mobile), run on device with Core ML through `DreamLiteIllustrator` in `magoSanduiche/Services/ImageGeneration/SceneIllustrator.swift` and `DreamLiteOnDeviceGenerator` (1024×1024, 4 flow-matching steps, no CFG). The vision panel renders the resulting `CGImage` through `AsciiMediaView`. `tools/dreamlite-coreml/convert.py` converts the PyTorch pipeline into Core ML packages (~2.1 GB with int8 weights).
 - `TipKit` in `magoSanduiche/Features/Game/GameView.swift` and `magoSanduiche/Features/Game/Tips/GameTips.swift`.
 - `AVFoundation`, `ImageIO`, `CoreGraphics`, and `URLSession` inside `magoSanduiche/Shared/Views/AsciiMediaView.swift`.
 
@@ -53,7 +53,10 @@ magoSanduiche/
       DungeonMasterService.swift
       DungeonMasterError.swift
     ImageGeneration/
-      DreamLiteClient.swift
+      DreamLiteModelStore.swift
+      DreamLiteOnDeviceGenerator.swift
+      DreamLiteSampling.swift
+      DreamLiteTokenizer.swift
       SceneIllustrator.swift
   Shared/
     Views/
@@ -71,7 +74,7 @@ The dungeon master is one guided Private Cloud Compute turn per player action.
 - `resolved()` emits nonzero health, nonzero mana, then exactly one `.requestAction`. `GameViewModel.applyToolEffects` is the only writer of HP, mana, and input mode.
 - Failures are `DungeonMasterError`. The terminal shows `error.terminalMessage`.
 
-There are no app-owned server routes. Scene art is a `CGImage` decoded from DreamLite-mobile output, shown as `VisionDisplayMode.scene`. The narrator does not return an image URL.
+There are no app-owned server routes. Scene art is a `CGImage` generated on device by DreamLite-mobile, shown as `VisionDisplayMode.scene`. The narrator does not return an image URL.
 
 ### Prompting And Chat Loop
 
@@ -113,7 +116,13 @@ There are two separate current surfaces: generated images and ASCII media render
 
 Generated image surface:
 
-- `DreamLiteIllustrator` sends the visual prompt to DreamLite-mobile (`POST /gradio_api/call/generate_image`, then reads the `complete` server-sent event and downloads the image file). It decodes the bytes into one `CGImage`. `DungeonMasterService.illustrate` wraps that in `SceneImage`.
+- `DreamLiteIllustrator` hands the visual prompt to `DreamLiteOnDeviceGenerator.shared`, which mirrors `DreamLiteMobilePipeline` on device:
+  1. `DreamLitePromptEncoder` wraps the prompt in the pipeline's chat template (`[Generate]: …`) and `DreamLiteTokenizer` (Qwen2 byte-level BPE, files in `Resources/DreamLite`) tokenizes it into a right-padded 256-token window.
+  2. Four Core ML chunks of the Qwen3-VL text decoder run one at a time, so the ~1.7B-parameter encoder is never fully in memory. The last chunk drops the 34 system-prompt positions and returns raw last-layer hidden states.
+  3. The UNet runs 4 Euler steps of `FlowMatchEulerDiscreteScheduler` (`DreamLiteFlowMatchSchedule`, dynamic shift for 128×128 latents) from seeded noise. An attention mask hides the padding.
+  4. The TAESDXL decoder produces RGB in [0, 1], which becomes an RGBA `CGImage`. `DungeonMasterService.illustrate` wraps it in `SceneImage`.
+- Generations run one at a time. A newer prompt stops an older generation at its next step boundary with `DreamLiteError.superseded`. The UNet and decoder stay loaded between scenes.
+- `DreamLiteModelStore` finds the compiled models in this order: `.mlmodelc` resources in the app bundle (with `DreamLiteManifest.json`), then a previous install in Application Support (`DreamLite/Models`, excluded from backup), then a one-time download of the `convert.py` folder from `DREAMLITE_MODEL_BASE_URL`. Downloads are checked against the manifest's sizes and SHA-256 digests before `MLModel.compileModel(at:)`.
 - `GameViewModel.handleVisionAfterTurn` runs as soon as a turn's `visualPrompt` is ready, sets `visionDisplayMode` to `.scene`, and `VisionPanel` renders it with `AsciiMediaView(image:)`. Only the latest prompt's image is applied; a slower generation from an earlier turn is dropped.
 
 Media rendering surface:
@@ -293,8 +302,10 @@ flowchart TD
 
 ### Image Layer
 
-- `magoSanduiche/Services/ImageGeneration/SceneIllustrator.swift` / `DreamLiteIllustrator`: default scene art via DreamLite-mobile. `ImagePlaygroundIllustrator` remains for the locked system-sheet path.
-- `magoSanduiche/Services/ImageGeneration/DreamLiteClient.swift` / `DreamLiteClient`: Gradio queue client. `DREAMLITE_ENDPOINT` (build setting, defaults to `https://carlofkl-dreamlite.hf.space`) can point at a self-hosted DreamLite app; optional `DREAMLITE_HF_TOKEN` is sent as a bearer token for ZeroGPU quota.
+- `magoSanduiche/Services/ImageGeneration/SceneIllustrator.swift` / `DreamLiteIllustrator`: default scene art via on-device DreamLite-mobile. `ImagePlaygroundIllustrator` remains for the locked system-sheet path.
+- `magoSanduiche/Services/ImageGeneration/DreamLiteOnDeviceGenerator.swift` / `DreamLiteOnDeviceGenerator`: Core ML text encoder → UNet → decoder pipeline, plus `DreamLiteError`.
+- `magoSanduiche/Services/ImageGeneration/DreamLiteModelStore.swift` / `DreamLiteModelStore`, `DreamLiteManifest`: locating, downloading, verifying, and compiling the models.
+- `tools/dreamlite-coreml/`: `convert.py` (PyTorch → Core ML packages + manifest), `inspect_models.py` (checks a converted folder against the app's input/output contract), `verify.py` (parity against `DreamLiteMobilePipeline`, including emulated int8 weights and float16 compute), and `tokenizer_vectors.py` (the tokenizer test fixture). Run `pip install -r requirements.txt` then `python convert.py --out ./DreamLiteCoreML`. Either copy the output folder's contents into `magoSanduiche/Resources/DreamLiteModels/` (Xcode compiles the packages into the bundle) or upload the folder to a static host, such as a Hugging Face model repo `resolve/main` URL, and set `DREAMLITE_MODEL_BASE_URL`.
 - `magoSanduiche/Features/Game/ViewModel/GameViewModel+Vision.swift` / `handleVisionAfterTurn`: asks `DungeonMasterService.illustrate` after a turn that has a visual prompt.
 - `magoSanduiche/Features/Game/Subviews/VisionPanel.swift` / `VisionPanel`: shows `.introStatic` or `.scene(SceneImage)`.
 - `magoSanduiche/Shared/Views/AsciiMediaView.swift` / `AsciiMediaView`: already supports `CGImage`, `UIImage`, remote image URLs, and videos. This should be reused for generated images rather than introducing another image renderer.
@@ -346,7 +357,7 @@ Risky integration points:
 - `PromptOutput` currently gives schema instructions manually while also using `responseFormat: .jsonObject`; this is pragmatic but not a strict JSON schema enforcement path.
 - `GameViewModel.rollDice()` currently resolves local game consequences independently of AI. If the old app expects AI-mediated dice outcomes, this flow needs a clear handoff contract.
 - `AsciiMediaView` can load remote media via `URLSession`; remote URLs from AI should be validated before loading.
-- DreamLite generation needs network access. The hosted Space runs on ZeroGPU, so anonymous callers share a small GPU quota and can be queued or rejected; set `DREAMLITE_HF_TOKEN` or self-host for production. Failures become `DreamLiteError` or `SceneMediaError` and the panel keeps its current frame. DreamLite-mobile is licensed CC BY-NC 4.0 (non-commercial).
+- DreamLite runs entirely on device, but the ~2.1 GB of converted models are not in git. Without bundled models or `DREAMLITE_MODEL_BASE_URL`, scene art fails with `DreamLiteError.modelsUnavailable`. With a base URL, the first scene waits for the one-time download. The app requests `com.apple.developer.kernel.increased-memory-limit` because the UNet, decoder, and one text-encoder chunk are resident together. Failures become `DreamLiteError` or `SceneMediaError` and the panel keeps its current frame. DreamLite-mobile is licensed CC BY-NC 4.0 (non-commercial).
 
 ## Recommendations For Implementation Planning
 
