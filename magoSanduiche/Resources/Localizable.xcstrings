@@ -471,13 +471,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Opens PayPal so you can send the developer a tip."
+            "value" : "Coffee tips are turned off for now."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Abre o PayPal para você mandar uma gorjeta ao desenvolvedor."
+            "value" : "As gorjetas de café estão desligadas por enquanto."
           }
         }
       }
@@ -631,13 +631,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The site, a note straight to the dungeon master, or a coffee via PayPal."
+            "value" : "The site, or a note straight to the dungeon master."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O site, um recado direto para o mestre da masmorra, ou um café pelo PayPal."
+            "value" : "O site, ou um recado direto para o mestre da masmorra."
           }
         }
       }

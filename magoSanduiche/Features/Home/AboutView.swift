@@ -106,6 +106,7 @@ struct AboutView: View {
                 value: String(localized: "nan_about_link_coffee_value"),
                 valueColor: .terminalWarning,
                 accessibilityHint: String(localized: "nan_about_link_coffee_a11y"),
+                isEnabled: AboutOutboundLink.coffeeEnabled,
                 action: { open(.coffee) }
             )
             Text("nan_about_links_hint")
@@ -190,6 +191,7 @@ private struct AboutLinkRow: View {
     let value: String
     let valueColor: Color
     let accessibilityHint: String
+    var isEnabled: Bool = true
     let action: () -> Void
 
     var body: some View {
@@ -204,22 +206,29 @@ private struct AboutLinkRow: View {
                     .foregroundStyle(valueColor)
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 8)
-                Text(">>")
-                    .font(.monocraft(relativeTo: .caption, weight: .bold))
-                    .foregroundStyle(Color.terminalMana)
-                    .accessibilityHidden(true)
+                if isEnabled {
+                    Text(">>")
+                        .font(.monocraft(relativeTo: .caption, weight: .bold))
+                        .foregroundStyle(Color.terminalMana)
+                        .accessibilityHidden(true)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
             .padding(.vertical, 4)
         }
         .buttonStyle(TerminalSubtleButtonStyle())
+        .disabled(!isEnabled)
+        .opacity(isEnabled ? 1 : 0.45)
         .accessibilityHint(accessibilityHint)
     }
 }
 
 /// About destinations: the site, a direct email, and the PayPal.Me tip page.
 private enum AboutOutboundLink {
+    /// Tip link stays listed, but the row does not open PayPal until this is turned back on.
+    static let coffeeEnabled = false
+
     case website
     case feedback(version: String, build: String)
     case coffee
@@ -242,7 +251,7 @@ private enum AboutOutboundLink {
         case .feedback(let version, let build):
             Self.feedbackURL(version: version, build: build)
         case .coffee:
-            URL(string: "https://paypal.me/enzoenrico")
+            coffeeEnabled ? URL(string: "https://paypal.me/enzoenrico") : nil
         }
     }
 
