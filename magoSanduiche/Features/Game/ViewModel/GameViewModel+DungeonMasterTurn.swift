@@ -62,6 +62,8 @@ extension GameViewModel {
         extra["terminal_entry_count"] = terminalEntries.count
         capture(analyticsEvent, extra: extra)
 
+        let inputSource = extra["input_source"] as? String
+        let suggestionIndex = extra["suggestion_index"] as? Int
         let narrativeTask = Task.detached(priority: .userInitiated) { @MainActor [self] in
             #if canImport(UIKit)
                 var backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "dm_narrative") {}
@@ -72,12 +74,24 @@ extension GameViewModel {
                     }
                 }
             #endif
-            await fetchNarrative(context: context, turnID: turnID, startedAt: startedAt)
+            await fetchNarrative(
+                context: context,
+                turnID: turnID,
+                startedAt: startedAt,
+                inputSource: inputSource,
+                suggestionIndex: suggestionIndex
+            )
         }
         coordinator?.replacePendingNarrativeFetch(narrativeTask)
     }
 
-    private func fetchNarrative(context: DungeonMasterTurnContext, turnID: String, startedAt: Date) async {
+    private func fetchNarrative(
+        context: DungeonMasterTurnContext,
+        turnID: String,
+        startedAt: Date,
+        inputSource: String?,
+        suggestionIndex: Int?
+    ) async {
         defer {
             coordinator?.clearPendingNarrativeFetch()
             loading = false
@@ -88,7 +102,11 @@ extension GameViewModel {
         do {
             let turn = try await dungeonMaster.generate(
                 context: context,
-                analyticsContext: aiContext(turnID: turnID)
+                analyticsContext: aiContext(
+                    turnID: turnID,
+                    inputSource: inputSource,
+                    suggestionIndex: suggestionIndex
+                )
             )
             let result = turn.output
             terminalEntries.append(TerminalEntry(kind: .dungeonMaster, text: result.narrative))

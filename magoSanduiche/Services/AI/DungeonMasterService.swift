@@ -67,7 +67,17 @@ final class DungeonMasterService {
 		analyticsContext: AIAnalyticsContext? = nil
 	) async throws(DungeonMasterError) -> DungeonMasterTurn {
 		let prompt = DungeonMasterTurnFormatter.format(context)
-		let draft = try await narrator.draft(for: prompt, analyticsContext: analyticsContext)
+		logUserPrompt(prompt, context: context, analyticsContext: analyticsContext)
+
+		let draft: DungeonTurnDraft
+		do {
+			draft = try await narrator.draft(for: prompt, analyticsContext: analyticsContext)
+		} catch {
+			logAIFailure(error, prompt: prompt, context: context, analyticsContext: analyticsContext)
+			throw error
+		}
+
+		logAIResponse(draft, context: context, analyticsContext: analyticsContext)
 		let normalizedCount = DungeonMasterTurnValidation.normalizedOptions(from: draft.options).count
 		if normalizedCount < DungeonMasterTurnValidation.minimumOptionCount {
 			var properties: [String: Any] = [
@@ -89,17 +99,24 @@ final class DungeonMasterService {
 		analyticsContext: AIAnalyticsContext? = nil
 	) async throws -> SceneImage {
 		let trimmed = visualPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
-		guard !trimmed.isEmpty else { throw SceneMediaError.emptyPrompt }
+		guard !trimmed.isEmpty else {
+			AppAnalytics.log(
+				"image_generation_prompt",
+				level: .warn,
+				attributes: imagePromptProperties(
+					prompt: "",
+					analyticsContext: analyticsContext,
+					extra: ["error_kind": SceneMediaError.emptyPrompt.analyticsKind]
+				)
+			)
+			throw SceneMediaError.emptyPrompt
+		}
 
-		var properties: [String: Any] = [
-			"prompt_length": trimmed.count,
-		]
-		if let sessionID = analyticsContext?.sessionID {
-			properties["game_session_id"] = sessionID
-		}
-		if let turnID = analyticsContext?.turnID {
-			properties["turn_id"] = turnID
-		}
+		var properties = imageEventProperties(trimmed, analyticsContext: analyticsContext)
+		AppAnalytics.log(
+			"image_generation_prompt",
+			attributes: imagePromptProperties(prompt: trimmed, analyticsContext: analyticsContext)
+		)
 		AppAnalytics.capture("vision_scene_generate_started", properties: properties)
 
 		do {
@@ -112,6 +129,117 @@ final class DungeonMasterService {
 			AppAnalytics.capture("vision_scene_generate_failed", properties: properties)
 			throw error
 		}
+	}
+
+	private func logUserPrompt(
+		_ prompt: String,
+		context: DungeonMasterTurnContext,
+		analyticsContext: AIAnalyticsContext?
+	) {
+		var attributes = turnProperties(context, analyticsContext: analyticsContext)
+		attributes["player_message"] = context.playerMessage
+		attributes["prompt"] = prompt
+		attributes["prompt_length"] = prompt.count
+		AppAnalytics.log("user_prompt", attributes: attributes)
+	}
+
+	private func logAIResponse(
+		_ draft: DungeonTurnDraft,
+		context: DungeonMasterTurnContext,
+		analyticsContext: AIAnalyticsContext?
+	) {
+		var attributes = turnProperties(context, analyticsContext: analyticsContext)
+		attributes["narrative"] = draft.narrative
+		attributes["narrative_length"] = draft.narrative.count
+		attributes["options"] = draft.options.joined(separator: "\n")
+		attributes["option_count"] = draft.options.count
+		attributes["visual_prompt"] = draft.visualPrompt
+		attributes["visual_prompt_length"] = draft.visualPrompt.count
+		attributes["health_change"] = draft.healthChange
+		attributes["mana_change"] = draft.manaChange
+		attributes["next_input"] = nextInputName(draft.nextInput)
+		AppAnalytics.log("ai_response", attributes: attributes)
+	}
+
+	private func logAIFailure(
+		_ error: DungeonMasterError,
+		prompt: String,
+		context: DungeonMasterTurnContext,
+		analyticsContext: AIAnalyticsContext?
+	) {
+		var attributes = turnProperties(context, analyticsContext: analyticsContext)
+		attributes["prompt"] = prompt
+		attributes["prompt_length"] = prompt.count
+		attributes["error_kind"] = error.analyticsKind
+		if let detail = error.analyticsDetail {
+			attributes["error_detail"] = detail
+		}
+		let level: AppAnalytics.LogLevel = error.analyticsKind == "cancelled" ? .warn : .error
+		AppAnalytics.log("ai_response", level: level, attributes: attributes)
+	}
+
+	private func turnProperties(
+		_ context: DungeonMasterTurnContext,
+		analyticsContext: AIAnalyticsContext?
+	) -> [String: Any] {
+		var properties: [String: Any] = [
+			"turn_kind": context.kind.rawValue,
+		]
+		if let sessionID = analyticsContext?.sessionID {
+			properties["game_session_id"] = sessionID
+		}
+		if let turnID = analyticsContext?.turnID {
+			properties["turn_id"] = turnID
+		}
+		if let inputSource = analyticsContext?.inputSource {
+			properties["input_source"] = inputSource
+		}
+		if let suggestionIndex = analyticsContext?.suggestionIndex {
+			properties["suggestion_index"] = suggestionIndex
+		}
+		if let diceRoll = context.diceRoll {
+			properties["dice_roll"] = diceRoll
+		}
+		return properties
+	}
+
+	private func nextInputName(_ nextInput: NextInput) -> String {
+		switch nextInput {
+		case .write:
+			"write"
+		case .roll:
+			"roll"
+		}
+	}
+
+	private func imageEventProperties(
+		_ prompt: String,
+		analyticsContext: AIAnalyticsContext?
+	) -> [String: Any] {
+		var properties: [String: Any] = [
+			"prompt_length": prompt.count,
+		]
+		if let sessionID = analyticsContext?.sessionID {
+			properties["game_session_id"] = sessionID
+		}
+		if let turnID = analyticsContext?.turnID {
+			properties["turn_id"] = turnID
+		}
+		return properties
+	}
+
+	private func imagePromptProperties(
+		prompt: String,
+		analyticsContext: AIAnalyticsContext?,
+		extra: [String: Any] = [:]
+	) -> [String: Any] {
+		var properties = imageEventProperties(prompt, analyticsContext: analyticsContext)
+		properties["prompt"] = prompt
+		properties["generator"] = "on_device"
+		for (key, value) in extra {
+			properties[key] = value
+		}
+		return properties
 	}
 
 	private func visionErrorKind(_ error: Error) -> String {

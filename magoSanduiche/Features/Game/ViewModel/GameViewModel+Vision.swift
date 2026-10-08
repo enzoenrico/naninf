@@ -13,7 +13,7 @@ extension GameViewModel {
         guard let visualPrompt else { return }
 
         if dungeonMaster.illustratesWithSystemSheet {
-            presentImagePlayground(prompt: visualPrompt)
+            presentImagePlayground(prompt: visualPrompt, turnID: turnID)
             return
         }
 
@@ -41,10 +41,23 @@ extension GameViewModel {
         }
     }
 
-    func presentImagePlayground(prompt: String) {
-        guard SceneImageGeneration.isLocked == false else { return }
+    func presentImagePlayground(prompt: String, turnID: String? = nil) {
         let trimmed = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty, canPresentImagePlayground else { return }
+        guard !trimmed.isEmpty else { return }
+        var extra: [String: Any] = [
+            "prompt": trimmed,
+            "prompt_length": trimmed.count,
+            "generator": "image_playground",
+        ]
+        if let turnID {
+            extra["turn_id"] = turnID
+        }
+        guard SceneImageGeneration.isLocked == false, canPresentImagePlayground else {
+            extra["error_kind"] = SceneImageGeneration.isLocked ? "locked" : "unavailable"
+            log("image_generation_prompt", level: .warn, extra: extra)
+            return
+        }
+        log("image_generation_prompt", extra: extra)
         imagePlaygroundConcept = trimmed
         coordinator?.revealVisionIfCollapsed()
         isImagePlaygroundPresented = true
