@@ -109,6 +109,10 @@ extension GameViewModel {
                     shouldDismiss: false
                 )
             }
+            let caption = SceneCaption.compose(
+                SceneDirection(poseOrAction: "stands in the room, staff in hand", location: trimmed),
+                memory: &sceneMemory
+            )
 
             if dungeonMaster.illustratesWithSystemSheet {
                 guard SceneImageGeneration.isLocked == false else {
@@ -125,7 +129,7 @@ extension GameViewModel {
                         shouldDismiss: false
                     )
                 }
-                queuedDebugPlaygroundPrompt = trimmed
+                queuedDebugPlaygroundPrompt = caption
                 return DebugImageGeneration(
                     message: String(localized: "nan_debug_ai_tools_image_sheet"),
                     didProduceImage: false,
@@ -139,7 +143,7 @@ extension GameViewModel {
 
             do {
                 let image = try await dungeonMaster.illustrate(
-                    visualPrompt: trimmed,
+                    visualPrompt: caption,
                     analyticsContext: aiContext(turnID: "debug-image")
                 )
                 visionDisplayMode = .scene(image)

@@ -64,7 +64,7 @@
 				manaChange: 0,
 				nextInput: .write,
 				options: ["Look closer", "Step back", "Call out"],
-				visualPrompt: ""
+				scene: SceneDirection()
 			)
 		}
 	}
@@ -104,7 +104,7 @@
 				manaChange: manaChange,
 				nextInput: nextInput,
 				options: options,
-				visualPrompt: visualPrompt
+				scene: SceneDirection(poseOrAction: visualPrompt)
 			)
 		}
 	}

@@ -15,7 +15,8 @@ import SwiftUI
 	import UIKit
 #endif
 
-private let asciiMediaDefaultCharacters = "  .*░▒▓█"
+// private let asciiMediaDefaultCharacters = "  .*░▒▓█"
+private let asciiMediaDefaultCharacters = "  .:'░▒▓@"
 
 enum AsciiMediaScaleMode: String {
 	case fit

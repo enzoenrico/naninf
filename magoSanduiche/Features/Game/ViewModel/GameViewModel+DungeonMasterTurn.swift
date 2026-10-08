@@ -127,8 +127,11 @@ extension GameViewModel {
                     "terminal_entry_count": terminalEntries.count,
                 ]
             )
-            Task {
-                await handleVisionAfterTurn(visualPrompt: result.visualPrompt, turnID: turnID)
+            if let scene = result.scene {
+                let caption = SceneCaption.compose(scene, memory: &sceneMemory)
+                Task {
+                    await handleVisionAfterTurn(visualPrompt: caption, turnID: turnID)
+                }
             }
         } catch {
             var failureProperties: [String: Any] = [

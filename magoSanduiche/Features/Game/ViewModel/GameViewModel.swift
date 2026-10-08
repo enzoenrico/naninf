@@ -23,6 +23,7 @@ final class GameViewModel {
 
     var loading = false
     var visionDisplayMode: VisionDisplayMode = .introStatic
+    var sceneMemory = SceneMemory()
     var visionMediaLoading = false
     var latestVisionRequestID: UUID?
     var isImagePlaygroundPresented = false

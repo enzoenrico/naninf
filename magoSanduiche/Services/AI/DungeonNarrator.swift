@@ -30,8 +30,8 @@ nonisolated struct DungeonTurnDraft: Equatable {
 	@Guide(description: "Three short, distinct tactical choices. No letter or number prefixes.", .count(3))
 	var options: [String]
 
-	@Guide(description: "One dense literal sentence describing what the Mage sees now, for image generation. Empty string when nothing is visible.")
-	var visualPrompt: String
+	@Guide(description: "The shot to paint. Leave poseOrAction empty when nothing is visible.")
+	var scene: SceneDirection
 }
 
 @Generable
@@ -69,7 +69,7 @@ extension DungeonTurnDraft {
 		let output = PromptOutput(
 			narrative: narrative,
 			options: options,
-			visualPrompt: visualPrompt
+			scene: scene.illustrated
 		)
 		return DungeonMasterTurn(output: output, toolEffects: toolEffects)
 	}

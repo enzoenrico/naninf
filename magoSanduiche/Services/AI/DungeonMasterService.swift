@@ -153,8 +153,10 @@ final class DungeonMasterService {
 		attributes["narrative_length"] = draft.narrative.count
 		attributes["options"] = draft.options.joined(separator: "\n")
 		attributes["option_count"] = draft.options.count
-		attributes["visual_prompt"] = draft.visualPrompt
-		attributes["visual_prompt_length"] = draft.visualPrompt.count
+		attributes["visual_prompt"] = draft.scene.poseOrAction
+		attributes["visual_prompt_length"] = draft.scene.poseOrAction.count
+		attributes["scene_location"] = draft.scene.location
+		attributes["scene_move"] = draft.scene.move
 		attributes["health_change"] = draft.healthChange
 		attributes["mana_change"] = draft.manaChange
 		attributes["next_input"] = nextInputName(draft.nextInput)

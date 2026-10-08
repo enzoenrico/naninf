@@ -8,13 +8,12 @@ import Foundation
 nonisolated struct PromptOutput: Sendable, Equatable {
 	let narrative: String
 	let options: [String]
-	let visualPrompt: String?
+	let scene: SceneDirection?
 
-	init(narrative: String, options: [String], visualPrompt: String?) {
+	init(narrative: String, options: [String], scene: SceneDirection?) {
 		self.narrative = narrative
 		self.options = DungeonMasterTurnValidation.paddedOptions(from: options)
-		let trimmed = visualPrompt?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-		self.visualPrompt = trimmed.isEmpty ? nil : trimmed
+		self.scene = scene
 	}
 }
 
