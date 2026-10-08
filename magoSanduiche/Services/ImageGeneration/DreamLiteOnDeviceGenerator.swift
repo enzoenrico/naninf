@@ -68,7 +68,8 @@ actor DreamLiteOnDeviceGenerator: DreamLiteImageGenerating {
 		var steps: Int?
 		/// `nil` draws a fresh seed for every scene.
 		var seed: UInt64?
-		var computeUnits: MLComputeUnits = .cpuAndGPU
+		/// `.all` lets Core ML schedule the Neural Engine, and keep the GPU for layers the NPU cannot run.
+		var computeUnits: MLComputeUnits = .all
 		var tokenizerBundle: Bundle = .main
 	}
 
