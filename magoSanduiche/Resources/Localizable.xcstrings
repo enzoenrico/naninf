@@ -290,6 +290,38 @@
         }
       }
     },
+    "nan_about_feedback_body" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NanInf %1$@ (build %2$@)\n\n"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NanInf %1$@ (build %2$@)\n\n"
+          }
+        }
+      }
+    },
+    "nan_about_feedback_subject" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NanInf feedback"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback do NanInf"
+          }
+        }
+      }
+    },
     "nan_about_engine_value" : {
       "localizations" : {
         "en" : {
@@ -430,6 +462,182 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "VERSÃO"
+          }
+        }
+      }
+    },
+    "nan_about_link_coffee_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens PayPal so you can send the developer a tip."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre o PayPal para você mandar uma gorjeta ao desenvolvedor."
+          }
+        }
+      }
+    },
+    "nan_about_link_coffee_key" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "COFFEE"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CAFÉ"
+          }
+        }
+      }
+    },
+    "nan_about_link_coffee_value" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "paypal.me/enzoenrico"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "paypal.me/enzoenrico"
+          }
+        }
+      }
+    },
+    "nan_about_link_feedback_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starts an email to hello@enzoenrico.com."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Começa um e-mail para hello@enzoenrico.com."
+          }
+        }
+      }
+    },
+    "nan_about_link_feedback_key" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FEEDBACK"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FEEDBACK"
+          }
+        }
+      }
+    },
+    "nan_about_link_feedback_value" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hello@enzoenrico.com"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hello@enzoenrico.com"
+          }
+        }
+      }
+    },
+    "nan_about_link_website_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens enzoenrico.com in the browser."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre enzoenrico.com no navegador."
+          }
+        }
+      }
+    },
+    "nan_about_link_website_key" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WEBSITE"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SITE"
+          }
+        }
+      }
+    },
+    "nan_about_link_website_value" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "enzoenrico.com"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "enzoenrico.com"
+          }
+        }
+      }
+    },
+    "nan_about_links_border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> LINKS"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "> LINKS"
+          }
+        }
+      }
+    },
+    "nan_about_links_hint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The site, a note straight to the dungeon master, or a coffee via PayPal."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O site, um recado direto para o mestre da masmorra, ou um café pelo PayPal."
           }
         }
       }
@@ -2347,13 +2555,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CREDITS / VERSION"
+            "value" : "SITE / FEEDBACK"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CRÉDITOS / VERSÃO"
+            "value" : "SITE / FEEDBACK"
           }
         }
       }

@@ -11,15 +11,14 @@ import SwiftUI
 struct AboutView: View {
     @Environment(AppCoordinator.self) private var coordinator
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         AppLayout(background: .gradient, scrollable: true) {
             VStack(alignment: .leading, spacing: 18) {
                 header
 
-                // systemPanel
-                //
-                // creditsPanel
+                linksPanel
 
                 Spacer()
 
@@ -86,6 +85,45 @@ struct AboutView: View {
         .drawBorder(String(localized: "nan_about_credits_border"), color: .terminalMana, lineWidth: 1)
     }
 
+    private var linksPanel: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            AboutLinkRow(
+                title: String(localized: "nan_about_link_website_key"),
+                value: String(localized: "nan_about_link_website_value"),
+                valueColor: .terminalMana,
+                accessibilityHint: String(localized: "nan_about_link_website_a11y"),
+                action: { open(.website) }
+            )
+            AboutLinkRow(
+                title: String(localized: "nan_about_link_feedback_key"),
+                value: String(localized: "nan_about_link_feedback_value"),
+                valueColor: .accent,
+                accessibilityHint: String(localized: "nan_about_link_feedback_a11y"),
+                action: { open(.feedback(version: appVersion, build: appBuild)) }
+            )
+            AboutLinkRow(
+                title: String(localized: "nan_about_link_coffee_key"),
+                value: String(localized: "nan_about_link_coffee_value"),
+                valueColor: .terminalWarning,
+                accessibilityHint: String(localized: "nan_about_link_coffee_a11y"),
+                action: { open(.coffee) }
+            )
+            Text("nan_about_links_hint")
+                .font(.monocraft(relativeTo: .caption))
+                .foregroundStyle(Color.terminalMutedText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .drawBorder(String(localized: "nan_about_links_border"), color: .terminalWarning, lineWidth: 1)
+    }
+
+    private func open(_ link: AboutOutboundLink) {
+        guard let url = link.url else { return }
+        AppAnalytics.capture("about_link_opened", properties: ["link": link.analyticsName])
+        openURL(url)
+    }
+
     private var thanksLine: some View {
         HStack(alignment: .firstTextBaseline, spacing: 4) {
             Text("nan_about_thanks")
@@ -144,6 +182,87 @@ private struct AboutKeyValueRow: View {
             Spacer(minLength: 0)
         }
         .accessibilityElement(children: .combine)
+    }
+}
+
+private struct AboutLinkRow: View {
+    let title: String
+    let value: String
+    let valueColor: Color
+    let accessibilityHint: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                Text("> \(title)")
+                    .font(.monocraft(relativeTo: .caption, weight: .bold))
+                    .foregroundStyle(Color.terminalMutedText)
+                    .frame(minWidth: 110, alignment: .leading)
+                Text(value)
+                    .font(.monocraft(relativeTo: .callout, weight: .semibold))
+                    .foregroundStyle(valueColor)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 8)
+                Text(">>")
+                    .font(.monocraft(relativeTo: .caption, weight: .bold))
+                    .foregroundStyle(Color.terminalMana)
+                    .accessibilityHidden(true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+            .padding(.vertical, 4)
+        }
+        .buttonStyle(TerminalSubtleButtonStyle())
+        .accessibilityHint(accessibilityHint)
+    }
+}
+
+/// About destinations: the site, a direct email, and the PayPal.Me tip page.
+private enum AboutOutboundLink {
+    case website
+    case feedback(version: String, build: String)
+    case coffee
+
+    var analyticsName: String {
+        switch self {
+        case .website:
+            "website"
+        case .feedback:
+            "feedback"
+        case .coffee:
+            "coffee"
+        }
+    }
+
+    var url: URL? {
+        switch self {
+        case .website:
+            URL(string: "https://enzoenrico.com")
+        case .feedback(let version, let build):
+            Self.feedbackURL(version: version, build: build)
+        case .coffee:
+            URL(string: "https://paypal.me/enzoenrico")
+        }
+    }
+
+    private static func feedbackURL(version: String, build: String) -> URL? {
+        let subject = String(localized: "nan_about_feedback_subject")
+        let body = String(
+            format: String(localized: "nan_about_feedback_body"),
+            locale: Locale.current,
+            version,
+            build
+        )
+        var allowed = CharacterSet.urlQueryAllowed
+        allowed.remove(charactersIn: "&+=? #")
+        guard
+            let encodedSubject = subject.addingPercentEncoding(withAllowedCharacters: allowed),
+            let encodedBody = body.addingPercentEncoding(withAllowedCharacters: allowed)
+        else {
+            return nil
+        }
+        return URL(string: "mailto:hello@enzoenrico.com?subject=\(encodedSubject)&body=\(encodedBody)")
     }
 }
 
