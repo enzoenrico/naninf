@@ -14,7 +14,7 @@ struct DungeonTurnDraftTests {
 			manaChange: -2,
 			nextInput: .roll,
 			options: ["A", "B", "C"],
-			visualPrompt: ""
+			scene: SceneDirection()
 		).resolved()
 
 		#expect(turn.toolEffects == [.changeHealth(-6), .changeMana(-2), .requestAction(.roll)])
@@ -27,11 +27,11 @@ struct DungeonTurnDraftTests {
 			manaChange: 0,
 			nextInput: .write,
 			options: ["A", "B", "C"],
-			visualPrompt: "  "
+			scene: SceneDirection(poseOrAction: "  ")
 		).resolved()
 
 		#expect(turn.toolEffects == [.requestAction(.write)])
-		#expect(turn.output.visualPrompt == nil)
+		#expect(turn.output.scene == nil)
 	}
 
 	@Test func resolvedClampsOutOfRangeDeltas() {
@@ -41,7 +41,7 @@ struct DungeonTurnDraftTests {
 			manaChange: 999,
 			nextInput: .write,
 			options: [],
-			visualPrompt: ""
+			scene: SceneDirection()
 		).resolved()
 
 		#expect(turn.toolEffects == [.changeHealth(-40), .changeMana(30), .requestAction(.write)])
@@ -55,12 +55,12 @@ struct DungeonTurnDraftTests {
 			manaChange: 0,
 			nextInput: .write,
 			options: ["Run", " ", ""],
-			visualPrompt: ""
+			scene: SceneDirection()
 		).resolved()
 
 		#expect(turn.output.options.count == 3)
 		#expect(turn.output.options[0] == "Run")
-		#expect(turn.output.visualPrompt == nil)
+		#expect(turn.output.scene == nil)
 	}
 }
 

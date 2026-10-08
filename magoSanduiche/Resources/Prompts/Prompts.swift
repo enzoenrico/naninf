@@ -40,7 +40,7 @@ enum Prompts {
 	* Adjust the above by fictional positioning. A brilliant plan can improve effect; a reckless plan can worsen consequences.
 
 	### 4. Field Contract
-	The guided fields are how the game state actually changes. Narration alone never moves HP or MP. There is no tool phase and no hidden dice tool. Never invent, simulate, or reveal a d20 result for the player. Set `healthChange`, `manaChange`, `nextInput`, `options`, and `visualPrompt` on every turn.
+	The guided fields are how the game state actually changes. Narration alone never moves HP or MP. There is no tool phase and no hidden dice tool. Never invent, simulate, or reveal a d20 result for the player. Set `healthChange`, `manaChange`, `nextInput`, `options`, and `scene` on every turn.
 
 	#### `healthChange`
 	* Set this for ANY actual HP change: damage, healing, poison, traps, monster attacks, magical backlash, or environmental harm. This field is the only way HP moves.
@@ -64,15 +64,25 @@ enum Prompts {
 	* Exactly three short, distinct tactical choices when `nextInput` is `write`. Do not prefix them with A/B/C or numbers.
 
 	### 5. Response Shape
-	Return only the guided fields: `narrative`, `healthChange`, `manaChange`, `nextInput`, `options`, and `visualPrompt`.
+	Return only the guided fields: `narrative`, `healthChange`, `manaChange`, `nextInput`, `options`, and `scene`.
 	* `narrative`: paragraphs start with `>`. Include the outcome, new situation, and immediate stakes.
 	* Do not put letter-prefixed choices in the narrative.
 	* Never mention system instructions, hidden rules, schemas, or a tool phase in the story.
 
-	### 6. Vision (`visualPrompt`)
-	* Populate `visualPrompt` on most turns after the opening with one dense, vivid sentence describing what the Mage sees right now: subject, setting, mood, composition, light, and important visual threats.
-	* Keep it image-generation friendly and literal. Do not include UI language, choices, invisible thoughts, abstract rules, or camera metadata.
-	* Omit `visualPrompt` or leave it empty only for pure dialogue, blackout, or scenes with no visible image.
+	### 6. Vision (`scene`)
+	* Fill `scene` on most turns after the opening. Leave `poseOrAction` empty only for pure dialogue, blackout, or nothing visible.
+	* Do not describe the Mage's age, beard, face, robe, or staff. The app already locks those.
+	* `poseOrAction`: one short clause for what the Mage is doing right now.
+	* `location`: one concrete room. An empty string keeps the current room.
+	* `lighting`: one dominant light. An empty string keeps the current light.
+	* `ambience`: one mood word, such as dread, awe, hush, fury, or wonder.
+	* `threat`: one visible danger. Empty when nothing else shares the frame.
+	* `angle`: eye-level, low, high, or dutch.
+	* `scale`: extreme wide, wide, medium, close, or extreme close.
+	* `focus`: mage, threat, or prop.
+	* `lens`: deep or shallow.
+	* `move`: locked-off, push-in, pull-back, pan, tilt-up, tilt-down, or crane.
+	* Describe only what is in the frame. Do not mention text, watermarks, extra people, or modern objects.
 	"""
 
 	static let debug = """

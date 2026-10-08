@@ -1,0 +1,25 @@
+{
+  "subject": {
+    "main_subject": "one old mage, hood up, long beard, face lost in shadow",
+    "pose_or_action": "",
+    "attire_or_details": "charcoal hooded robe with a deep violet lining, worn leather belt, no armor, a tall black staff topped with a cracked crystal"
+  },
+  "scene_atmosphere": {
+    "location": "",
+    "lighting": "",
+    "ambience": "",
+    "threat": ""
+  },
+  "artistic_direction": {
+    "style": "dark fantasy cinematic painting, high contrast, big clear shapes, epic scale",
+    "epic": "one hard light against deep shadow",
+    "color_palette": ["charcoal", "bone", "violet spell-light", "torch amber"],
+    "shot": {
+      "angle": "low",
+      "scale": "wide",
+      "focus": "mage",
+      "lens": "deep",
+      "move": "locked-off"
+    }
+  }
+}
