@@ -251,7 +251,7 @@ private enum AboutOutboundLink {
         case .feedback(let version, let build):
             Self.feedbackURL(version: version, build: build)
         case .coffee:
-            coffeeEnabled ? URL(string: "https://paypal.me/enzoenrico") : nil
+            URL(string: "https://paypal.me/enzoenrico")
         }
     }
 

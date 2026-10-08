@@ -73,6 +73,9 @@
     "> BACK" : {
 
     },
+    ">>" : {
+
+    },
     "$" : {
 
     },
@@ -290,6 +293,22 @@
         }
       }
     },
+    "nan_about_engine_value" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAN-DOS / SwiftUI"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAN-DOS / SwiftUI"
+          }
+        }
+      }
+    },
     "nan_about_feedback_body" : {
       "localizations" : {
         "en" : {
@@ -318,22 +337,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Feedback do NanInf"
-          }
-        }
-      }
-    },
-    "nan_about_engine_value" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NAN-DOS / SwiftUI"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NAN-DOS / SwiftUI"
           }
         }
       }
