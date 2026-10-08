@@ -16,8 +16,17 @@ extension GameViewModel {
         ]
     }
 
-    func aiContext(turnID: String) -> AIAnalyticsContext {
-        AIAnalyticsContext(sessionID: gameSessionID, turnID: turnID)
+    func aiContext(
+        turnID: String,
+        inputSource: String? = nil,
+        suggestionIndex: Int? = nil
+    ) -> AIAnalyticsContext {
+        AIAnalyticsContext(
+            sessionID: gameSessionID,
+            turnID: turnID,
+            inputSource: inputSource,
+            suggestionIndex: suggestionIndex
+        )
     }
 
     func capture(_ event: String, extra: [String: Any] = [:]) {
@@ -26,6 +35,18 @@ extension GameViewModel {
             properties[key] = value
         }
         AppAnalytics.capture(event, properties: properties)
+    }
+
+    func log(
+        _ message: String,
+        level: AppAnalytics.LogLevel = .info,
+        extra: [String: Any] = [:]
+    ) {
+        var properties = sessionAnalyticsProperties
+        for (key, value) in extra {
+            properties[key] = value
+        }
+        AppAnalytics.log(message, level: level, attributes: properties)
     }
 
     func incrementStoredCounter(_ key: String) {
