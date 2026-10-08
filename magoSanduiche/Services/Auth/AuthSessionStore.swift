@@ -5,14 +5,11 @@
 
 import AuthenticationServices
 import Foundation
-import Supabase
 
 @MainActor
 @Observable
 final class AuthSessionStore {
 	private let snapshotStore: AuthLoginSnapshotStore
-	private let authService: SupabaseAuthService?
-	private var authListenerTask: Task<Void, Never>?
 	private var hasStarted = false
 	private var isUITestMode = false
 
@@ -23,35 +20,26 @@ final class AuthSessionStore {
 	private(set) var errorMessage: String?
 	private(set) var configurationMessage: String?
 
-	init(bundle: Bundle = .main, defaults: UserDefaults = .standard) {
+	init(defaults: UserDefaults = .standard) {
 		snapshotStore = AuthLoginSnapshotStore(defaults: defaults)
 		loginSnapshot = snapshotStore.load()
-
-		do {
-			let configuration = try AppAuthConfiguration.load(bundle: bundle)
-			authService = SupabaseAuthService(configuration: configuration)
-		} catch {
-			authService = nil
-			configurationMessage = String(localized: "nan_auth_config_missing")
-			isLoadingSession = false
-		}
 	}
 
 	#if DEBUG
 		/// Builds a store with a fixed, network-free state for UI-test screenshots.
 		init(uiTestMode mode: UITestAuthMode, defaults: UserDefaults = .standard) {
 			snapshotStore = AuthLoginSnapshotStore(defaults: defaults)
-			authService = nil
 			isUITestMode = true
 			isLoadingSession = false
 
 			switch mode {
 			case .authenticated:
 				loginSnapshot = AuthLoginSnapshot(
-					uiTestUserID: "00000000-0000-0000-0000-000000000001",
+					userID: "00000000-0000-0000-0000-000000000001",
 					email: "wizard@mago.test",
 					provider: .apple,
-					displayName: "Sandwich Wizard"
+					displayName: "Sandwich Wizard",
+					signedInAt: Date(timeIntervalSince1970: 1_700_000_000)
 				)
 				isAuthenticated = true
 			case .unauthenticated:
@@ -75,34 +63,22 @@ final class AuthSessionStore {
 
 		if isUITestMode { return }
 
-		guard let authService else {
-			isAuthenticated = false
-			isLoadingSession = false
-			return
-		}
-
-		authListenerTask = Task { @MainActor [weak self] in
-			let changes = authService.authStateChanges
-			for await (event, session) in changes {
-				self?.handleAuthEvent(event, session: session)
-			}
-		}
-
-		await refreshStoredSession()
+		await restoreStoredSession()
 	}
 
 	func handleAppleSignInButtonCompletion(_ result: Result<ASAuthorization, Error>) async {
-		guard let authService else { return }
 		isAuthenticating = true
 		errorMessage = nil
 		defer { isAuthenticating = false }
 
 		do {
-			let session = try await authService.signInWithApple(result)
-			storeSession(session, provider: .apple)
+			let snapshot = try snapshot(from: result)
+			store(snapshot)
 			AppAnalytics.capture("auth_signed_in", properties: [
 				"provider": PlayerAuthProvider.apple.rawValue
 			])
+		} catch let error as ASAuthorizationError where error.code == .canceled {
+			return
 		} catch {
 			errorMessage = error.localizedDescription
 			let nsError = error as NSError
@@ -120,51 +96,76 @@ final class AuthSessionStore {
 		errorMessage = nil
 		defer { isAuthenticating = false }
 
-		do {
-			try await authService?.signOut()
-			clearSession()
-			AppAnalytics.capture("auth_signed_out")
-			AppAnalytics.markSignedOut()
-		} catch {
-			errorMessage = error.localizedDescription
-			AppAnalytics.capture("auth_sign_out_failed", properties: [
-				"error": error.localizedDescription
-			])
-		}
+		clearSession()
+		AppAnalytics.capture("auth_signed_out")
+		AppAnalytics.markSignedOut()
 	}
 
-	private func refreshStoredSession() async {
-		guard let authService else { return }
+	private func restoreStoredSession() async {
 		isLoadingSession = true
-		errorMessage = nil
 		defer { isLoadingSession = false }
 
+		guard let snapshot = loginSnapshot else {
+			isAuthenticated = false
+			return
+		}
+
+		if snapshot.provider == .apple, await appleCredentialRevoked(userID: snapshot.userID) {
+			clearSession()
+			return
+		}
+
+		isAuthenticated = true
+		AppAnalytics.identifySignedInPlayer(userID: snapshot.userID, provider: snapshot.provider.rawValue)
+	}
+
+	private func snapshot(from result: Result<ASAuthorization, Error>) throws -> AuthLoginSnapshot {
+		let authorization = try result.get()
+		guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential else {
+			throw AuthServiceError.missingAppleCredential
+		}
+
+		let userID = credential.user.trimmingCharacters(in: .whitespacesAndNewlines)
+		guard !userID.isEmpty else {
+			throw AuthServiceError.missingAppleUserID
+		}
+
+		let previous = previousSnapshot(for: userID)
+		return AuthLoginSnapshot(
+			userID: userID,
+			email: credential.email ?? previous?.email,
+			provider: .apple,
+			displayName: Self.displayName(from: credential.fullName) ?? previous?.displayName
+		)
+	}
+
+	private func previousSnapshot(for userID: String) -> AuthLoginSnapshot? {
+		if loginSnapshot?.userID == userID {
+			return loginSnapshot
+		}
+		guard let stored = snapshotStore.load(), stored.userID == userID else {
+			return nil
+		}
+		return stored
+	}
+
+	private func appleCredentialRevoked(userID: String) async -> Bool {
 		do {
-			let session = try await authService.currentSession()
-			storeSession(session)
-		} catch {
-			clearSession()
-		}
-	}
-
-	private func handleAuthEvent(_ event: AuthChangeEvent, session: Session?) {
-		switch event {
-		case .initialSession, .signedIn, .tokenRefreshed, .userUpdated, .mfaChallengeVerified:
-			if let session {
-				storeSession(session)
-			} else {
-				clearSession()
+			let state = try await ASAuthorizationAppleIDProvider().credentialState(forUserID: userID)
+			switch state {
+			case .revoked, .notFound:
+				return true
+			case .authorized, .transferred:
+				return false
+			@unknown default:
+				return false
 			}
-		case .signedOut, .userDeleted:
-			clearSession()
-		case .passwordRecovery:
-			break
+		} catch {
+			return false
 		}
-		isLoadingSession = false
 	}
 
-	private func storeSession(_ session: Session, provider: PlayerAuthProvider? = nil) {
-		let snapshot = AuthLoginSnapshot(session: session, provider: provider)
+	private func store(_ snapshot: AuthLoginSnapshot) {
 		loginSnapshot = snapshot
 		isAuthenticated = true
 		snapshotStore.save(snapshot)
@@ -175,5 +176,37 @@ final class AuthSessionStore {
 		loginSnapshot = nil
 		isAuthenticated = false
 		snapshotStore.clear()
+	}
+
+	private static func displayName(from name: PersonNameComponents?) -> String? {
+		guard let name else { return nil }
+
+		var parts: [String] = []
+		if let givenName = name.givenName, !givenName.isEmpty {
+			parts.append(givenName)
+		}
+		if let middleName = name.middleName, !middleName.isEmpty {
+			parts.append(middleName)
+		}
+		if let familyName = name.familyName, !familyName.isEmpty {
+			parts.append(familyName)
+		}
+
+		guard !parts.isEmpty else { return nil }
+		return parts.joined(separator: " ")
+	}
+}
+
+enum AuthServiceError: LocalizedError {
+	case missingAppleCredential
+	case missingAppleUserID
+
+	var errorDescription: String? {
+		switch self {
+		case .missingAppleCredential:
+			"Apple did not return a valid authorization credential."
+		case .missingAppleUserID:
+			"Apple did not return a user identifier."
+		}
 	}
 }

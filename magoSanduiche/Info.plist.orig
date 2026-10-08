@@ -2,18 +2,30 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+<<<<<<< HEAD
 	<key>CFBundleURLTypes</key>
 	<array>
-		<string>Monocraft.otf</string>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>google</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.889846342771-1ksj627me9rk2kavklohje4gqafdnu4h</string>
+			</array>
+		</dict>
 	</array>
-	<key>DREAMLITE_MODEL_BASE_URL</key>
-	<string>$(DREAMLITE_MODEL_BASE_URL)</string>
 	<key>GIDClientID</key>
 	<string>889846342771-1ksj627me9rk2kavklohje4gqafdnu4h.apps.googleusercontent.com</string>
+=======
+>>>>>>> narrator-private-cloud-compute
 	<key>POSTHOG_HOST</key>
 	<string>https://us.i.posthog.com</string>
 	<key>POSTHOG_PROJECT_TOKEN</key>
 	<string>phc_t6kHzZzyorXtiXxLEX26gXazbEtfcbdBwE5hBEts8JPH</string>
+	<key>SUPABASE_PUBLISHABLE_KEY</key>
+	<string>$(SUPABASE_PUBLISHABLE_KEY)</string>
+	<key>SUPABASE_URL</key>
+	<string>$(SUPABASE_URL)</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Monocraft.otf</string>

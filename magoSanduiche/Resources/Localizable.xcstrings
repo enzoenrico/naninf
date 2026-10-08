@@ -707,6 +707,7 @@
       }
     },
     "nan_auth_config_missing" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1213,6 +1214,23 @@
         }
       }
     },
+    "nan_debug_ai_tools_image_locked" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image generation is locked."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A geração de imagem está bloqueada."
+          }
+        }
+      }
+    },
     "nan_debug_ai_tools_image_placeholder" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1243,22 +1261,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cena aplicada ao painel de visão."
-          }
-        }
-      }
-    },
-    "nan_debug_ai_tools_image_locked" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Image generation is locked."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A geração de imagem está bloqueada."
           }
         }
       }

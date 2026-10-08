@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		5B0D71A42F1A000100A6C001 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 5B0D71A32F1A000100A6C001 /* PostHog */; };
-		5BA0F0032F40000100A6C001 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA0F0022F40000100A6C001 /* Supabase */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,7 +70,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B0D71A42F1A000100A6C001 /* PostHog in Frameworks */,
-				5BA0F0032F40000100A6C001 /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,7 +131,6 @@
 			name = magoSanduiche;
 			packageProductDependencies = (
 				5B0D71A32F1A000100A6C001 /* PostHog */,
-				5BA0F0022F40000100A6C001 /* Supabase */,
 			);
 			productName = magoSanduiche;
 			productReference = 5BE1F3002EDE1B62004ACDF5 /* magoSanduiche.app */;
@@ -219,7 +216,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				5B0D71A22F1A000100A6C001 /* XCRemoteSwiftPackageReference "posthog-ios" */,
-				5BA0F0002F40000100A6C001 /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5BE1F3012EDE1B62004ACDF5 /* Products */;
@@ -457,8 +453,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kyou.naninf;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPABASE_PUBLISHABLE_KEY = sb_publishable_ZFYp9NWBCrQDBXBFYCq91w_nK9cIccT;
-				SUPABASE_URL = "https://hqbfifbyxrtegcpndjsg.supabase.co";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -499,8 +493,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kyou.naninf;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPABASE_PUBLISHABLE_KEY = sb_publishable_ZFYp9NWBCrQDBXBFYCq91w_nK9cIccT;
-				SUPABASE_URL = "https://hqbfifbyxrtegcpndjsg.supabase.co";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -656,14 +648,6 @@
 				minimumVersion = 3.90.1;
 			};
 		};
-		5BA0F0002F40000100A6C001 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/supabase/supabase-swift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.46.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -671,11 +655,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B0D71A22F1A000100A6C001 /* XCRemoteSwiftPackageReference "posthog-ios" */;
 			productName = PostHog;
-		};
-		5BA0F0022F40000100A6C001 /* Supabase */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 5BA0F0002F40000100A6C001 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Supabase;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

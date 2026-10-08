@@ -3,7 +3,7 @@
 //  magoSanduiche
 //
 //  DEBUG-only harness that lets UI tests drive the app into a specific screen and
-//  state deterministically, bypassing onboarding gating, Supabase auth, and the
+//  state deterministically, bypassing onboarding gating, sign-in, and the
 //  remote game services. Activated by the launch argument:
 //
 //      -uiTestScenario <UITestScenario.rawValue>
