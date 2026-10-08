@@ -21,15 +21,23 @@ struct DungeonMasterTurnFormatterTests {
 		#expect(formatted.contains("DM: > Torches flicker."))
 	}
 
-	@Test func diceConfirmationTurnNamesNextInput() {
+	@Test func diceConfirmationTurnSuppliesTheRollForThePreviousNarration() {
 		let formatted = DungeonMasterTurnFormatter.format(
-			.fixture(kind: .diceResultConfirmation, diceRoll: 17)
+			.fixture(
+				kind: .diceResultConfirmation,
+				storySoFar: [
+					TerminalEntry(kind: .player, text: "I force the gate"),
+					TerminalEntry(kind: .dungeonMaster, text: "> The gate holds.\nRoll to force it."),
+				],
+				diceRoll: 17
+			)
 		)
 
 		#expect(formatted.contains("turnKind: diceResultConfirmation"))
 		#expect(formatted.contains("playerD20Roll: 17"))
-		#expect(formatted.contains("nextInput"))
-		#expect(formatted.contains("healthChange"))
+		#expect(formatted.contains("pendingCheck: > The gate holds. Roll to force it."))
+		#expect(!formatted.contains("instruction:"))
+		#expect(!formatted.contains("playerMessage:"))
 	}
 
 	@Test func storySoFarKeepsNewestEntriesWithinBudget() {

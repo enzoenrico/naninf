@@ -55,11 +55,44 @@ struct DungeonMasterServiceTests {
 		}
 	}
 
+	@Test @MainActor func generateRetriesARefusedTurnWithTheRecentStory() async throws {
+		let narrator = RefusalThenSuccessNarrator()
+		let dm = DungeonMasterService(narrator: narrator)
+		let story = (0 ..< 6).map { index in
+			TerminalEntry(kind: .dungeonMaster, text: "> beat \(index)")
+		}
+
+		let turn = try await dm.generate(
+			context: .fixture(playerMessage: "I look closer", storySoFar: story)
+		)
+
+		#expect(narrator.prompts.count == 2)
+		#expect(narrator.prompts[1].contains("> beat 5"))
+		#expect(!narrator.prompts[1].contains("> beat 0"))
+		#expect(turn.output.narrative == "> Test")
+	}
+
 	@Test @MainActor func generatePropagatesTypedFailure() async {
 		let narrator = ScriptedNarrator(failure: .quotaReached(resetDate: nil))
 		let dm = DungeonMasterService(narrator: narrator)
 		await #expect(throws: DungeonMasterError.quotaReached(resetDate: nil)) {
 			_ = try await dm.generate(context: .fixture(playerMessage: "hi"))
 		}
+	}
+}
+
+private final class RefusalThenSuccessNarrator: DungeonNarrator {
+	private(set) var prompts: [String] = []
+
+	func draft(
+		for prompt: String,
+		analyticsContext: AIAnalyticsContext?
+	) async throws(DungeonMasterError) -> DungeonTurnDraft {
+		_ = analyticsContext
+		prompts.append(prompt)
+		if prompts.count == 1 {
+			throw .refused
+		}
+		return .fixture()
 	}
 }

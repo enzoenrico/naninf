@@ -13,24 +13,24 @@ protocol DungeonNarrator {
 	) async throws(DungeonMasterError) -> DungeonTurnDraft
 }
 
-@Generable(description: "One dungeon master turn for a solo dark-fantasy RPG.")
+@Generable(description: "One turn of a fictional tabletop fantasy game. When the prompt includes playerD20Roll, narrate that result's effect on pendingCheck.")
 nonisolated struct DungeonTurnDraft: Equatable {
-	@Guide(description: "The story. One to four short paragraphs, each starting with `>`. Outcome, new situation, immediate stakes.")
+	@Guide(description: "The story. One to four short paragraphs, each starting with `>`. Brief adventure tension. When playerD20Roll is present, this is the outcome of that result for pendingCheck. Otherwise leave any d20 number to the UI.")
 	var narrative: String
 
-	@Guide(description: "Signed HP change caused by this turn. Negative damages, positive heals. Glancing -1 to -3, solid -4 to -8, deadly -9 or worse. 0 when HP does not change.", .range(-40...40))
+	@Guide(description: "Signed hit-point change for this turn. Negative lowers HP, positive restores it. Graze -1 to -3, solid blow -4 to -8, dire blow -9 or worse. 0 when HP stays the same.", .range(-40...40))
 	var healthChange: Int
 
 	@Guide(description: "Signed mana change. Cantrip -1, standard spell -2 to -3, ritual -4 or worse. Restores +2 to +6. 0 when no magic was spent or regained. If a cast would go below 0 the spell fizzles and this is 0.", .range(-30...30))
 	var manaChange: Int
 
-	@Guide(description: "What the player does next. write for free text with three options. roll when an uncertain, meaningful outcome needs a d20 in the UI. Never resolve the roll yourself.")
+	@Guide(description: "What the player does next. write, with three options, after a resolved beat, including after playerD20Roll settles pendingCheck. roll only to request a new d20 in the UI; leave that number unstated.")
 	var nextInput: NextInput
 
 	@Guide(description: "Three short, distinct tactical choices. No letter or number prefixes.", .count(3))
 	var options: [String]
 
-	@Guide(description: "The shot to paint. Leave poseOrAction empty when nothing is visible.")
+	@Guide(description: "The shot to paint. A moving, high-contrast moment. Leave poseOrAction empty when nothing is visible.")
 	var scene: SceneDirection
 }
 

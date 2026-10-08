@@ -815,6 +815,25 @@ private enum AsciiMediaLoader {
 	}
 }
 
+/// Spreads a frame across the glyph ramp. A dark painting whose pixels sit in a narrow band
+/// otherwise collapses to one or two characters.
+enum AsciiLuminance {
+	static func stretched(_ pixels: [UInt8]) -> [UInt8] {
+		let count = pixels.count
+		guard count > 1 else { return pixels }
+		let sorted = pixels.sorted()
+		let low = Double(sorted[count * 4 / 100])
+		let high = Double(sorted[min(count - 1, count * 96 / 100)])
+		let span = high - low
+		guard span >= 16 else { return pixels }
+		let scale = 255 / span
+		return pixels.map { pixel in
+			let lifted = (Double(pixel) - low) * scale
+			return UInt8(min(255, max(0, lifted)).rounded())
+		}
+	}
+}
+
 private enum AsciiRasterizer {
 	nonisolated static func rasterize(
 		_ image: CGImage,
@@ -853,7 +872,7 @@ private enum AsciiRasterizer {
 		}
 
 		let rows = buildRows(
-			from: pixels,
+			from: AsciiLuminance.stretched(pixels),
 			columns: targetSize.columns,
 			rows: targetSize.rows,
 			characters: configuration.characters

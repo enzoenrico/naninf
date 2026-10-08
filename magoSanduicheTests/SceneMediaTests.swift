@@ -21,6 +21,48 @@ struct SceneMediaTests {
 		#expect(scene.cgImage.width == 1)
 		#expect(scene.cgImage.height == 1)
 	}
+
+	@Test @MainActor func illustrateFramesASquareCanvasToSixteenByNine() async throws {
+		let service = DungeonMasterService(
+			narrator: ScriptedNarrator(drafts: []),
+			illustrator: FixedIllustrator(image: try solidSceneImage(width: 32, height: 32))
+		)
+
+		let scene = try await service.illustrate(visualPrompt: "Torchlit corridor")
+
+		#expect(scene.cgImage.width == 32)
+		#expect(scene.cgImage.height == 18)
+	}
+}
+
+struct AsciiVisionSpinnerTests {
+	@Test func framesStayOnOneGridAndTheArmTurns() {
+		let up = AsciiVisionSpinnerArt.lines(for: 0)
+		let turned = AsciiVisionSpinnerArt.lines(for: 1)
+
+		#expect(up.count == AsciiVisionSpinnerArt.rows)
+		#expect(up.allSatisfy { $0.count == AsciiVisionSpinnerArt.columns })
+		#expect(up != turned)
+		#expect(AsciiVisionSpinnerArt.lines(for: AsciiVisionSpinnerArt.frameCount) == up)
+		#expect(up.joined().contains("@"))
+		#expect(up.flatMap(\.unicodeScalars).filter { !$0.properties.isWhitespace }.count > 20)
+	}
+}
+
+struct SceneFrameTests {
+	@Test func squareImageCropsToThePlaceholderAspect() throws {
+		let framed = SceneFrame.widescreen(try solidSceneImage(width: 32, height: 32))
+
+		#expect(framed.width == 32)
+		#expect(framed.height == 18)
+	}
+
+	@Test func widescreenImageIsLeftAlone() throws {
+		let framed = SceneFrame.widescreen(try solidSceneImage(width: 32, height: 18))
+
+		#expect(framed.width == 32)
+		#expect(framed.height == 18)
+	}
 }
 
 struct GameViewModelVisionTests {
@@ -76,6 +118,7 @@ struct GameViewModelVisionTests {
 			)
 		)
 		let coordinator = AppCoordinator()
+		coordinator.isImageCollapsed = false
 		vm.attachCoordinator(coordinator)
 		vm.hasSubmittedPlayerTurn = true
 		let image = try await ScriptedIllustrator().illustrate("torch")
@@ -86,6 +129,42 @@ struct GameViewModelVisionTests {
 
 		#expect(vm.visionDisplayMode == .scene(previous))
 		#expect(!vm.visionMediaLoading)
+		#expect(vm.visionGenerationPercent == nil)
+		#expect(coordinator.isImageCollapsed)
+	}
+
+	@Test @MainActor func generationClosesThePreviewUntilTheImageExists() async throws {
+		let gate = GenerationGate()
+		let vm = GameViewModel(
+			persistRunsToLibrary: false,
+			dungeonMaster: DungeonMasterService(
+				narrator: ScriptedNarrator(drafts: []),
+				illustrator: GatedIllustrator(gate: gate)
+			)
+		)
+		let coordinator = AppCoordinator()
+		coordinator.isImageCollapsed = false
+		vm.attachCoordinator(coordinator)
+		vm.hasSubmittedPlayerTurn = true
+
+		let turn = Task { await vm.handleVisionAfterTurn(visualPrompt: "Torchlit corridor", turnID: "turn") }
+		await gate.waitUntilStarted()
+
+		#expect(coordinator.isImageCollapsed)
+		#expect(vm.visionMediaLoading)
+		#expect(vm.visionGenerationPercent == 42)
+		#expect(vm.visionDisplayMode == .introStatic)
+
+		gate.release()
+		await turn.value
+
+		guard case .scene = vm.visionDisplayMode else {
+			Issue.record("expected a generated scene")
+			return
+		}
+		#expect(!vm.visionMediaLoading)
+		#expect(vm.visionGenerationPercent == nil)
+		#expect(!coordinator.isImageCollapsed)
 	}
 
 	@Test @MainActor func debugIllustrationShowsTheScene() async {
@@ -222,6 +301,97 @@ struct GameViewModelVisionTests {
 		#expect(!vm.isImagePlaygroundPresented)
 		#expect(!coordinator.isImageCollapsed)
 	}
+}
+
+private struct FixedIllustrator: SceneIllustrator {
+	let image: CGImage
+
+	func illustrate(_ prompt: String) async throws -> CGImage {
+		_ = prompt
+		return image
+	}
+}
+
+private struct GatedIllustrator: SceneIllustrator {
+	let gate: GenerationGate
+
+	func illustrate(_ prompt: String) async throws -> CGImage {
+		try await illustrate(prompt, progress: .ignored)
+	}
+
+	func illustrate(_ prompt: String, progress: SceneIllustrationProgress) async throws -> CGImage {
+		_ = prompt
+		progress.update(0.42)
+		await gate.markStartedAndWait()
+		return try solidSceneImage(width: 16, height: 16)
+	}
+}
+
+private final class GenerationGate: @unchecked Sendable {
+	private let lock = NSLock()
+	private var didStart = false
+	private var startWaiter: CheckedContinuation<Void, Never>?
+	private var releaseWaiter: CheckedContinuation<Void, Never>?
+	private var isReleased = false
+
+	func markStartedAndWait() async {
+		await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+			lock.lock()
+			didStart = true
+			let waiter = startWaiter
+			startWaiter = nil
+			if isReleased {
+				lock.unlock()
+				waiter?.resume()
+				continuation.resume()
+				return
+			}
+			releaseWaiter = continuation
+			lock.unlock()
+			waiter?.resume()
+		}
+	}
+
+	func waitUntilStarted() async {
+		await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+			lock.lock()
+			if didStart {
+				lock.unlock()
+				continuation.resume()
+			} else {
+				startWaiter = continuation
+				lock.unlock()
+			}
+		}
+	}
+
+	func release() {
+		lock.lock()
+		isReleased = true
+		let waiter = releaseWaiter
+		releaseWaiter = nil
+		lock.unlock()
+		waiter?.resume()
+	}
+}
+
+private func solidSceneImage(width: Int, height: Int) throws -> CGImage {
+	let colorSpace = CGColorSpaceCreateDeviceGray()
+	guard
+		let context = CGContext(
+			data: nil,
+			width: width,
+			height: height,
+			bitsPerComponent: 8,
+			bytesPerRow: width,
+			space: colorSpace,
+			bitmapInfo: CGImageAlphaInfo.none.rawValue
+		),
+		let image = context.makeImage()
+	else {
+		throw SceneMediaError.noImage
+	}
+	return image
 }
 
 private struct SheetIllustrator: SceneIllustrator {

@@ -72,6 +72,20 @@ final class DungeonMasterService {
 		let draft: DungeonTurnDraft
 		do {
 			draft = try await narrator.draft(for: prompt, analyticsContext: analyticsContext)
+		} catch let error where error == .refused {
+			let shortened = context.keepingRecentStory()
+			let retryPrompt = DungeonMasterTurnFormatter.format(shortened)
+			guard retryPrompt != prompt else {
+				logAIFailure(error, prompt: prompt, context: context, analyticsContext: analyticsContext)
+				throw error
+			}
+			captureRefusalRetry(context: shortened, analyticsContext: analyticsContext)
+			do {
+				draft = try await narrator.draft(for: retryPrompt, analyticsContext: analyticsContext)
+			} catch {
+				logAIFailure(error, prompt: retryPrompt, context: shortened, analyticsContext: analyticsContext)
+				throw error
+			}
 		} catch {
 			logAIFailure(error, prompt: prompt, context: context, analyticsContext: analyticsContext)
 			throw error
@@ -96,7 +110,8 @@ final class DungeonMasterService {
 
 	func illustrate(
 		visualPrompt: String,
-		analyticsContext: AIAnalyticsContext? = nil
+		analyticsContext: AIAnalyticsContext? = nil,
+		progress: SceneIllustrationProgress = .ignored
 	) async throws -> SceneImage {
 		let trimmed = visualPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
 		guard !trimmed.isEmpty else {
@@ -120,15 +135,31 @@ final class DungeonMasterService {
 		AppAnalytics.capture("vision_scene_generate_started", properties: properties)
 
 		do {
-			let cgImage = try await illustrator.illustrate(trimmed)
+			let cgImage = try await illustrator.illustrate(trimmed, progress: progress)
 			AppAnalytics.capture("vision_scene_generate_succeeded", properties: properties)
-			return SceneImage(cgImage: cgImage)
+			return SceneImage(cgImage: SceneFrame.widescreen(cgImage))
 		} catch {
 			properties["error_kind"] = visionErrorKind(error)
 			properties["error_detail"] = AppAnalytics.clipped(error.localizedDescription)
 			AppAnalytics.capture("vision_scene_generate_failed", properties: properties)
 			throw error
 		}
+	}
+
+	private func captureRefusalRetry(
+		context: DungeonMasterTurnContext,
+		analyticsContext: AIAnalyticsContext?
+	) {
+		var properties: [String: Any] = [
+			"turn_kind": context.kind.rawValue,
+		]
+		if let sessionID = analyticsContext?.sessionID {
+			properties["game_session_id"] = sessionID
+		}
+		if let turnID = analyticsContext?.turnID {
+			properties["turn_id"] = turnID
+		}
+		AppAnalytics.capture("dm_turn_refusal_retried", properties: properties)
 	}
 
 	private func logUserPrompt(

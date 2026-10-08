@@ -25,6 +25,8 @@ final class GameViewModel {
     var visionDisplayMode: VisionDisplayMode = .introStatic
     var sceneMemory = SceneMemory()
     var visionMediaLoading = false
+    /// Fraction of the in-flight scene render, from 0 to 1. `nil` when the terminal is idle.
+    var visionGenerationProgress: Double?
     var latestVisionRequestID: UUID?
     var isImagePlaygroundPresented = false
     var imagePlaygroundConcept = ""

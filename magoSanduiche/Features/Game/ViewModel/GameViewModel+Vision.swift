@@ -19,25 +19,21 @@ extension GameViewModel {
 
         let requestID = UUID()
         latestVisionRequestID = requestID
-        visionMediaLoading = true
-        coordinator?.revealVisionIfCollapsed()
-        defer {
-            if latestVisionRequestID == requestID {
-                visionMediaLoading = false
-            }
-        }
+        beginCollapsedGeneration()
+        defer { finishCollapsedGeneration(requestID) }
 
         do {
             let image = try await dungeonMaster.illustrate(
                 visualPrompt: visualPrompt,
-                analyticsContext: aiContext(turnID: turnID)
+                analyticsContext: aiContext(turnID: turnID),
+                progress: visionProgress(for: requestID)
             )
             // A newer turn's prompt (or a restored run) supersedes this scene.
             guard latestVisionRequestID == requestID else { return }
             visionDisplayMode = .scene(image)
             coordinator?.revealVisionIfCollapsed()
         } catch {
-            // Keep the current frame. A failed illustration should not hide the panel.
+            // Keep the current frame. The preview stays closed until a scene arrives.
         }
     }
 
@@ -59,14 +55,14 @@ extension GameViewModel {
         }
         log("image_generation_prompt", extra: extra)
         imagePlaygroundConcept = trimmed
-        coordinator?.revealVisionIfCollapsed()
+        coordinator?.collapseVisionIfExpanded()
         isImagePlaygroundPresented = true
     }
 
     func acceptPlaygroundImage(at url: URL) {
         isImagePlaygroundPresented = false
         guard let cgImage = try? SceneImageLoader.cgImage(at: url) else { return }
-        visionDisplayMode = .scene(SceneImage(cgImage: cgImage))
+        visionDisplayMode = .scene(SceneImage(cgImage: SceneFrame.widescreen(cgImage)))
         coordinator?.revealVisionIfCollapsed()
     }
 
@@ -89,6 +85,56 @@ extension GameViewModel {
             }
         #endif
         return ImagePlaygroundViewController.isAvailable
+    }
+
+    var visionGenerationPercent: Int? {
+        guard let visionGenerationProgress else { return nil }
+        return Int((min(max(visionGenerationProgress, 0), 1) * 100).rounded())
+    }
+
+    private func beginCollapsedGeneration() {
+        visionMediaLoading = true
+        visionGenerationProgress = 0
+        coordinator?.collapseVisionIfExpanded()
+    }
+
+    private func finishCollapsedGeneration(_ requestID: UUID) {
+        guard latestVisionRequestID == requestID else { return }
+        visionMediaLoading = false
+        visionGenerationProgress = nil
+    }
+
+    private func visionProgress(for requestID: UUID) -> SceneIllustrationProgress {
+        let relay = VisionProgressRelay { fraction in
+            self.applyVisionProgress(fraction, for: requestID)
+        }
+        return SceneIllustrationProgress { relay.update($0) }
+    }
+
+    private func applyVisionProgress(_ fraction: Double, for requestID: UUID) {
+        guard latestVisionRequestID == requestID, visionMediaLoading else { return }
+        visionGenerationProgress = min(1, max(0, fraction))
+    }
+}
+
+private nonisolated final class VisionProgressRelay: @unchecked Sendable {
+    private let apply: @MainActor (Double) -> Void
+
+    init(_ apply: @escaping @MainActor (Double) -> Void) {
+        self.apply = apply
+    }
+
+    func update(_ fraction: Double) {
+        let fraction = min(1, max(0, fraction))
+        if Thread.isMainThread {
+            MainActor.assumeIsolated {
+                apply(fraction)
+            }
+        } else {
+            Task { @MainActor in
+                apply(fraction)
+            }
+        }
     }
 }
 
@@ -137,14 +183,16 @@ extension GameViewModel {
                 )
             }
 
-            visionMediaLoading = true
-            coordinator?.revealVisionIfCollapsed()
-            defer { visionMediaLoading = false }
+            let requestID = UUID()
+            latestVisionRequestID = requestID
+            beginCollapsedGeneration()
+            defer { finishCollapsedGeneration(requestID) }
 
             do {
                 let image = try await dungeonMaster.illustrate(
                     visualPrompt: caption,
-                    analyticsContext: aiContext(turnID: "debug-image")
+                    analyticsContext: aiContext(turnID: "debug-image"),
+                    progress: visionProgress(for: requestID)
                 )
                 visionDisplayMode = .scene(image)
                 coordinator?.revealVisionIfCollapsed()

@@ -7,15 +7,15 @@ import Foundation
 import FoundationModels
 
 /// One turn's visible shot. The Mage's body, clothes, and palette stay in `scene_template.json`.
-@Generable(description: "The shot to paint. Leave poseOrAction empty when nothing is visible.")
+@Generable(description: "The shot to paint. A moving, high-contrast moment. Leave poseOrAction empty when nothing is visible.")
 nonisolated struct SceneDirection: Equatable, Sendable {
-	@Guide(description: "What the Mage is doing right now, one short clause. Empty when nothing is visible. Do not describe age, beard, face, robe, or staff.")
+	@Guide(description: "What the Mage is doing right now, one short clause of action in progress. Empty when nothing is visible. Do not describe age, beard, face, robe, or staff.")
 	var poseOrAction: String
 
 	@Guide(description: "One concrete room. Empty string keeps the current room.")
 	var location: String
 
-	@Guide(description: "One dominant light source. Empty string keeps the current light.")
+	@Guide(description: "One blinding light. Pitch-black background and a white-hot rim on the figure. Empty string keeps the current light.")
 	var lighting: String
 
 	@Guide(description: "One mood word: dread, awe, hush, fury, or wonder. Empty if unchanged.")
@@ -36,7 +36,7 @@ nonisolated struct SceneDirection: Equatable, Sendable {
 	@Guide(description: "deep or shallow.")
 	var lens: String
 
-	@Guide(description: "locked-off, push-in, pull-back, pan, tilt-up, tilt-down, or crane.")
+	@Guide(description: "push-in, pull-back, pan, tilt-up, tilt-down, or crane. A moving camera.")
 	var move: String
 
 	init(
@@ -78,10 +78,12 @@ struct SceneMemory: Equatable, Sendable {
 	var lighting = ""
 }
 
-/// Merges the locked sheet with one shot and renders the caption DreamLite paints.
+/// Merges the locked sheet with one shot and renders the JSON prompt DreamLite paints.
 enum SceneCaption {
 	static let fallbackLocation = "a vast stone dungeon hall"
 	static let fallbackLighting = "one hard torch amber light against deep shadow"
+	/// Appended to every light so the figure separates from the room in a short glyph ramp.
+	static let rimLight = "pitch-black void, white-hot rim light, silhouette bright against the black"
 
 	static func compose(_ scene: SceneDirection, memory: inout SceneMemory) -> String {
 		let sheet = SceneVisionTemplate.load()
@@ -89,27 +91,35 @@ enum SceneCaption {
 		let lighting = remember(scene.lighting, into: &memory.lighting, fallback: fallbackLighting, words: 12)
 		let shot = ShotLanguage.resolve(scene, defaults: sheet.artisticDirection.shot)
 		let focusName = ShotLanguage.focusName(shot.focus)
+		let phrases = ShotLanguage.phrases(shot, focusName: focusName)
+		let art = artDirection(sheet.artisticDirection)
 
-		var clauses = [
-			sheet.subject.mainSubject,
-			sheet.subject.attireOrDetails,
-			sheet.artisticDirection.style,
-			"palette of \(sheet.artisticDirection.colorPalette.joined(separator: ", "))",
-			sheet.artisticDirection.epic,
-			ShotLanguage.sentence(shot, focusName: focusName),
-			clip(scene.poseOrAction, words: 14),
-			location,
-			lighting,
-		]
-		let ambience = clip(scene.ambience, words: 4)
-		if !ambience.isEmpty {
-			clauses.append("atmosphere of \(ambience)")
-		}
-		let threat = clip(scene.threat, words: 12)
-		if !threat.isEmpty {
-			clauses.append(threat)
-		}
-		return clauses.joined(separator: ". ")
+		let prompt = ScenePrompt(
+			subject: .init(
+				mainSubject: sheet.subject.mainSubject,
+				poseOrAction: inMotion(scene.poseOrAction),
+				attireOrDetails: sheet.subject.attireOrDetails
+			),
+			sceneAtmosphere: .init(
+				location: location,
+				lighting: hardLight(lighting),
+				ambience: clip(scene.ambience, words: 4),
+				threat: clip(scene.threat, words: 12)
+			),
+			artisticDirection: .init(
+				style: art.style,
+				epic: art.epic,
+				colorPalette: sheet.artisticDirection.colorPalette,
+				shot: .init(
+					angle: phrases.angle,
+					scale: phrases.scale,
+					focus: shot.focus,
+					lens: phrases.lens,
+					move: phrases.move
+				)
+			)
+		)
+		return jsonString(prompt)
 	}
 
 	private static func remember(_ incoming: String, into stored: inout String, fallback: String, words: Int) -> String {
@@ -128,6 +138,106 @@ enum SceneCaption {
 	private static func clip(_ text: String, words: Int) -> String {
 		let parts = text.split { $0.isWhitespace }.prefix(words)
 		return parts.joined(separator: " ")
+	}
+
+	/// ASCII keeps only a few luminance steps, so the pose is always mid-action.
+	private static func inMotion(_ pose: String) -> String {
+		let action = clip(pose, words: 12)
+		guard !action.isEmpty else { return "moving through the frame" }
+		if action.lowercased().contains("motion") {
+			return action
+		}
+		return "\(action), mid-motion"
+	}
+
+	/// Every light gets a black void and a white-hot rim. A light that already says "hard" or "shadow" is still too close together for ASCII.
+	private static func hardLight(_ lighting: String) -> String {
+		if lighting.lowercased().contains("white-hot") {
+			return lighting
+		}
+		return "\(lighting), \(rimLight)"
+	}
+
+	private static func artDirection(_ direction: SceneVisionSheet.ArtisticDirection) -> (style: String, epic: String) {
+		var style = direction.style
+		if !style.lowercased().contains("extreme contrast") {
+			style += ", extreme contrast"
+		}
+		if !style.lowercased().contains("white-hot") {
+			style += ", white-hot highlights against pitch black, no midtone gray"
+		}
+		if !style.lowercased().contains("mid-motion") {
+			style += ", caught mid-motion"
+		}
+		var epic = direction.epic
+		if !epic.lowercased().contains("rim light") {
+			epic += ", white-hot rim light on a pitch-black void"
+		}
+		if !epic.lowercased().contains("sharp edges") {
+			epic += ", sharp edges"
+		}
+		return (style, epic)
+	}
+
+	private static func jsonString(_ prompt: ScenePrompt) -> String {
+		let encoder = JSONEncoder()
+		encoder.keyEncodingStrategy = .convertToSnakeCase
+		encoder.outputFormatting = [.withoutEscapingSlashes]
+		guard let data = try? encoder.encode(prompt), let text = String(data: data, encoding: .utf8) else {
+			return "{}"
+		}
+		return text
+	}
+}
+
+/// The image prompt. Same shape as `scene_template.json`, filled for this shot.
+private struct ScenePrompt: Encodable {
+	var subject: Subject
+	var sceneAtmosphere: Atmosphere
+	var artisticDirection: ArtisticDirection
+
+	struct Subject: Encodable {
+		var mainSubject: String
+		var poseOrAction: String
+		var attireOrDetails: String
+	}
+
+	struct Atmosphere: Encodable {
+		var location: String
+		var lighting: String
+		var ambience: String
+		var threat: String
+
+		func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(location, forKey: .location)
+			try container.encode(lighting, forKey: .lighting)
+			if !ambience.isEmpty {
+				try container.encode(ambience, forKey: .ambience)
+			}
+			if !threat.isEmpty {
+				try container.encode(threat, forKey: .threat)
+			}
+		}
+
+		private enum CodingKeys: String, CodingKey {
+			case location, lighting, ambience, threat
+		}
+	}
+
+	struct ArtisticDirection: Encodable {
+		var style: String
+		var epic: String
+		var colorPalette: [String]
+		var shot: Shot
+	}
+
+	struct Shot: Encodable {
+		var angle: String
+		var scale: String
+		var focus: String
+		var lens: String
+		var move: String
 	}
 }
 
@@ -181,10 +291,10 @@ enum SceneVisionTemplate {
 			attireOrDetails: "charcoal hooded robe with a deep violet lining, worn leather belt, no armor, a tall black staff topped with a cracked crystal"
 		),
 		artisticDirection: .init(
-			style: "dark fantasy cinematic painting, high contrast, big clear shapes, epic scale",
-			epic: "one hard light against deep shadow",
-			colorPalette: ["charcoal", "bone", "violet spell-light", "torch amber"],
-			shot: .init(angle: "low", scale: "wide", focus: "mage", lens: "deep", move: "locked-off")
+			style: "dark fantasy painting, extreme contrast, white-hot highlights against pitch black, no midtone gray, big clear shapes, caught mid-motion",
+			epic: "white-hot rim light on a pitch-black void, sharp edges",
+			colorPalette: ["pitch black", "bone white", "white-hot torch", "bright violet light"],
+			shot: .init(angle: "low", scale: "wide", focus: "mage", lens: "deep", move: "push-in")
 		)
 	)
 }
@@ -204,7 +314,7 @@ private enum ShotLanguage {
 			scale: match(scene.scale, aliases: scaleAliases, fallback: defaults.scale),
 			focus: match(scene.focus, aliases: focusAliases, fallback: defaults.focus),
 			lens: match(scene.lens, aliases: lensAliases, fallback: defaults.lens),
-			move: match(scene.move, aliases: moveAliases, fallback: defaults.move)
+			move: moving(match(scene.move, aliases: moveAliases, fallback: defaults.move))
 		)
 	}
 
@@ -216,38 +326,54 @@ private enum ShotLanguage {
 		}
 	}
 
-	static func sentence(_ shot: Shot, focusName: String) -> String {
+	struct Phrases: Equatable {
+		var angle: String
+		var scale: String
+		var lens: String
+		var move: String
+	}
+
+	static func phrases(_ shot: Shot, focusName: String) -> Phrases {
 		let angle =
 			switch shot.angle {
-			case "eye-level": "camera at eye level"
-			case "high": "camera high, looking down"
-			case "dutch": "tilted horizon"
-			default: "camera low, looking up"
+			case "eye-level": "eye level, tracking with the motion"
+			case "high": "high angle, dropping in with the motion"
+			case "dutch": "tilted horizon, swinging with the motion"
+			default: "low angle, driving up with the motion"
 			}
 		let scale =
 			switch shot.scale {
-			case "extreme wide": "extreme wide view, the room immense"
-			case "medium": "medium view, the mage large in frame"
-			case "close": "close view on \(focusName)"
-			case "extreme close": "extreme close view on \(focusName)"
-			default: "wide view, the mage large in the room"
+			case "extreme wide": "extreme wide, the room sweeping past a moving figure"
+			case "medium": "medium, \(focusName) large and in motion"
+			case "close": "close on \(focusName) in motion"
+			case "extreme close": "extreme close on \(focusName) in motion"
+			default: "wide, \(focusName) large and moving through the room"
 			}
 		let lens =
 			switch shot.lens {
-			case "shallow": "shallow focus, only \(focusName) is sharp"
-			default: "deep focus, the room stays readable"
+			case "shallow": "white-hot edge on \(focusName), pitch-black background"
+			default: "pitch-black background, white-hot edges, the room stays readable"
 			}
 		let move =
 			switch shot.move {
-			case "push-in": "\(focusName) fills more of the frame and the background presses close"
-			case "pull-back": "the room opens around \(focusName)"
-			case "pan": "\(focusName) sits to one side with empty room ahead of the look"
-			case "tilt-up": "the frame rises, ceiling and vertical scale visible"
-			case "tilt-down": "the frame drops, the floor in the foreground"
-			case "crane": "a high view, the floor pattern visible, the room spread out"
-			default: "the frame is still"
+			case "pull-back": "\(focusName) strides as the view pulls back"
+			case "pan": "\(focusName) crosses the frame as the view pans"
+			case "tilt-up": "\(focusName) rises as the view tilts up"
+			case "tilt-down": "\(focusName) drops as the view tilts down"
+			case "crane": "\(focusName) moves as the view cranes overhead"
+			default: "\(focusName) moves toward the lens as the view pushes in"
 			}
-		return "\(angle), \(scale), \(lens), \(move)"
+		return Phrases(angle: angle, scale: scale, lens: lens, move: move)
+	}
+
+	/// A locked or unknown camera still becomes a push-in. ASCII reads a frozen pose as a photograph.
+	private static func moving(_ move: String) -> String {
+		switch move {
+		case "pull-back", "pan", "tilt-up", "tilt-down", "crane", "push-in":
+			move
+		default:
+			"push-in"
+		}
 	}
 
 	private static func match(_ raw: String, aliases: [String: String], fallback: String) -> String {
@@ -307,9 +433,10 @@ private enum ShotLanguage {
 	]
 
 	private static let moveAliases = [
-		"locked off": "locked-off",
-		"locked": "locked-off",
-		"static": "locked-off",
+		"locked off": "push-in",
+		"locked": "push-in",
+		"static": "push-in",
+		"still": "push-in",
 		"push in": "push-in",
 		"zoom in": "push-in",
 		"pull back": "pull-back",

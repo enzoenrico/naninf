@@ -77,6 +77,21 @@ struct DreamLiteTokenizerTests {
 	}
 }
 
+struct DreamLiteRunProgressTests {
+	@Test func eachStageAdvancesTheFraction() {
+		var meter = DreamLiteRunProgress(textChunks: 4, steps: 4)
+
+		#expect(meter.total == 11)
+		#expect(meter.fraction == 0)
+		#expect(abs(meter.advance() - (1.0 / 11)) < 1e-9)
+		for _ in 0..<10 {
+			_ = meter.advance()
+		}
+		#expect(meter.fraction == 1)
+		#expect(meter.advance() == 1)
+	}
+}
+
 struct DreamLiteSamplingTests {
 	/// `FlowMatchEulerDiscreteScheduler.set_timesteps` as called by `DreamLiteMobilePipeline` at 1024×1024.
 	@Test func fourStepSigmasMatchDiffusers() {

@@ -11,15 +11,15 @@
     "threat": ""
   },
   "artistic_direction": {
-    "style": "dark fantasy cinematic painting, high contrast, big clear shapes, epic scale",
-    "epic": "one hard light against deep shadow",
-    "color_palette": ["charcoal", "bone", "violet spell-light", "torch amber"],
+    "style": "dark fantasy painting, extreme contrast, white-hot highlights against pitch black, no midtone gray, big clear shapes, caught mid-motion",
+    "epic": "white-hot rim light on a pitch-black void, sharp edges",
+    "color_palette": ["pitch black", "bone white", "white-hot torch", "bright violet light"],
     "shot": {
       "angle": "low",
       "scale": "wide",
       "focus": "mage",
       "lens": "deep",
-      "move": "locked-off"
+      "move": "push-in"
     }
   }
 }

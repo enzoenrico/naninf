@@ -50,7 +50,7 @@ private struct StartupBootView: View {
 	private var bootMessages: [String] {
 		[
 			"NAN-DOS 1.0",
-			"Copyright (C) 1986 Sandwich Wizard Systems",
+			"Copyright (C) 2026 Sandwich Wizard Systems",
 			"",
 			"C:\\MAGO> BOOT DUNGEON.EXE",
 			String(localized: "nan_boot_loading_memory"),

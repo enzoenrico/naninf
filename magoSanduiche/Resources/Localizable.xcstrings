@@ -5841,6 +5841,38 @@
         }
       }
     },
+    "nan_vision_collapsed_generating_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rendering omen, %lld percent"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renderizando presságio, %lld por cento"
+          }
+        }
+      }
+    },
+    "nan_vision_collapsed_progress" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        }
+      }
+    },
     "nan_vision_collapsed_title" : {
       "localizations" : {
         "en" : {
@@ -6040,9 +6072,6 @@
       }
     },
     "OK" : {
-
-    },
-    "OPEN" : {
 
     }
   },

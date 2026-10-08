@@ -54,3 +54,30 @@ nonisolated enum VisionDisplayMode: Equatable {
 	case introStatic
 	case scene(SceneImage)
 }
+
+/// The vision placeholder video is 1280×720. Scene art is shown in that same 16:9 frame.
+enum SceneFrame {
+	static let widthOverHeight = 16.0 / 9.0
+
+	/// Center-crops to 16:9. DreamLite's converted canvas is square; the band that matches the placeholder is what the panel shows.
+	static func widescreen(_ image: CGImage) -> CGImage {
+		let width = image.width
+		let height = image.height
+		guard width > 1, height > 1 else { return image }
+
+		let current = Double(width) / Double(height)
+		guard abs(current - widthOverHeight) > 0.01 else { return image }
+
+		let rect: CGRect
+		if current > widthOverHeight {
+			let croppedWidth = max(1, Int((Double(height) * widthOverHeight).rounded()))
+			let x = max(0, (width - croppedWidth) / 2)
+			rect = CGRect(x: x, y: 0, width: min(croppedWidth, width - x), height: height)
+		} else {
+			let croppedHeight = max(1, Int((Double(width) / widthOverHeight).rounded()))
+			let y = max(0, (height - croppedHeight) / 2)
+			rect = CGRect(x: 0, y: y, width: width, height: min(croppedHeight, height - y))
+		}
+		return image.cropping(to: rect) ?? image
+	}
+}

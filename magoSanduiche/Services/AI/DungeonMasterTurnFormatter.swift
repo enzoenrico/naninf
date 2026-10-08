@@ -19,6 +19,22 @@ struct DungeonMasterTurnContext: Sendable {
     let maxMana: Int
     let storySoFar: [TerminalEntry]
     let diceRoll: Int?
+
+    func keepingRecentStory() -> DungeonMasterTurnContext {
+        let relevant = storySoFar.filter { $0.kind == .player || $0.kind == .dungeonMaster }
+        let recent = Array(relevant.suffix(2))
+        guard recent.count < relevant.count else { return self }
+        return DungeonMasterTurnContext(
+            kind: kind,
+            playerMessage: playerMessage,
+            health: health,
+            maxHealth: maxHealth,
+            mana: mana,
+            maxMana: maxMana,
+            storySoFar: recent,
+            diceRoll: diceRoll
+        )
+    }
 }
 
 enum DungeonMasterTurnFormatter {
@@ -26,6 +42,7 @@ enum DungeonMasterTurnFormatter {
 
     static func format(_ context: DungeonMasterTurnContext) -> String {
         var lines: [String] = [
+            "game: fictional tabletop fantasy",
             "turnKind: \(context.kind.rawValue)",
             "health: \(context.health)/\(context.maxHealth)",
             "mana: \(context.mana)/\(context.maxMana)",
@@ -44,14 +61,25 @@ enum DungeonMasterTurnFormatter {
             if let roll = context.diceRoll {
                 lines.append("playerD20Roll: \(roll)")
             }
-            lines.append(
-                "instruction: The player confirmed their d20 roll in the UI. Adjudicate the pending check using playerD20Roll. "
-                    + "Set healthChange and manaChange when those resources change. Set nextInput to write and provide exactly three options "
-                    + "unless another dice roll is required, then set nextInput to roll. Do not resolve a new roll yourself."
-            )
+            if let pending = pendingCheckLine(from: context.storySoFar) {
+                lines.append("pendingCheck: \(pending)")
+            }
         }
 
         return lines.joined(separator: "\n")
+    }
+
+    static func pendingCheckLine(from entries: [TerminalEntry]) -> String? {
+        guard let text = entries.last(where: { $0.kind == .dungeonMaster })?.text else {
+            return nil
+        }
+        let collapsed = text.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        guard !collapsed.isEmpty else { return nil }
+        let limit = 500
+        if collapsed.count <= limit {
+            return collapsed
+        }
+        return String(collapsed.suffix(limit))
     }
 
     static func storyLines(from entries: [TerminalEntry], budget: Int) -> [String] {

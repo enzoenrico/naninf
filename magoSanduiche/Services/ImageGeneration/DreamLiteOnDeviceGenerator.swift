@@ -56,6 +56,34 @@ nonisolated enum DreamLiteError: Error, LocalizedError, Equatable {
 
 nonisolated protocol DreamLiteImageGenerating: Sendable {
 	func generateImage(prompt: String) async throws -> CGImage
+	func generateImage(prompt: String, progress: SceneIllustrationProgress) async throws -> CGImage
+}
+
+extension DreamLiteImageGenerating {
+	func generateImage(prompt: String, progress: SceneIllustrationProgress) async throws -> CGImage {
+		_ = progress
+		return try await generateImage(prompt: prompt)
+	}
+}
+
+/// One share per pipeline stage: model load, each text chunk, the painter, each denoising step, then the decode.
+nonisolated struct DreamLiteRunProgress: Equatable, Sendable {
+	private var completed = 0
+	let total: Int
+
+	init(textChunks: Int, steps: Int) {
+		total = 1 + max(0, textChunks) + 1 + max(1, steps) + 1
+	}
+
+	var fraction: Double {
+		guard total > 0 else { return 1 }
+		return Double(completed) / Double(total)
+	}
+
+	mutating func advance() -> Double {
+		completed = min(total, completed + 1)
+		return fraction
+	}
 }
 
 /// Runs `carlofkl/DreamLite-mobile` text-to-image on device with Core ML:
@@ -86,6 +114,10 @@ actor DreamLiteOnDeviceGenerator: DreamLiteImageGenerating {
 
 	/// Generations run one at a time; a newer prompt stops older ones at their next step boundary.
 	func generateImage(prompt: String) async throws -> CGImage {
+		try await generateImage(prompt: prompt, progress: .ignored)
+	}
+
+	func generateImage(prompt: String, progress: SceneIllustrationProgress) async throws -> CGImage {
 		let trimmed = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
 		guard !trimmed.isEmpty else { throw DreamLiteError.emptyPrompt }
 
@@ -94,7 +126,7 @@ actor DreamLiteOnDeviceGenerator: DreamLiteImageGenerating {
 		let previous = tail
 		let work = Task {
 			await previous?.value
-			return try await self.run(trimmed, ticket: ticket)
+			return try await self.run(trimmed, ticket: ticket, progress: progress)
 		}
 		tail = Task { _ = try? await work.value }
 		return try await withTaskCancellationHandler {
@@ -114,30 +146,39 @@ actor DreamLiteOnDeviceGenerator: DreamLiteImageGenerating {
 		guard ticket == latestTicket else { throw DreamLiteError.superseded }
 	}
 
-	private func run(_ prompt: String, ticket: Int) async throws -> CGImage {
+	private func run(_ prompt: String, ticket: Int, progress: SceneIllustrationProgress) async throws -> CGImage {
 		try checkpoint(ticket)
 		let models = try await store.models()
 		let manifest = models.manifest
 		let window = try promptEncoder(for: manifest).window(for: prompt)
-
-		try checkpoint(ticket)
-		let embeddings = try await encodeText(window.tokenIDs, models: models, ticket: ticket)
-		let mask = MLShapedArray<Float32>(
-			scalars: (0..<manifest.promptEmbeddingCount).map { $0 < window.validEmbeddingCount ? 1 : 0 },
-			shape: [1, manifest.promptEmbeddingCount]
-		)
-
-		let (unet, decoder) = try await residentModels(models)
 		let side = manifest.latentSize
-		let latentShape = [1, manifest.latentChannels, side, side]
-		var noise = DreamLiteNoise(seed: configuration.seed ?? UInt64.random(in: .min ... .max))
-		var latents = noise.gaussian(count: latentShape.reduce(1, *))
 		let schedule = DreamLiteFlowMatchSchedule(
 			steps: configuration.steps ?? manifest.defaultSteps,
 			latentHeight: side,
 			latentWidth: side,
 			configuration: manifest.scheduler
 		)
+		var meter = DreamLiteRunProgress(textChunks: models.textEncoderURLs.count, steps: schedule.stepCount)
+		progress.update(meter.advance())
+
+		try checkpoint(ticket)
+		let embeddings = try await encodeText(
+			window.tokenIDs,
+			models: models,
+			ticket: ticket,
+			meter: &meter,
+			progress: progress
+		)
+		let mask = MLShapedArray<Float32>(
+			scalars: (0..<manifest.promptEmbeddingCount).map { $0 < window.validEmbeddingCount ? 1 : 0 },
+			shape: [1, manifest.promptEmbeddingCount]
+		)
+
+		let (unet, decoder) = try await residentModels(models)
+		progress.update(meter.advance())
+		let latentShape = [1, manifest.latentChannels, side, side]
+		var noise = DreamLiteNoise(seed: configuration.seed ?? UInt64.random(in: .min ... .max))
+		var latents = noise.gaussian(count: latentShape.reduce(1, *))
 		for index in 0..<schedule.stepCount {
 			try checkpoint(ticket)
 			let input = try MLDictionaryFeatureProvider(dictionary: [
@@ -148,6 +189,7 @@ actor DreamLiteOnDeviceGenerator: DreamLiteImageGenerating {
 			])
 			let velocity = try await Self.output("noise_pred", of: unet.prediction(from: input))
 			schedule.step(&latents, velocity: velocity.scalars, at: index)
+			progress.update(meter.advance())
 		}
 
 		try checkpoint(ticket)
@@ -159,13 +201,19 @@ actor DreamLiteOnDeviceGenerator: DreamLiteImageGenerating {
 		)
 		let shape = decoded.shape
 		guard shape.count == 4, shape[1] == 3 else { throw DreamLiteError.missingOutput("image") }
-		return try DreamLiteImageEncoding.cgImage(planarRGB: decoded.scalars, width: shape[3], height: shape[2])
+		let image = try DreamLiteImageEncoding.cgImage(planarRGB: decoded.scalars, width: shape[3], height: shape[2])
+		progress.update(meter.advance())
+		return image
 	}
 
 	/// Chunks are loaded one at a time so the ~1.7B-parameter text encoder never sits in memory at once.
-	private func encodeText(_ tokenIDs: [Int32], models: DreamLiteCompiledModels, ticket: Int) async throws
-		-> MLShapedArray<Float32>
-	{
+	private func encodeText(
+		_ tokenIDs: [Int32],
+		models: DreamLiteCompiledModels,
+		ticket: Int,
+		meter: inout DreamLiteRunProgress,
+		progress: SceneIllustrationProgress
+	) async throws -> MLShapedArray<Float32> {
 		var hidden: MLShapedArray<Float32>?
 		for (index, url) in models.textEncoderURLs.enumerated() {
 			try checkpoint(ticket)
@@ -179,6 +227,7 @@ actor DreamLiteOnDeviceGenerator: DreamLiteImageGenerating {
 			let name = index == 0 ? "input_ids" : "input_hidden_states"
 			let output = try await model.prediction(from: MLDictionaryFeatureProvider(dictionary: [name: input]))
 			hidden = try Self.output("hidden_states", of: output)
+			progress.update(meter.advance())
 		}
 		guard let hidden else { throw DreamLiteError.missingOutput("hidden_states") }
 		return hidden

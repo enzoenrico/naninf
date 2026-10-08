@@ -32,7 +32,7 @@ struct PrivateCloudNarrator: DungeonNarrator {
 			let response = try await session.respond(
 				to: prompt,
 				generating: DungeonTurnDraft.self,
-				contextOptions: ContextOptions(includeSchemaInPrompt: true, reasoningLevel: .moderate)
+				contextOptions: ContextOptions(includeSchemaInPrompt: true, reasoningLevel: .light)
 			)
 			captureGeneration(
 				usage: response.usage,

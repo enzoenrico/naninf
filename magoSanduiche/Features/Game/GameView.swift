@@ -247,7 +247,7 @@ struct GameSessionView: View {
         shouldShowTips: Bool
     ) -> some View {
         if coordinator.isImageCollapsed {
-            CollapsedVisionBar {
+            CollapsedVisionBar(generationPercent: vm.visionGenerationPercent) {
                 handleVisionTap()
             }
             .terminalPanelTransition(edge: .top)
@@ -257,6 +257,7 @@ struct GameSessionView: View {
                 displayMode: vm.visionDisplayMode,
                 isStoryLoading: vm.loading,
                 isVisionLoading: vm.visionMediaLoading,
+                generationPercent: vm.visionGenerationPercent,
                 phase: vm.uiPhase
             )
             .popoverTipIf(imageSectionTip, arrowEdge: .top, when: shouldShowTips)

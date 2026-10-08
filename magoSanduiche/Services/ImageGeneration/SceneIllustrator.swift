@@ -10,11 +10,32 @@ import ImagePlayground
 
 protocol SceneIllustrator {
 	func illustrate(_ prompt: String) async throws -> CGImage
+	func illustrate(_ prompt: String, progress: SceneIllustrationProgress) async throws -> CGImage
 	var illustratesWithSystemSheet: Bool { get }
 }
 
 extension SceneIllustrator {
 	var illustratesWithSystemSheet: Bool { false }
+
+	func illustrate(_ prompt: String, progress: SceneIllustrationProgress) async throws -> CGImage {
+		_ = progress
+		return try await illustrate(prompt)
+	}
+}
+
+/// Fraction of a scene render, from 0 to 1. Safe to call off the main actor.
+nonisolated struct SceneIllustrationProgress: Sendable {
+	private let report: @Sendable (Double) -> Void
+
+	init(_ report: @escaping @Sendable (Double) -> Void = { _ in }) {
+		self.report = report
+	}
+
+	static let ignored = SceneIllustrationProgress()
+
+	func update(_ fraction: Double) {
+		report(min(1, max(0, fraction)))
+	}
 }
 
 enum SceneImageGeneration {
@@ -58,7 +79,11 @@ struct DreamLiteIllustrator: SceneIllustrator {
 	}
 
 	func illustrate(_ prompt: String) async throws -> CGImage {
-		try await generator.generateImage(prompt: prompt)
+		try await illustrate(prompt, progress: .ignored)
+	}
+
+	func illustrate(_ prompt: String, progress: SceneIllustrationProgress) async throws -> CGImage {
+		try await generator.generateImage(prompt: prompt, progress: progress)
 	}
 }
 
