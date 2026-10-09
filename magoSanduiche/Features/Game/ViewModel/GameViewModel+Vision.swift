@@ -63,7 +63,11 @@ extension GameViewModel {
             coordinator?.revealVisionIfCollapsed()
             return
         }
-        guard let image = sceneArchive?.image(for: prompt) else { return }
+        guard let archive = sceneArchive else { return }
+        guard let image = archive.image(for: prompt) else {
+            storedSceneRevision += 1
+            return
+        }
         visionDisplayMode = .recalled(prompt, image)
         coordinator?.revealVisionIfCollapsed()
     }

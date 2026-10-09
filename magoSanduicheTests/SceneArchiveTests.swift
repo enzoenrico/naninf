@@ -161,6 +161,32 @@ struct SceneArchiveTests {
 		#expect(try context.fetch(FetchDescriptor<StoredScene>()).count == 0)
 	}
 
+	@Test @MainActor func recallOfABadSceneLeavesThePanelAndReloadsTheList() throws {
+		let store = try ArchiveStore()
+		let context = store.context
+		let runID = UUID()
+		let run = try insertRun(id: runID, into: context)
+		let prompt = try player("look")
+		context.insert(
+			StoredScene(
+				promptID: prompt.entryID,
+				runID: runID,
+				png: Data([0x00, 0x01, 0x02]),
+				run: run
+			)
+		)
+		try context.save()
+		let vm = viewModel(persistRunsToLibrary: true)
+		vm.modelContext = context
+		vm.persistedRunID = runID
+
+		vm.recallScene(prompt)
+
+		#expect(vm.visionDisplayMode == .introStatic)
+		#expect(vm.storedSceneRevision == 1)
+		#expect(try context.fetch(FetchDescriptor<StoredScene>()).isEmpty)
+	}
+
 	@Test @MainActor func onboardingDoesNotOpenAnArchive() throws {
 		let store = try ArchiveStore()
 		let context = store.context
