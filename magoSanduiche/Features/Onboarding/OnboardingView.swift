@@ -15,6 +15,7 @@ struct OnboardingView: View {
 	@AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 	@AppStorage("hasUnlockedFullGame") private var hasUnlockedFullGame = false
 	@State private var vm = OnboardingViewModel()
+	@State private var didUnlockOnboarding = false
 	#if DEBUG
 		@State private var didApplyUITestStep = false
 	#endif
@@ -60,6 +61,10 @@ struct OnboardingView: View {
 			AppAnalytics.capture("onboarding_step_viewed", properties: onboardingProperties)
 			await advanceAfterProcessingIfNeeded()
 		}
+		.onChange(of: authSessionStore.isAuthenticated) { _, isAuthenticated in
+			guard isAuthenticated else { return }
+			handleOnboardingAuthenticated()
+		}
 		#if DEBUG
 			.onAppear {
 				guard !didApplyUITestStep, let step = UITestConfiguration.onboardingStep else { return }
@@ -92,24 +97,33 @@ struct OnboardingView: View {
 			]) { _, new in new })
 
 		if vm.isOnFinalPage {
-			guard authSessionStore.isAuthenticated else { return }
-			vm.persistResponsesOnUnlock()
-			AppAnalytics.capture("onboarding_unlocked", properties: onboardingProperties)
-			AppAnalytics.setPersonProperties([
-				"onboarding_completed": true,
-				"onboarding_goal": vm.responses.selectedGoalID ?? "",
-				"onboarding_pain_points": vm.responses.selectedPainPointIDs.sorted(),
-				"onboarding_preferences": vm.responses.selectedPreferenceIDs.sorted(),
-			])
-			TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
-				hasCompletedOnboarding = true
-				hasUnlockedFullGame = true
-				coordinator.popToRoot()
-			}
+			handleOnboardingAuthenticated()
 		} else {
 			TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
 				vm.advance()
 			}
+		}
+	}
+
+	private func handleOnboardingAuthenticated() {
+		#if DEBUG
+			if UITestConfiguration.isActive { return }
+		#endif
+		guard authSessionStore.isAuthenticated, !didUnlockOnboarding else { return }
+		didUnlockOnboarding = true
+
+		vm.persistResponsesOnUnlock()
+		AppAnalytics.capture("onboarding_unlocked", properties: onboardingProperties)
+		AppAnalytics.setPersonProperties([
+			"onboarding_completed": true,
+			"onboarding_goal": vm.responses.selectedGoalID ?? "",
+			"onboarding_pain_points": vm.responses.selectedPainPointIDs.sorted(),
+			"onboarding_preferences": vm.responses.selectedPreferenceIDs.sorted(),
+		])
+		TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
+			hasCompletedOnboarding = true
+			hasUnlockedFullGame = true
+			coordinator.popToRoot()
 		}
 	}
 
@@ -171,9 +185,9 @@ struct OnboardingView: View {
 		case .processing:
 			ProcessingOnboardingScreen()
 		case .demo:
-			DemoOnboardingScreen(vm: vm)
+			DemoOnboardingScreen(vm: vm, onAuthenticated: handleOnboardingAuthenticated)
 		case .signIn:
-			SignInOnboardingScreen()
+			SignInOnboardingScreen(onAuthenticated: handleOnboardingAuthenticated)
 		}
 	}
 
@@ -504,9 +518,9 @@ private enum OnboardingDemoFlow: Identifiable {
 
 private struct DemoOnboardingScreen: View {
 	@Environment(AuthSessionStore.self) private var authSessionStore
-	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 	let vm: OnboardingViewModel
+	let onAuthenticated: () -> Void
 	@State private var gameVM = GameViewModel(persistRunsToLibrary: false)
 	@State private var demoCoordinator = AppCoordinator()
 	@State private var activeDemoFlow: OnboardingDemoFlow?
@@ -596,12 +610,10 @@ private struct DemoOnboardingScreen: View {
 					activeDemoFlow = nil
 				}
 			case .auth:
-				AuthView()
-					.onChange(of: authSessionStore.isAuthenticated) { _, isAuthenticated in
-						guard isAuthenticated else { return }
-						AppAnalytics.capture("onboarding_demo_login_completed")
-						handleDemoFinishedAndSignedIn()
-					}
+				AuthView(onAuthenticated: {
+					AppAnalytics.capture("onboarding_demo_login_completed")
+					onAuthenticated()
+				})
 			}
 		}
 	}
@@ -626,16 +638,6 @@ private struct DemoOnboardingScreen: View {
 		return didCompleteDemo
 	}
 
-	private func handleDemoFinishedAndSignedIn() {
-		activeDemoFlow = nil
-		Task { @MainActor in
-			try? await Task.sleep(for: .milliseconds(250))
-			TerminalMotion.perform(reduceMotion: reduceMotion, animation: TerminalMotion.panelAnimation) {
-				vm.completeDemoIfReady()
-			}
-		}
-	}
-
 	private func skipDemoAsCompleted() {
 		#if DEBUG
 			vm.skipDemoForDebug()
@@ -647,7 +649,7 @@ private struct DemoOnboardingScreen: View {
 					"debug_skip": true,
 				])
 			if authSessionStore.isAuthenticated {
-				handleDemoFinishedAndSignedIn()
+				onAuthenticated()
 			} else {
 				activeDemoFlow = .auth
 			}
@@ -717,6 +719,7 @@ private struct DemoGameCover: View {
 
 private struct SignInOnboardingScreen: View {
 	@Environment(AuthSessionStore.self) private var authSessionStore
+	let onAuthenticated: () -> Void
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 16) {
@@ -752,7 +755,7 @@ private struct SignInOnboardingScreen: View {
 							.font(.monocraft(relativeTo: .caption))
 							.foregroundStyle(signInStatusColor)
 					}
-					PlayerSignInPanel()
+					PlayerSignInPanel(onAuthenticated: onAuthenticated)
 				}
 				.padding(14)
 				.frame(maxWidth: .infinity, alignment: .leading)

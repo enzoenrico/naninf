@@ -27,7 +27,7 @@ struct DreamLiteIllustratorTests {
 		)
 		vm.hasSubmittedPlayerTurn = true
 
-		await vm.handleVisionAfterTurn(visualPrompt: "  Torchlit corridor  ", turnID: "turn")
+		await vm.handleVisionAfterTurn(visualPrompt: "  Torchlit corridor  ", prompt: visionPrompt(), turnID: "turn")
 
 		guard case .scene(let scene) = vm.visionDisplayMode else {
 			Issue.record("expected a DreamLite scene")
@@ -49,7 +49,7 @@ struct DreamLiteIllustratorTests {
 		)
 		vm.hasSubmittedPlayerTurn = true
 
-		await vm.handleVisionAfterTurn(visualPrompt: "Torchlit corridor", turnID: "turn")
+		await vm.handleVisionAfterTurn(visualPrompt: "Torchlit corridor", prompt: visionPrompt(), turnID: "turn")
 
 		#expect(vm.visionDisplayMode == .introStatic)
 		#expect(!vm.visionMediaLoading)
@@ -65,9 +65,9 @@ struct DreamLiteIllustratorTests {
 		)
 		vm.hasSubmittedPlayerTurn = true
 
-		let slowTurn = Task { await vm.handleVisionAfterTurn(visualPrompt: "slow", turnID: "turn-1") }
+		let slowTurn = Task { await vm.handleVisionAfterTurn(visualPrompt: "slow", prompt: visionPrompt(), turnID: "turn-1") }
 		try await Task.sleep(for: .milliseconds(20))
-		await vm.handleVisionAfterTurn(visualPrompt: "fast", turnID: "turn-2")
+		await vm.handleVisionAfterTurn(visualPrompt: "fast", prompt: visionPrompt(), turnID: "turn-2")
 		await slowTurn.value
 
 		guard case .scene(let scene) = vm.visionDisplayMode else {
@@ -102,6 +102,11 @@ private struct DelayedIllustrator: SceneIllustrator {
 		}
 		return try solidImage(width: 1, height: 1)
 	}
+}
+
+@MainActor
+private func visionPrompt() -> PlayerPromptID {
+	PlayerPromptID(TerminalEntry(kind: .player, text: "look"))!
 }
 
 private func solidImage(width: Int, height: Int) throws -> CGImage {

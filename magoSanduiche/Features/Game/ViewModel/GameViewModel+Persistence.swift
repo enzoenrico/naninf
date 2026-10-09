@@ -14,10 +14,25 @@ extension GameViewModel {
         persistedRunID = stored.id
         gameSessionID = stored.analyticsSessionID
         applyPlaybackState(GameRunSnapshotMapper.playbackState(from: stored))
-        visionDisplayMode = .introStatic
         visionMediaLoading = false
         visionGenerationProgress = nil
         latestVisionRequestID = nil
+        visionDisplayMode = visionModeForRestoredRun()
+    }
+
+    var sceneArchive: SceneArchive? {
+        guard persistRunsToLibrary, let modelContext, let persistedRunID else { return nil }
+        return SceneArchive.open(runID: persistedRunID, context: modelContext)
+    }
+
+    private func visionModeForRestoredRun() -> VisionDisplayMode {
+        guard let sceneArchive else { return .introStatic }
+        for entry in terminalEntries.reversed() {
+            guard let prompt = PlayerPromptID(entry) else { continue }
+            guard let image = sceneArchive.image(for: prompt) else { continue }
+            return .recalled(prompt, image)
+        }
+        return .introStatic
     }
 
     func saveSnapshot(modelContext: ModelContext) {

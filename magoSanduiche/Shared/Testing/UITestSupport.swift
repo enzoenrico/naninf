@@ -425,7 +425,10 @@ enum UITestConfiguration {
 	static func makeModelContainerIfNeeded() -> ModelContainer? {
 		guard isActive else { return nil }
 		let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
-		guard let container = try? ModelContainer(for: StoredGameRun.self, configurations: configuration) else {
+		guard let container = try? ModelContainer(
+			for: Schema(GameRunPersistSchema.models),
+			configurations: [configuration]
+		) else {
 			return nil
 		}
 		seedRuns(into: container.mainContext)

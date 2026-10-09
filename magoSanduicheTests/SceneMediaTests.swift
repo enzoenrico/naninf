@@ -84,7 +84,7 @@ struct GameViewModelVisionTests {
 		vm.attachCoordinator(coordinator)
 		vm.hasSubmittedPlayerTurn = true
 
-		await vm.handleVisionAfterTurn(visualPrompt: "Torchlit corridor", turnID: "turn")
+		await vm.handleVisionAfterTurn(visualPrompt: "Torchlit corridor", prompt: visionPrompt(), turnID: "turn")
 
 		guard case .scene(let scene) = vm.visionDisplayMode else {
 			Issue.record("expected a generated scene")
@@ -103,7 +103,7 @@ struct GameViewModelVisionTests {
 		vm.hasSubmittedPlayerTurn = true
 		vm.visionDisplayMode = .introStatic
 
-		await vm.handleVisionAfterTurn(visualPrompt: nil, turnID: "turn")
+		await vm.handleVisionAfterTurn(visualPrompt: nil, prompt: visionPrompt(), turnID: "turn")
 
 		#expect(vm.visionDisplayMode == .introStatic)
 		#expect(coordinator.isImageCollapsed)
@@ -125,7 +125,7 @@ struct GameViewModelVisionTests {
 		let previous = SceneImage(cgImage: image)
 		vm.visionDisplayMode = .scene(previous)
 
-		await vm.handleVisionAfterTurn(visualPrompt: "A dark stair", turnID: "turn")
+		await vm.handleVisionAfterTurn(visualPrompt: "A dark stair", prompt: visionPrompt(), turnID: "turn")
 
 		#expect(vm.visionDisplayMode == .scene(previous))
 		#expect(!vm.visionMediaLoading)
@@ -147,7 +147,7 @@ struct GameViewModelVisionTests {
 		vm.attachCoordinator(coordinator)
 		vm.hasSubmittedPlayerTurn = true
 
-		let turn = Task { await vm.handleVisionAfterTurn(visualPrompt: "Torchlit corridor", turnID: "turn") }
+		let turn = Task { await vm.handleVisionAfterTurn(visualPrompt: "Torchlit corridor", prompt: visionPrompt(), turnID: "turn") }
 		await gate.waitUntilStarted()
 
 		#expect(coordinator.isImageCollapsed)
@@ -227,7 +227,7 @@ struct GameViewModelVisionTests {
 		vm.imagePlaygroundAvailabilityOverride = true
 		vm.hasSubmittedPlayerTurn = true
 
-		await vm.handleVisionAfterTurn(visualPrompt: "Torchlit corridor", turnID: "turn")
+		await vm.handleVisionAfterTurn(visualPrompt: "Torchlit corridor", prompt: visionPrompt(), turnID: "turn")
 
 		#expect(SceneImageGeneration.isLocked)
 		#expect(!vm.isImagePlaygroundPresented)
@@ -246,7 +246,7 @@ struct GameViewModelVisionTests {
 		vm.imagePlaygroundAvailabilityOverride = false
 		vm.hasSubmittedPlayerTurn = true
 
-		await vm.handleVisionAfterTurn(visualPrompt: "Torchlit corridor", turnID: "turn")
+		await vm.handleVisionAfterTurn(visualPrompt: "Torchlit corridor", prompt: visionPrompt(), turnID: "turn")
 
 		#expect(!vm.isImagePlaygroundPresented)
 		#expect(vm.visionDisplayMode == .introStatic)
@@ -409,4 +409,9 @@ private struct FailingIllustrator: SceneIllustrator {
 		_ = prompt
 		throw SceneMediaError.unavailable
 	}
+}
+
+@MainActor
+private func visionPrompt() -> PlayerPromptID {
+	PlayerPromptID(TerminalEntry(kind: .player, text: "look"))!
 }

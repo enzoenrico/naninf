@@ -33,7 +33,7 @@ struct magoSanduicheApp: App {
 
 	private static func makeDefaultContainer() -> ModelContainer {
 		do {
-			return try ModelContainer(for: StoredGameRun.self)
+			return try ModelContainer(for: Schema(GameRunPersistSchema.models))
 		} catch {
 			fatalError("Failed to create ModelContainer: \(error)")
 		}

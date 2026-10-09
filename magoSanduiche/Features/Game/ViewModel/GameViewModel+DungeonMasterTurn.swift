@@ -39,6 +39,12 @@ extension GameViewModel {
         return true
     }
 
+    func appendPlayerLine(_ text: String) -> PlayerPromptID {
+        let entry = TerminalEntry(kind: .player, text: text)
+        terminalEntries.append(entry)
+        return PlayerPromptID(entry)!
+    }
+
     func beginDungeonMasterTurn(
         displayText: String,
         context: DungeonMasterTurnContext,
@@ -51,7 +57,7 @@ extension GameViewModel {
         selectedSuggestionIndex = nil
         loading = true
         uiPhase = .awaitingDungeonMaster
-        terminalEntries.append(TerminalEntry(kind: .player, text: displayText))
+        let prompt = appendPlayerLine(displayText)
         contextualInput = ""
 
         let turnID = UUID().uuidString
@@ -76,6 +82,7 @@ extension GameViewModel {
             #endif
             await fetchNarrative(
                 context: context,
+                prompt: prompt,
                 turnID: turnID,
                 startedAt: startedAt,
                 inputSource: inputSource,
@@ -87,15 +94,25 @@ extension GameViewModel {
 
     private func fetchNarrative(
         context: DungeonMasterTurnContext,
+        prompt: PlayerPromptID,
         turnID: String,
         startedAt: Date,
         inputSource: String?,
         suggestionIndex: Int?
     ) async {
+        var illustration: (caption: String, prompt: PlayerPromptID, turnID: String)?
         defer {
             coordinator?.clearPendingNarrativeFetch()
             loading = false
             persistRun()
+            if let illustration {
+                let caption = illustration.caption
+                let prompt = illustration.prompt
+                let turnID = illustration.turnID
+                Task {
+                    await handleVisionAfterTurn(visualPrompt: caption, prompt: prompt, turnID: turnID)
+                }
+            }
             onCompletedPlayerAction?()
         }
 
@@ -128,10 +145,11 @@ extension GameViewModel {
                 ]
             )
             if let scene = result.scene {
-                let caption = SceneCaption.compose(scene, memory: &sceneMemory)
-                Task {
-                    await handleVisionAfterTurn(visualPrompt: caption, turnID: turnID)
-                }
+                illustration = (
+                    caption: SceneCaption.compose(scene, memory: &sceneMemory),
+                    prompt: prompt,
+                    turnID: turnID
+                )
             }
         } catch {
             var failureProperties: [String: Any] = [

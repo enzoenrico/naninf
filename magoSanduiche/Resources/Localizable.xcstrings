@@ -76,6 +76,9 @@
     ">>" : {
 
     },
+    "▣" : {
+
+    },
     "$" : {
 
     },
@@ -5613,6 +5616,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "> VOCÊ"
+          }
+        }
+      }
+    },
+    "nan_terminal_prompt_recall_a11y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows this prompt's scene"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra a cena deste comando"
           }
         }
       }

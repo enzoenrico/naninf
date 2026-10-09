@@ -156,14 +156,6 @@ final class OnboardingViewModel {
 		return completedDemoActions >= demoActionTarget
 	}
 
-	func completeDemoIfReady() {
-		guard currentStep == .demo else { return }
-		guard completedDemoActions >= demoActionTarget else { return }
-		guard !isOnFinalPage else { return }
-
-		currentIndex += 1
-	}
-
 	#if DEBUG
 		func skipDemoForDebug() {
 			guard currentStep == .demo else { return }

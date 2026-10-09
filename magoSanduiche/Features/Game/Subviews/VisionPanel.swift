@@ -23,9 +23,13 @@ struct VisionPanel: View {
 		isStoryLoading && !isVisionLoading
 	}
 
+	private var showsVisionSpinner: Bool {
+		isVisionLoading && displayMode.recalledPrompt == nil
+	}
+
 	var body: some View {
 		ZStack(alignment: .topLeading) {
-			if isVisionLoading {
+			if showsVisionSpinner {
 				AsciiVisionSpinner(percent: generationPercent)
 			} else {
 				mediaContent
@@ -63,7 +67,7 @@ struct VisionPanel: View {
 		case .introStatic:
 			AsciiMediaView(catalogVideoNamed: VisionDisplayMode.introPlaceholderCatalogName)
 				.asciiScaleMode(.fit)
-		case .scene(let image):
+		case .scene(let image), .recalled(_, let image):
 			AsciiMediaView(image: image.cgImage)
 				.asciiScaleMode(.fit)
 		}

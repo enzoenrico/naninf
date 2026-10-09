@@ -10,6 +10,7 @@ import Foundation
 @Observable
 final class AuthSessionStore {
 	private let snapshotStore: AuthLoginSnapshotStore
+	private let appleCredentialStateLookup: (String) async -> ASAuthorizationAppleIDProvider.CredentialState?
 	private var hasStarted = false
 	private var isUITestMode = false
 
@@ -20,15 +21,20 @@ final class AuthSessionStore {
 	private(set) var errorMessage: String?
 	private(set) var configurationMessage: String?
 
-	init(defaults: UserDefaults = .standard) {
+	init(
+		defaults: UserDefaults = .standard,
+		appleCredentialStateLookup: @escaping (String) async -> ASAuthorizationAppleIDProvider.CredentialState? = systemAppleCredentialState
+	) {
 		snapshotStore = AuthLoginSnapshotStore(defaults: defaults)
 		loginSnapshot = snapshotStore.load()
+		self.appleCredentialStateLookup = appleCredentialStateLookup
 	}
 
 	#if DEBUG
 		/// Builds a store with a fixed, network-free state for UI-test screenshots.
 		init(uiTestMode mode: UITestAuthMode, defaults: UserDefaults = .standard) {
 			snapshotStore = AuthLoginSnapshotStore(defaults: defaults)
+			appleCredentialStateLookup = Self.systemAppleCredentialState
 			isUITestMode = true
 			isLoadingSession = false
 
@@ -150,18 +156,31 @@ final class AuthSessionStore {
 	}
 
 	private func appleCredentialRevoked(userID: String) async -> Bool {
+		guard let state = await appleCredentialStateLookup(userID) else { return false }
+		return Self.shouldClearStoredSession(for: state)
+	}
+
+	/// `.notFound` shows up after a successful Sign in with Apple, especially on the
+	/// simulator. Dropping the saved session there logs the player out on the next launch.
+	/// Only an explicit revoke should do that.
+	static func shouldClearStoredSession(for state: ASAuthorizationAppleIDProvider.CredentialState) -> Bool {
+		switch state {
+		case .revoked:
+			true
+		case .authorized, .notFound, .transferred:
+			false
+		@unknown default:
+			false
+		}
+	}
+
+	private static func systemAppleCredentialState(
+		userID: String
+	) async -> ASAuthorizationAppleIDProvider.CredentialState? {
 		do {
-			let state = try await ASAuthorizationAppleIDProvider().credentialState(forUserID: userID)
-			switch state {
-			case .revoked, .notFound:
-				return true
-			case .authorized, .transferred:
-				return false
-			@unknown default:
-				return false
-			}
+			return try await ASAuthorizationAppleIDProvider().credentialState(forUserID: userID)
 		} catch {
-			return false
+			return nil
 		}
 	}
 
@@ -169,6 +188,7 @@ final class AuthSessionStore {
 		loginSnapshot = snapshot
 		isAuthenticated = true
 		snapshotStore.save(snapshot)
+		snapshotStore.markOnboardingComplete()
 		AppAnalytics.identifySignedInPlayer(userID: snapshot.userID, provider: snapshot.provider.rawValue)
 	}
 

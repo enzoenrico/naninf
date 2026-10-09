@@ -8,6 +8,7 @@ import SwiftUI
 struct AuthView: View {
 	@Environment(AuthSessionStore.self) private var authSessionStore
 	@Environment(\.colorScheme) private var colorScheme
+	var onAuthenticated: () -> Void = {}
 
 	private var isDisabled: Bool {
 		authSessionStore.isLoadingSession ||
@@ -87,7 +88,7 @@ struct AuthView: View {
 	}
 
 	private var authActions: some View {
-		PlayerSignInPanel()
+		PlayerSignInPanel(onAuthenticated: onAuthenticated)
 			.disabled(isDisabled)
 	}
 

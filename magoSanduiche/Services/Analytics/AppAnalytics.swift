@@ -199,7 +199,11 @@ enum AppAnalytics {
 
     private static var shouldCapture: Bool {
         guard isConfigured else { return false }
-        return !UITestConfiguration.isActive
+        #if DEBUG
+            return !UITestConfiguration.isActive
+        #else
+            return true
+        #endif
     }
 
     private static func sanitizedString(for key: String, in bundle: Bundle) -> String? {
