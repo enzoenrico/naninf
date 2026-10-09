@@ -436,13 +436,6 @@ struct GameSessionView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background {
-                    Color.clear
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            dismissContextualInputIfActive()
-                        }
-                }
             }
         }
         .scrollDismissesKeyboard(.immediately)
@@ -507,6 +500,7 @@ struct GameSessionView: View {
                         .foregroundStyle(tint)
                         .accessibilityHidden(true)
                 }
+                .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .accessibilityHint(String(localized: "nan_terminal_prompt_recall_a11y"))
