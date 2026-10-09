@@ -39,8 +39,8 @@ struct SceneArchiveTests {
 		let archive = SceneArchive.open(runID: runID, context: context)
 		let prompt = try player("look")
 
-		await archive.keep(SceneImage(cgImage: try bitmap(width: 4, height: 2)), for: prompt)
-		await archive.keep(SceneImage(cgImage: try bitmap(width: 6, height: 3)), for: prompt)
+		#expect(await archive.keep(SceneImage(cgImage: try bitmap(width: 4, height: 2)), for: prompt))
+		#expect(await archive.keep(SceneImage(cgImage: try bitmap(width: 6, height: 3)), for: prompt))
 
 		let rows = try context.fetch(FetchDescriptor<StoredScene>())
 		#expect(rows.count == 1)
@@ -87,7 +87,10 @@ struct SceneArchiveTests {
 		context.delete(run)
 		try context.save()
 
-		await archive.keep(SceneImage(cgImage: try bitmap(width: 4, height: 2)), for: try player("look"))
+		#expect(
+			await archive.keep(SceneImage(cgImage: try bitmap(width: 4, height: 2)), for: try player("look"))
+				== false
+		)
 
 		#expect(try context.fetch(FetchDescriptor<StoredScene>()).isEmpty)
 	}
@@ -260,6 +263,7 @@ struct SceneArchiveTests {
 			return
 		}
 		#expect(scene.id == prompt.entryID)
+		#expect(vm.storedSceneRevision == 1)
 		let rows = try context.fetch(FetchDescriptor<StoredScene>())
 		#expect(rows.count == 1)
 		#expect(rows[0].promptID == prompt.entryID)

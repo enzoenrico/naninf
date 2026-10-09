@@ -49,7 +49,8 @@ extension GameViewModel {
     }
 
     private func keepSceneEvenIfSuperseded(_ image: SceneImage, for prompt: PlayerPromptID) async {
-        await sceneArchive?.keep(image, for: prompt)
+        guard await sceneArchive?.keep(image, for: prompt) == true else { return }
+        storedSceneRevision += 1
     }
 
     private func showCurrentScene(_ image: SceneImage, for prompt: PlayerPromptID) {

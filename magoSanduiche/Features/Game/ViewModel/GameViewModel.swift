@@ -28,6 +28,8 @@ final class GameViewModel {
     /// Fraction of the in-flight scene render, from 0 to 1. `nil` when the terminal is idle.
     var visionGenerationProgress: Double?
     var latestVisionRequestID: UUID?
+    /// Bumped after a scene row is saved, so the transcript reloads which prompts can be tapped.
+    var storedSceneRevision = 0
     var isImagePlaygroundPresented = false
     var imagePlaygroundConcept = ""
     #if DEBUG

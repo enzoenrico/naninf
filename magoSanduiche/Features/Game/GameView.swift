@@ -412,7 +412,7 @@ struct GameSessionView: View {
     @ViewBuilder
     private func terminalTranscript(vm: GameViewModel, coordinator: AppCoordinator) -> some View {
         ScrollView {
-            RecallablePromptsReader(run: vm.persistedRunID) { recallable in
+            RecallablePromptsReader(run: vm.persistedRunID, revision: vm.storedSceneRevision) { recallable in
                 VStack(alignment: .leading, spacing: 16) {
                     ForEach(vm.terminalEntries) { entry in
                         terminalEntryView(

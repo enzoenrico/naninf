@@ -38,24 +38,23 @@ struct SceneArchive {
 		SceneArchive(runID: runID, context: context)
 	}
 
-	func keep(_ image: SceneImage, for prompt: PlayerPromptID) async {
+	func keep(_ image: SceneImage, for prompt: PlayerPromptID) async -> Bool {
 		let source = image.cgImage
 		let png = await Task.detached(priority: .utility) {
 			ScenePNG.data(from: source)
 		}.value
-		guard let png else { return }
-		guard let run = GameRunSnapshotMapper.fetch(id: runID, context: context) else { return }
+		guard let png else { return false }
+		guard let run = GameRunSnapshotMapper.fetch(id: runID, context: context) else { return false }
 
 		let promptID = prompt.entryID
 		if let existing = storedScene(promptID: promptID) {
 			existing.png = png
-			savePNG(png, promptID: promptID, pendingInsert: nil)
-			return
+			return savePNG(png, promptID: promptID, pendingInsert: nil)
 		}
 
 		let row = StoredScene(promptID: promptID, runID: runID, png: png, run: run)
 		context.insert(row)
-		savePNG(png, promptID: promptID, pendingInsert: row)
+		return savePNG(png, promptID: promptID, pendingInsert: row)
 	}
 
 	func image(for prompt: PlayerPromptID) -> SceneImage? {
@@ -68,23 +67,29 @@ struct SceneArchive {
 		return SceneImage(cgImage: cgImage, id: prompt.entryID)
 	}
 
-	private func savePNG(_ png: Data, promptID: UUID, pendingInsert: StoredScene?) {
+	private func savePNG(_ png: Data, promptID: UUID, pendingInsert: StoredScene?) -> Bool {
 		do {
 			try context.save()
+			return true
 		} catch {
 			// A unique promptID does not upsert. 133021 is the constraint-merge error.
 			guard isUniqueConflict(error) else {
 				if let pendingInsert {
 					context.delete(pendingInsert)
 				}
-				return
+				return false
 			}
 			if let pendingInsert {
 				context.delete(pendingInsert)
 			}
-			guard let existing = storedScene(promptID: promptID, excluding: pendingInsert) else { return }
+			guard let existing = storedScene(promptID: promptID, excluding: pendingInsert) else { return false }
 			existing.png = png
-			try? context.save()
+			do {
+				try context.save()
+				return true
+			} catch {
+				return false
+			}
 		}
 	}
 
@@ -191,21 +196,28 @@ struct RecallablePrompts {
 
 struct RecallablePromptsReader<Content: View>: View {
 	private let runID: UUID?
+	private let revision: Int
 	private let content: (RecallablePrompts) -> Content
 
-	init(run: UUID?, @ViewBuilder content: @escaping (RecallablePrompts) -> Content) {
+	init(run: UUID?, revision: Int, @ViewBuilder content: @escaping (RecallablePrompts) -> Content) {
 		self.runID = run
+		self.revision = revision
 		self.content = content
 	}
 
 	var body: some View {
 		if let runID {
 			RecallableSceneQuery(runID: runID, content: content)
-				.id(runID)
+				.id(SceneListIdentity(runID: runID, revision: revision))
 		} else {
 			content(RecallablePrompts(scenes: []))
 		}
 	}
+}
+
+private struct SceneListIdentity: Hashable {
+	let runID: UUID
+	let revision: Int
 }
 
 private struct RecallableSceneQuery<Content: View>: View {
