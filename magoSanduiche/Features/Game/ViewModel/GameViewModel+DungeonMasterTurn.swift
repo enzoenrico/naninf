@@ -100,10 +100,19 @@ extension GameViewModel {
         inputSource: String?,
         suggestionIndex: Int?
     ) async {
+        var illustration: (caption: String, prompt: PlayerPromptID, turnID: String)?
         defer {
             coordinator?.clearPendingNarrativeFetch()
             loading = false
             persistRun()
+            if let illustration {
+                let caption = illustration.caption
+                let prompt = illustration.prompt
+                let turnID = illustration.turnID
+                Task {
+                    await handleVisionAfterTurn(visualPrompt: caption, prompt: prompt, turnID: turnID)
+                }
+            }
             onCompletedPlayerAction?()
         }
 
@@ -136,10 +145,11 @@ extension GameViewModel {
                 ]
             )
             if let scene = result.scene {
-                let caption = SceneCaption.compose(scene, memory: &sceneMemory)
-                Task {
-                    await handleVisionAfterTurn(visualPrompt: caption, prompt: prompt, turnID: turnID)
-                }
+                illustration = (
+                    caption: SceneCaption.compose(scene, memory: &sceneMemory),
+                    prompt: prompt,
+                    turnID: turnID
+                )
             }
         } catch {
             var failureProperties: [String: Any] = [
