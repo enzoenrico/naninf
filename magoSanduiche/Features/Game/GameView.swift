@@ -488,7 +488,10 @@ struct GameSessionView: View {
                     dismissContextualInputIfActive()
                 }
             )
-        } else if let prompt = recallable.prompt(for: entry) {
+        } else if let prompt = recallable.prompt(
+            for: entry,
+            displayedImageID: vm.sceneArchive == nil ? nil : vm.visionDisplayMode.onScreenImageID
+        ) {
             let tint = recallColor(prompt: prompt, entry: entry, vm: vm)
             Button {
                 dismissContextualInputIfActive()

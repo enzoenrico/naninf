@@ -181,8 +181,10 @@ struct RecallablePrompts {
 		promptIDs = Set(scenes.map(\.promptID))
 	}
 
-	func prompt(for entry: TerminalEntry) -> PlayerPromptID? {
-		guard let prompt = PlayerPromptID(entry), promptIDs.contains(prompt.entryID) else { return nil }
+	func prompt(for entry: TerminalEntry, displayedImageID: UUID? = nil) -> PlayerPromptID? {
+		guard let prompt = PlayerPromptID(entry) else { return nil }
+		if promptIDs.contains(prompt.entryID) { return prompt }
+		guard displayedImageID == prompt.entryID else { return nil }
 		return prompt
 	}
 }

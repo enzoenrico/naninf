@@ -10,6 +10,17 @@ import Testing
 @testable import magoSanduiche
 
 struct SceneArchiveTests {
+	@Test @MainActor func displayedSceneIsTappableBeforeTheQueryRefreshes() {
+		let prompts = RecallablePrompts(scenes: [])
+		let player = TerminalEntry(kind: .player, text: "look")
+		let narrator = TerminalEntry(kind: .dungeonMaster, text: "The hall.")
+
+		#expect(prompts.prompt(for: player, displayedImageID: player.id)?.entryID == player.id)
+		#expect(prompts.prompt(for: player, displayedImageID: UUID()) == nil)
+		#expect(prompts.prompt(for: player) == nil)
+		#expect(prompts.prompt(for: narrator, displayedImageID: narrator.id) == nil)
+	}
+
 	@Test @MainActor func playerPromptIDMatchesOnlyPlayerLines() {
 		let player = TerminalEntry(id: UUID(), kind: .player, text: "open the door")
 		let prompt = PlayerPromptID(player)
