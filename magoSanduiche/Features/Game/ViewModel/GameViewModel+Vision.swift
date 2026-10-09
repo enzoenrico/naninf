@@ -7,6 +7,10 @@ import CoreGraphics
 import Foundation
 import ImagePlayground
 
+#if canImport(UIKit)
+    import UIKit
+#endif
+
 extension GameViewModel {
     func handleVisionAfterTurn(visualPrompt: String?, prompt: PlayerPromptID, turnID: String) async {
         guard hasSubmittedPlayerTurn else { return }
@@ -21,6 +25,14 @@ extension GameViewModel {
         latestVisionRequestID = requestID
         beginCollapsedGeneration()
         defer { finishCollapsedGeneration(requestID) }
+        #if canImport(UIKit)
+            let backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "scene_archive") {}
+            defer {
+                if backgroundTaskID != .invalid {
+                    UIApplication.shared.endBackgroundTask(backgroundTaskID)
+                }
+            }
+        #endif
 
         do {
             let image = try await dungeonMaster.illustrate(
