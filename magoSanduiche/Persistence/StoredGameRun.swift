@@ -32,6 +32,7 @@ final class StoredGameRun {
 	var analyticsSessionID: String
 	var aiHistoryBlob: Data?
 	var previewImageRelativePath: String?
+	@Relationship(deleteRule: .cascade, inverse: \StoredScene.run) var scenes: [StoredScene] = []
 
 	init(
 		id: UUID,
@@ -88,4 +89,5 @@ final class StoredGameRun {
 
 enum GameRunPersistSchema {
 	static let currentVersion = 1
+	static let models: [any PersistentModel.Type] = [StoredGameRun.self, StoredScene.self]
 }
