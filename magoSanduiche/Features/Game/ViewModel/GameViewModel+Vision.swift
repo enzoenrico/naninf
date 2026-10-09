@@ -8,7 +8,7 @@ import Foundation
 import ImagePlayground
 
 extension GameViewModel {
-    func handleVisionAfterTurn(visualPrompt: String?, turnID: String) async {
+    func handleVisionAfterTurn(visualPrompt: String?, prompt: PlayerPromptID, turnID: String) async {
         guard hasSubmittedPlayerTurn else { return }
         guard let visualPrompt else { return }
 
@@ -28,13 +28,31 @@ extension GameViewModel {
                 analyticsContext: aiContext(turnID: turnID),
                 progress: visionProgress(for: requestID)
             )
-            // A newer turn's prompt (or a restored run) supersedes this scene.
+            await keepSceneEvenIfSuperseded(image, for: prompt)
             guard latestVisionRequestID == requestID else { return }
-            visionDisplayMode = .scene(image)
-            coordinator?.revealVisionIfCollapsed()
+            showCurrentScene(image, for: prompt)
         } catch {
             // Keep the current frame. The preview stays closed until a scene arrives.
         }
+    }
+
+    private func keepSceneEvenIfSuperseded(_ image: SceneImage, for prompt: PlayerPromptID) async {
+        await sceneArchive?.keep(image, for: prompt)
+    }
+
+    private func showCurrentScene(_ image: SceneImage, for prompt: PlayerPromptID) {
+        visionDisplayMode = .scene(SceneImage(cgImage: image.cgImage, id: prompt.entryID))
+        coordinator?.revealVisionIfCollapsed()
+    }
+
+    func recallScene(_ prompt: PlayerPromptID) {
+        if visionDisplayMode.recalledPrompt == prompt {
+            coordinator?.revealVisionIfCollapsed()
+            return
+        }
+        guard let image = sceneArchive?.image(for: prompt) else { return }
+        visionDisplayMode = .recalled(prompt, image)
+        coordinator?.revealVisionIfCollapsed()
     }
 
     func presentImagePlayground(prompt: String, turnID: String? = nil) {

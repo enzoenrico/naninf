@@ -53,6 +53,23 @@ nonisolated enum VisionDisplayMode: Equatable {
 
 	case introStatic
 	case scene(SceneImage)
+	case recalled(PlayerPromptID, SceneImage)
+
+	var recalledPrompt: PlayerPromptID? {
+		if case .recalled(let prompt, _) = self {
+			return prompt
+		}
+		return nil
+	}
+
+	var onScreenImageID: UUID? {
+		switch self {
+		case .introStatic:
+			nil
+		case .scene(let image), .recalled(_, let image):
+			image.id
+		}
+	}
 }
 
 /// The vision placeholder video is 1280×720. Scene art is shown in that same 16:9 frame.

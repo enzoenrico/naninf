@@ -412,27 +412,37 @@ struct GameSessionView: View {
     @ViewBuilder
     private func terminalTranscript(vm: GameViewModel, coordinator: AppCoordinator) -> some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                ForEach(vm.terminalEntries) { entry in
-                    terminalEntryView(entry: entry, vm: vm, coordinator: coordinator)
+            RecallablePromptsReader(run: vm.persistedRunID) { recallable in
+                VStack(alignment: .leading, spacing: 16) {
+                    ForEach(vm.terminalEntries) { entry in
+                        terminalEntryView(
+                            entry: entry,
+                            vm: vm,
+                            coordinator: coordinator,
+                            recallable: recallable
+                        )
                         .id(entry.id)
-                }
+                    }
 
-                if coordinator.isDicePromptVisible {
-                    DicePromptView(
-                        diceValue: vm.diceValue,
-                        revealStage: vm.diceRevealStage,
-                        resultText: vm.diceResultText,
-                        showRollingFlavor:
-                        vm.loading && vm.uiPhase == .rollingDice && vm.diceRevealStage != .bamReveal
-                    )
-                    .drawBorder("nan_dice_prompt", color: .accent, lineWidth: 2, animate: true, glowPreset: .chrome)
+                    if coordinator.isDicePromptVisible {
+                        DicePromptView(
+                            diceValue: vm.diceValue,
+                            revealStage: vm.diceRevealStage,
+                            resultText: vm.diceResultText,
+                            showRollingFlavor:
+                            vm.loading && vm.uiPhase == .rollingDice && vm.diceRevealStage != .bamReveal
+                        )
+                        .drawBorder("nan_dice_prompt", color: .accent, lineWidth: 2, animate: true, glowPreset: .chrome)
+                    }
                 }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(Rectangle())
-            .dismissContextualInputOnTap(when: coordinator.isContextualInputVisible) {
-                dismissContextualInputIfActive()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background {
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            dismissContextualInputIfActive()
+                        }
+                }
             }
         }
         .scrollDismissesKeyboard(.immediately)
@@ -443,7 +453,12 @@ struct GameSessionView: View {
     }
 
     @ViewBuilder
-    private func terminalEntryView(entry: TerminalEntry, vm: GameViewModel, coordinator: AppCoordinator) -> some View {
+    private func terminalEntryView(
+        entry: TerminalEntry,
+        vm: GameViewModel,
+        coordinator: AppCoordinator,
+        recallable: RecallablePrompts
+    ) -> some View {
         let isLatest = entry.id == vm.terminalEntries.last?.id
         let useTypewriter =
             !vm.suppressTerminalAnimations
@@ -473,6 +488,25 @@ struct GameSessionView: View {
                     dismissContextualInputIfActive()
                 }
             )
+        } else if let prompt = recallable.prompt(for: entry) {
+            let tint = recallColor(prompt: prompt, entry: entry, vm: vm)
+            Button {
+                dismissContextualInputIfActive()
+                vm.recallScene(prompt)
+            } label: {
+                HStack(alignment: .top, spacing: 8) {
+                    Text(entry.renderedText)
+                        .font(.monocraft())
+                        .foregroundStyle(tint)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Text("▣")
+                        .font(.monocraft())
+                        .foregroundStyle(tint)
+                        .accessibilityHidden(true)
+                }
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint(String(localized: "nan_terminal_prompt_recall_a11y"))
         } else {
             Text(entry.renderedText)
                 .font(.monocraft())
@@ -482,6 +516,13 @@ struct GameSessionView: View {
                     dismissContextualInputIfActive()
                 }
         }
+    }
+
+    private func recallColor(prompt: PlayerPromptID, entry: TerminalEntry, vm: GameViewModel) -> Color {
+        if vm.visionDisplayMode.recalledPrompt == prompt || vm.visionDisplayMode.onScreenImageID == entry.id {
+            return Color.terminalWarning
+        }
+        return Color.terminalMana
     }
 
     @ViewBuilder
