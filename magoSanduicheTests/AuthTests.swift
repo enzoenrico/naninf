@@ -1,3 +1,4 @@
+import AuthenticationServices
 import Foundation
 import Testing
 @testable import magoSanduiche
@@ -61,5 +62,56 @@ struct AuthTests {
 		#expect(session.isAuthenticated == false)
 		#expect(session.loginSnapshot == nil)
 		#expect(AuthLoginSnapshotStore(defaults: defaults).load() == nil)
+	}
+
+	@Test @MainActor func appleSnapshotStaysSignedInWhenCredentialIsNotFound() async {
+		let suiteName = "auth-apple-not-found-\(UUID().uuidString)"
+		let defaults = UserDefaults(suiteName: suiteName)!
+		defer { defaults.removePersistentDomain(forName: suiteName) }
+
+		let snapshot = AuthLoginSnapshot(
+			userID: "apple-user",
+			email: "wizard@mago.test",
+			provider: .apple,
+			displayName: "Sandwich Wizard",
+			signedInAt: Date(timeIntervalSince1970: 1_700_000_000)
+		)
+		AuthLoginSnapshotStore(defaults: defaults).save(snapshot)
+
+		let session = AuthSessionStore(defaults: defaults) { _ in .notFound }
+		await session.start()
+
+		#expect(session.isAuthenticated)
+		#expect(session.loginSnapshot == snapshot)
+		#expect(defaults.bool(forKey: "hasCompletedOnboarding") == false)
+	}
+
+	@Test @MainActor func revokedAppleCredentialClearsStoredSession() async {
+		let suiteName = "auth-apple-revoked-\(UUID().uuidString)"
+		let defaults = UserDefaults(suiteName: suiteName)!
+		defer { defaults.removePersistentDomain(forName: suiteName) }
+
+		let snapshot = AuthLoginSnapshot(
+			userID: "apple-user",
+			email: "wizard@mago.test",
+			provider: .apple,
+			displayName: "Sandwich Wizard",
+			signedInAt: Date(timeIntervalSince1970: 1_700_000_000)
+		)
+		AuthLoginSnapshotStore(defaults: defaults).save(snapshot)
+
+		let session = AuthSessionStore(defaults: defaults) { _ in .revoked }
+		await session.start()
+
+		#expect(session.isAuthenticated == false)
+		#expect(session.loginSnapshot == nil)
+		#expect(AuthLoginSnapshotStore(defaults: defaults).load() == nil)
+	}
+
+	@Test @MainActor func onlyRevokedAppleCredentialClearsTheSession() {
+		#expect(AuthSessionStore.shouldClearStoredSession(for: .revoked))
+		#expect(AuthSessionStore.shouldClearStoredSession(for: .notFound) == false)
+		#expect(AuthSessionStore.shouldClearStoredSession(for: .authorized) == false)
+		#expect(AuthSessionStore.shouldClearStoredSession(for: .transferred) == false)
 	}
 }

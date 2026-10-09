@@ -36,6 +36,8 @@ struct AuthLoginSnapshot: Codable, Equatable {
 struct AuthLoginSnapshotStore {
 	private enum StorageKey {
 		static let loginSnapshot = "authLoginSnapshot"
+		static let hasCompletedOnboarding = "hasCompletedOnboarding"
+		static let hasUnlockedFullGame = "hasUnlockedFullGame"
 	}
 
 	private let defaults: UserDefaults
@@ -52,6 +54,13 @@ struct AuthLoginSnapshotStore {
 	func save(_ snapshot: AuthLoginSnapshot) {
 		guard let data = try? JSONEncoder().encode(snapshot) else { return }
 		defaults.set(data, forKey: StorageKey.loginSnapshot)
+	}
+
+	/// Apple sign-in is the end of onboarding. Persist the gate here so the next
+	/// launch opens the player home even if the sign-in view is still on screen.
+	func markOnboardingComplete() {
+		defaults.set(true, forKey: StorageKey.hasCompletedOnboarding)
+		defaults.set(true, forKey: StorageKey.hasUnlockedFullGame)
 	}
 
 	func clear() {

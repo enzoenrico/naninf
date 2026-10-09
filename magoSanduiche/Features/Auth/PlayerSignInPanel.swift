@@ -9,6 +9,7 @@ import SwiftUI
 struct PlayerSignInPanel: View {
 	@Environment(AuthSessionStore.self) private var authSessionStore
 	@Environment(\.colorScheme) private var colorScheme
+	var onAuthenticated: () -> Void = {}
 
 	var body: some View {
 		SignInWithAppleButton(.signIn) { request in
@@ -16,6 +17,8 @@ struct PlayerSignInPanel: View {
 		} onCompletion: { result in
 			Task { @MainActor in
 				await authSessionStore.handleAppleSignInButtonCompletion(result)
+				guard authSessionStore.isAuthenticated else { return }
+				onAuthenticated()
 			}
 		}
 		.signInWithAppleButtonStyle(appleSignInButtonStyle)
