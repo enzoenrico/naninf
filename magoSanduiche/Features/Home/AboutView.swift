@@ -101,14 +101,6 @@ struct AboutView: View {
                 accessibilityHint: String(localized: "nan_about_link_feedback_a11y"),
                 action: { open(.feedback(version: appVersion, build: appBuild)) }
             )
-            AboutLinkRow(
-                title: String(localized: "nan_about_link_coffee_key"),
-                value: String(localized: "nan_about_link_coffee_value"),
-                valueColor: .terminalWarning,
-                accessibilityHint: String(localized: "nan_about_link_coffee_a11y"),
-                isEnabled: AboutOutboundLink.coffeeEnabled,
-                action: { open(.coffee) }
-            )
             Text("nan_about_links_hint")
                 .font(.monocraft(relativeTo: .caption))
                 .foregroundStyle(Color.terminalMutedText)
@@ -224,7 +216,7 @@ private struct AboutLinkRow: View {
     }
 }
 
-/// About destinations: the site, a direct email, and the PayPal.Me tip page.
+// TODO: add a kofi
 private enum AboutOutboundLink {
     /// Tip link stays listed, but the row does not open PayPal until this is turned back on.
     static let coffeeEnabled = false

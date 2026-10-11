@@ -473,6 +473,7 @@
       }
     },
     "nan_about_link_coffee_a11y" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -489,6 +490,7 @@
       }
     },
     "nan_about_link_coffee_key" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -505,6 +507,7 @@
       }
     },
     "nan_about_link_coffee_value" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1480,6 +1483,7 @@
       }
     },
     "nan_debug_ai_tools_image_sample" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

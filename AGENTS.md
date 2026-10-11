@@ -5,7 +5,7 @@
 ### What this project is
 
 `magoSanduiche` (display name **NanInf**, bundle id `com.kyou.naninf`) is a native
-**iOS / iPadOS SwiftUI application** — a CRT/terminal-styled, AI dungeon-master RPG.
+**iPhone-only SwiftUI application** — a CRT/terminal-styled, AI dungeon-master RPG.
 It is built and run exclusively through **Xcode** (project created with Xcode 26,
 `SDKROOT = iphoneos`, app deployment target `IPHONEOS_DEPLOYMENT_TARGET = 27.0`,
 shared scheme `magoSanduiche`). There is **no `Package.swift`** and no SwiftPM target.
